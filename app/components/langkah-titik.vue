@@ -7,8 +7,18 @@ const hasil = ref<{ nama: string, alamat: string, lat: number, lng: number }[]>(
 const mencari = ref(false)
 const pesanCari = ref('')
 
-const { ambilPosisi, memuat: memuatGps, pesanError: errorGps } = useGps()
+const { ambilPosisi, memuat: memuatGps, pesanError: pesanErrorGps } = useGps()
+const { tampilkan } = useNotifikasi()
 const akurasi = ref<number | null>(null)
+
+// Dari mana titik yang sekarang berasal. Penting karena ketiganya punya tingkat
+// kepercayaan yang jauh berbeda, dan pencarian nama adalah yang paling rapuh:
+// Nominatim mencocokkan kata, bukan tempat. Kueri "Kantor Kecamatan Kebayoran
+// Baru" mengembalikan "Kantor Kepala Seksi Pendidikan Dasar Kecamatan Kebayoran
+// Baru", kantor yang berbeda, 1,8 km dari kantor kecamatan yang sebenarnya.
+// Surveyor yang menekan hasil pertama tanpa memeriksa akan menyimpan titik yang
+// salah, dan tidak ada satu pun yang memberitahunya.
+const asalTitik = ref<'awal' | 'cari' | 'gps' | 'geser'>('awal')
 
 async function cari() {
   const q = kueri.value.trim()
@@ -35,14 +45,25 @@ function pakaiHasil(h: { nama: string, lat: number, lng: number }) {
   hasil.value = []
   kueri.value = h.nama
   akurasi.value = null
+  asalTitik.value = 'cari'
   emit('geser', { lat: h.lat, lng: h.lng })
 }
 
 async function pakaiGps() {
   const p = await ambilPosisi()
-  if (!p) return
+  if (!p) {
+    tampilkan(pesanErrorGps.value, 'galat')
+    return
+  }
   akurasi.value = Math.round(p.akurasi)
+  asalTitik.value = 'gps'
   emit('geser', { lat: p.lat, lng: p.lng })
+}
+
+function geserManual(t: { lat: number, lng: number }) {
+  akurasi.value = null
+  asalTitik.value = 'geser'
+  emit('geser', t)
 }
 </script>
 
@@ -78,7 +99,7 @@ async function pakaiGps() {
     <p v-if="pesanCari" class="text-sm text-gray-600">{{ pesanCari }}</p>
 
     <div class="h-64 overflow-hidden rounded border border-gray-300 sm:h-80">
-      <PemilihTitik :lat="props.lat" :lng="props.lng" @geser="emit('geser', $event)" />
+      <PemilihTitik :lat="props.lat" :lng="props.lng" @geser="geserManual" />
     </div>
 
     <button
@@ -89,7 +110,18 @@ async function pakaiGps() {
       {{ memuatGps ? 'Membaca lokasi' : 'Pakai lokasi saya' }}
     </button>
 
-    <p v-if="errorGps" role="alert" class="text-sm text-skor-kurang">{{ errorGps }}</p>
+    <!-- Peringatan khusus untuk titik hasil pencarian nama. Pencarian mencocokkan
+         kata, bukan tempat, jadi hasil pertamanya bisa gedung lain yang kebetulan
+         namanya mirip. Kalimatnya menyebut jaraknya bisa ratusan meter supaya
+         terbaca sebagai peringatan sungguhan, bukan basa-basi. -->
+    <p
+      v-if="asalTitik === 'cari'" role="status"
+      class="rounded-lg border border-skor-sedang bg-white px-3 py-2 text-sm text-gray-800"
+    >
+      Titik ini datang dari pencarian nama, bukan dari GPS. Pencarian bisa meleset
+      ratusan meter ke gedung lain yang namanya mirip. Kalau kamu sedang berdiri di
+      tempatnya, pakai lokasi saya lebih tepat, atau geser pin ke pintu masuknya.
+    </p>
     <p v-else-if="akurasi !== null" class="text-sm text-gray-600">
       Lokasi terbaca dengan ketelitian sekitar {{ akurasi }} meter. Geser pin kalau meleset.
     </p>

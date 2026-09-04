@@ -37,7 +37,7 @@ function tutup() {
   <section
     v-if="terlihat"
     aria-labelledby="judul-pengenalan"
-    class="relative rounded-lg border border-gray-200 bg-white px-4 py-3 pr-10 shadow-lg"
+    class="relative rounded-lg border border-gray-200 bg-white px-4 py-3 pr-12 shadow-lg"
   >
     <h2 id="judul-pengenalan" class="text-sm font-semibold">Baru pertama ke sini?</h2>
     <p class="mt-1 text-[13px] leading-relaxed text-gray-700">
@@ -47,7 +47,7 @@ function tutup() {
 
     <button
       type="button" aria-label="Tutup pengenalan"
-      class="absolute right-2 top-2 grid h-8 w-8 place-items-center rounded text-gray-500 hover:bg-gray-100 hover:text-gray-900"
+      class="absolute right-0 top-0 grid h-11 w-11 place-items-center rounded text-gray-500 hover:bg-gray-100 hover:text-gray-900"
       @click="tutup"
     >
       <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor"

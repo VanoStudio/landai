@@ -27,7 +27,11 @@ function laporSiap() {
   emit('siap')
 }
 let peta: maplibregl.Map | null = null
-let penanda: maplibregl.Marker[] = []
+
+// Penanda disimpan berkunci, bukan sebagai senarai. Kuncinya menyandikan
+// keanggotaan kelompok, jadi penanda yang keanggotaannya tidak berubah bisa
+// dipakai ulang apa adanya alih-alih dibuat ulang tiap kali pandangan berhenti.
+let penanda = new Map<string, maplibregl.Marker>()
 let penandaSaya: maplibregl.Marker | null = null
 
 // Koridor Blok M, titik mulai survei (PRD bagian 9).
@@ -125,19 +129,62 @@ function buatElemenKluster(anggota: LokasiPeta[]): HTMLButtonElement {
   return el
 }
 
+// Identitas sebuah penanda adalah keanggotaannya, bukan urutannya. Penanda tunggal
+// dikenali dari id lokasinya, kelompok dari daftar anggotanya yang diurutkan supaya
+// urutan hasil pengelompokan tidak ikut menentukan kunci.
+function kunciKelompok(g: Kelompok): string {
+  return g.anggota.length === 1
+    ? `s:${g.anggota[0]!.id}`
+    : `k:${g.anggota.map(a => a.id).sort().join(',')}`
+}
+
+// Isi penanda tunggal bisa berubah tanpa keanggotaannya berubah, misalnya setelah
+// skornya dihitung ulang. Diperbarui di tempat, tetap tanpa membuat elemen baru.
+function segarkanIsi(el: HTMLElement, l: LokasiPeta) {
+  if (el.textContent !== String(l.skor)) el.textContent = String(l.skor)
+  el.style.setProperty('--warna-skor', warnaSkor(l.skor))
+  el.dataset.status = l.status
+  el.setAttribute('aria-label', `${l.nama}, skor ${l.skor} dari 100, ${labelSkor(l.skor)}`)
+}
+
 function gambarPenanda() {
   if (!peta) return
-  penanda.forEach(p => p.remove())
 
-  penanda = kelompokkan().map((g) => {
+  const bertahan = new Map<string, maplibregl.Marker>()
+
+  for (const g of kelompokkan()) {
+    const kunci = kunciKelompok(g)
     const satu = g.anggota.length === 1
-    const el = satu ? buatElemenPenanda(g.anggota[0]!) : buatElemenKluster(g.anggota)
 
+    // Sudah ada dan keanggotaannya sama: dipakai ulang. MapLibre yang memindahkan
+    // posisinya sendiri tiap bingkai, jadi tidak ada yang perlu dikerjakan di sini.
+    const lama = penanda.get(kunci)
+    if (lama) {
+      penanda.delete(kunci)
+      if (satu) segarkanIsi(lama.getElement(), g.anggota[0]!)
+      bertahan.set(kunci, lama)
+      continue
+    }
+
+    const el = satu ? buatElemenPenanda(g.anggota[0]!) : buatElemenKluster(g.anggota)
     const lng = satu ? g.anggota[0]!.lng : g.anggota.reduce((s, a) => s + a.lng, 0) / g.anggota.length
     const lat = satu ? g.anggota[0]!.lat : g.anggota.reduce((s, a) => s + a.lat, 0) / g.anggota.length
 
-    return new maplibregl.Marker({ element: el }).setLngLat([lng, lat]).addTo(peta!)
-  })
+    // Transform dipasang sebelum elemen masuk ke DOM. MapLibre memasang posisinya
+    // lewat antrean tugas DOM yang baru dijalankan pada bingkai berikutnya, jadi
+    // elemen baru sempat terlukis satu bingkai di titik nol wadah, yaitu pojok kiri
+    // atas peta. Itulah kedipan yang terlihat. Dengan transform awal yang sudah
+    // benar, bingkai pertamanya sudah berada di tempatnya.
+    const titik = peta.project([lng, lat])
+    el.style.transform = `translate(-50%, -50%) translate(${titik.x}px, ${titik.y}px)`
+
+    bertahan.set(kunci, new maplibregl.Marker({ element: el }).setLngLat([lng, lat]).addTo(peta))
+  }
+
+  // Yang tersisa di peta lama adalah kelompok yang keanggotaannya benar-benar
+  // berubah. Hanya itu yang dibongkar.
+  penanda.forEach(m => m.remove())
+  penanda = bertahan
 
   tandaiTerpilih()
 }
@@ -182,6 +229,22 @@ watch(wadah, (el) => {
 
   peta.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'bottom-right')
 
+  // Pendengar moveend dipasang SEBELUM pembingkaian pertama, bukan sesudahnya.
+  //
+  // Dulu urutannya terbalik, dan akibatnya halus tapi nyata: pasFrame() pertama
+  // memakai durasi nol, jadi ia melompat seketika dan memancarkan moveend saat itu
+  // juga, sebelum pendengarnya ada. Kelompok yang terhitung pada zoom awal 14.5 pun
+  // tidak pernah dihitung ulang untuk bingkai yang sebenarnya. Kalau data sudah ikut
+  // terhidrasi dari server, watch pada props.lokasi juga tidak pernah menyala, jadi
+  // tidak ada satu pun yang memperbaikinya.
+  //
+  // Yang terlihat pengguna: penanda tampil dalam kelompok yang salah sejak awal, lalu
+  // tiba-tiba tersusun ulang begitu peta pertama kali digeser atau diperbesar.
+  // Terukur di layar 390px: satu kelompok berisi tiga lokasi menjadi dua tambah satu
+  // hanya karena peta digeser lima piksel, tanpa ada penanda yang terpilih dan tanpa
+  // perubahan perbesaran.
+  peta.on('moveend', gambarPenanda)
+
   // Penanda adalah overlay DOM, bukan lapisan peta, jadi tidak perlu menunggu
   // gaya selesai dimuat. Digambar langsung supaya lokasi sudah terlihat walau
   // tile masih dalam perjalanan di jaringan lambat.
@@ -206,11 +269,6 @@ watch(wadah, (el) => {
     peta.setStyle(GAYA_OSM)
     peta.once('idle', laporSiap)
   })
-
-  // Kelompok dihitung dari jarak di layar, jadi harus dihitung ulang setiap kali
-  // pandangan berhenti bergeser. Memakai 'moveend', bukan 'move', supaya penanda
-  // tidak dibongkar pasang di tengah gerakan.
-  peta.on('moveend', gambarPenanda)
 
   // Klik di area kosong menutup kartu ringkas.
   peta.on('click', () => emit('pilih', null))

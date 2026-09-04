@@ -282,9 +282,25 @@
   filter: saturate(0.6);
 }
 
-/* Kontrol MapLibre disamakan sudutnya dengan bahasa visual sisanya. */
+/* Kontrol MapLibre disamakan sudutnya dengan bahasa visual sisanya, dan tombolnya
+   dinaikkan dari 29px bawaan ke 44px. Ukuran bawaannya dirancang untuk tetikus;
+   di layar 375px ia menjadi sasaran sentuh terkecil di seluruh aplikasi, jauh di
+   bawah ambang yang dipakai setiap tombol lain di sini. */
 .maplibregl-ctrl-group {
   border-radius: 6px;
+}
+
+/* Nama kelasnya sengaja ditulis dua kali. CSS milik MapLibre memakai pemilih
+   dengan kekhususan yang sama persis dan dimuat sesudah berkas ini, jadi pada
+   kekhususan seri ia yang menang. Pengulangan menaikkan kekhususan satu tingkat
+   tanpa perlu !important. */
+.maplibregl-ctrl-group.maplibregl-ctrl-group button {
+  width: 44px;
+  height: 44px;
+}
+
+.maplibregl-ctrl-group.maplibregl-ctrl-group button .maplibregl-ctrl-icon {
+  background-size: 20px 20px;
 }
 
 @layer components {
@@ -423,5 +439,132 @@
     .panel-leave-to {
       transform: none;
     }
+  }
+}
+
+@layer components {
+  /* Notifikasi turun dari tepi atas, arah datangnya sama dengan letaknya. */
+  .notif-enter-active,
+  .notif-leave-active {
+    transition: opacity 180ms ease, transform 240ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .notif-enter-from,
+  .notif-leave-to {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  /* Kartu yang tersisa merapat tanpa melompat saat satu kartu di atasnya padam. */
+  .notif-move {
+    transition: transform 240ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  /* Kabut penanda kelanjutan pada baris chip yang bergulir mendatar. Fungsinya
+     memberi tahu masih ada isi di luar layar, bukan hiasan, jadi ia padam sendiri
+     begitu gulirannya sampai ujung. */
+  .kabut-gulir {
+    background: linear-gradient(to left, var(--color-white), transparent);
+  }
+
+  /* Batang gulir baris chip disembunyikan di peramban desktop: di sana barisnya
+     membungkus, jadi batang itu tidak pernah punya guna. */
+  .baris-chip {
+    scrollbar-width: none;
+  }
+
+  .baris-chip::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .notif-enter-active,
+  .notif-leave-active {
+    transition: opacity 120ms linear;
+  }
+
+  .notif-enter-from,
+  .notif-leave-to {
+    transform: none;
+  }
+
+  .notif-move {
+    transition: none;
+  }
+}
+
+@layer components {
+  /* Lapisan pembuka. Latarnya warna merek pekat tanpa gradien dan tanpa hiasan lain
+     di luar wordmark, sesuai keputusan yang tercatat di DESIGN.md. */
+  .layar-pembuka {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    display: grid;
+    place-items: center;
+    background: var(--color-brand);
+    animation: pembuka-pergi 2000ms linear forwards;
+  }
+
+  /* Batas keras dua detik ditegakkan di sini, bukan di JavaScript. Kalau skrip gagal
+     dimuat, lapisan ini tetap padam dan aplikasi tetap bisa dipakai. */
+  @keyframes pembuka-pergi {
+    0%, 84% {
+      opacity: 1;
+      visibility: visible;
+    }
+    100% {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+  }
+
+  /* Jalan keluar lebih awal, dipakai begitu data dan peta siap. */
+  .layar-pembuka.pembuka-selesai {
+    animation: pembuka-pergi-cepat 300ms ease-out forwards;
+  }
+
+  @keyframes pembuka-pergi-cepat {
+    from {
+      opacity: 1;
+      visibility: visible;
+    }
+    to {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+  }
+
+  /* Anak tangga melebur menjadi garis landai. Kedua jalur punya urutan perintah yang
+     sama persis, jadi peramban menginterpolasi titik demi titik. Kalau properti d
+     tidak didukung, jalurnya tetap tergambar sebagai tangga dari atribut d, dan yang
+     hilang cuma peralihannya. */
+  .pembuka-glif {
+    animation: melebur 1100ms cubic-bezier(0.65, 0, 0.35, 1) 260ms forwards;
+  }
+
+  @keyframes melebur {
+    to {
+      d: path('M5 25 L5 22.6 L7.9 20.73 Q8.3 20.47 8.3 20.47 L8.3 20.47 Q8.3 20.47 8.7 20.21 L11.1 18.66 Q11.6 18.34 11.6 18.34 L11.6 18.34 Q11.6 18.34 12.2 17.95 L14 16.79 Q15.8 15.63 17.2 14.73 L27 8.4 L27 25 Z');
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Tanpa peleburan: langsung bentuk akhirnya, dan lapisannya padam lebih cepat. */
+  .pembuka-glif {
+    animation: none;
+    d: path('M5 25 L5 22.6 L7.9 20.73 Q8.3 20.47 8.3 20.47 L8.3 20.47 Q8.3 20.47 8.7 20.21 L11.1 18.66 Q11.6 18.34 11.6 18.34 L11.6 18.34 Q11.6 18.34 12.2 17.95 L14 16.79 Q15.8 15.63 17.2 14.73 L27 8.4 L27 25 Z');
+  }
+
+  .layar-pembuka {
+    animation: pembuka-pergi 900ms linear forwards;
+  }
+
+  .layar-pembuka.pembuka-selesai {
+    animation: pembuka-pergi-cepat 120ms linear forwards;
   }
 }

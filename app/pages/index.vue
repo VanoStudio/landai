@@ -12,6 +12,42 @@ const keluar = useKeluar()
 // rangkanya sudah ada di HTML pertama, menutupi jendela paling kosong yaitu sebelum
 // hidrasi selesai.
 const petaSiap = ref(false)
+
+// Lapisan pembuka hanya untuk muat pertama dalam satu sesi. Kembali ke peta dari
+// halaman lain tidak perlu disambut lagi, dan datanya pun sudah tersimpan.
+const pembukaBelumPernah = useState('pembuka-belum-pernah', () => true)
+
+// Nilainya dibaca saat setup, bukan di onMounted, supaya lapisan ini ikut dirender
+// server dan sudah ada di HTML pertama. Kalau baru dipasang setelah hidrasi, ia justru
+// muncul SESUDAH rangka pemuatan, kebalikan dari gunanya: yang perlu ditutupi adalah
+// jendela sebelum hidrasi, bukan sesudahnya.
+const pembukaTampil = ref(pembukaBelumPernah.value)
+const pembukaSelesai = ref(false)
+
+onMounted(() => {
+  if (!pembukaTampil.value) return
+  pembukaBelumPernah.value = false
+
+  const mulai = performance.now()
+
+  // Jeda minimum supaya lapisan ini tidak sekadar berkedip pada muat yang cepat.
+  // Batas maksimumnya sudah dipegang animasi CSS, jadi yang di sini hanya jalan
+  // keluar lebih awal.
+  //
+  // Dibuat menolak panggilan kedua, bukan dengan menghentikan pengamatnya dari dalam
+  // callback-nya sendiri. Dengan immediate, callback berjalan seketika saat watch
+  // dipanggil, jadi rujukan ke penghentinya jatuh sebelum const itu terisi dan
+  // seluruh halaman peta membalas 500.
+  let sudahTutup = false
+  const tutup = () => {
+    if (sudahTutup) return
+    sudahTutup = true
+    setTimeout(() => { pembukaSelesai.value = true }, Math.max(0, 480 - (performance.now() - mulai)))
+  }
+
+  watch(pending, (masihMuat) => { if (!masihMuat) tutup() }, { immediate: true })
+  setTimeout(tutup, 1900)
+})
 const petaRef = ref<{
   tandaiPosisiSaya: (lat: number, lng: number) => void
   pindahKe: (lat: number, lng: number, zoom?: number) => void
@@ -21,12 +57,37 @@ const petaRef = ref<{
 // pemeriksaan konteks aman dan kalimat galatnya. Tidak ada pembacaan posisi baru
 // yang ditulis di sini.
 const { ambilPosisi, memuat: memuatGps, pesanError: errorGps } = useGps()
+const { tampilkan } = useNotifikasi()
 
 async function keLokasiSaya() {
   const p = await ambilPosisi()
-  if (!p) return
+  if (!p) {
+    // Galat izin lokasi dulunya kotak menetap yang menimpa kartu ringkas dan tidak
+    // pernah hilang. Sekarang lewat antrean notifikasi yang padam sendiri.
+    tampilkan(errorGps.value, 'galat')
+    return
+  }
   petaRef.value?.tandaiPosisiSaya(p.lat, p.lng)
 }
+
+// Baris chip bergulir mendatar di layar sempit. Di 375px ketiga chip berjumlah
+// sekitar 480px, jadi selalu ada yang di luar layar. Chip ketiga yang terpotong
+// separuh sudah menjadi petunjuk, tetapi tidak cukup jelas, jadi ditambah kabut di
+// tepi kanan yang padam sendiri begitu gulirannya sampai ujung.
+const barisChip = ref<HTMLElement | null>(null)
+const adaLanjutan = ref(false)
+
+function ukurLanjutan() {
+  const el = barisChip.value
+  if (!el) return
+  adaLanjutan.value = el.scrollWidth - el.clientWidth - el.scrollLeft > 8
+}
+
+onMounted(() => {
+  ukurLanjutan()
+  window.addEventListener('resize', ukurLanjutan)
+})
+onBeforeUnmount(() => window.removeEventListener('resize', ukurLanjutan))
 
 const filterAktif = ref<Kebutuhan[]>([])
 const terpilihId = ref<string | null>(null)
@@ -86,6 +147,8 @@ useHead({ title: 'landai — peta aksesibilitas' })
 
 <template>
   <div class="flex h-[100dvh] w-full flex-col overflow-hidden">
+    <LayarPembuka v-if="pembukaTampil" :selesai="pembukaSelesai" />
+
     <!-- Identitas, pencarian area, pemindah tampilan, akun.
          Membungkus jadi dua baris di layar sempit: kolom pencarian diberi lebar penuh
          supaya teks bantuannya tidak terpotong, dan urutannya ditukar di layar lebar
@@ -100,15 +163,18 @@ useHead({ title: 'landai — peta aksesibilitas' })
         <!-- Pemindah tampilan pindah ke sini, terpisah dari baris chip penyaring.
              Menyaring data dan mengganti cara melihat data adalah dua pekerjaan
              berbeda, jadi tidak duduk dalam satu baris yang sama. -->
+        <!-- Segmen mengisi penuh tinggi wadah, bukan 36px di dalam bantalan 4px.
+             Keduanya bersentuhan, jadi pengecualian jarak pada aturan ukuran sasaran
+             tidak berlaku dan sasarannya harus utuh 44px. -->
         <div
-          class="flex h-11 shrink-0 items-center rounded-full border border-gray-300 p-1"
+          class="flex h-11 shrink-0 items-stretch overflow-hidden rounded-full border border-gray-300"
           role="tablist" aria-label="Pindah tampilan"
         >
           <button
             v-for="t in (['peta', 'daftar'] as const)" :key="t"
             type="button" role="tab"
             :aria-selected="tampilan === t"
-            class="h-9 rounded-full px-2.5 text-[13px] font-medium capitalize sm:px-3"
+            class="-my-px h-11 rounded-full px-3 text-[13px] font-medium capitalize sm:px-4"
             :class="tampilan === t ? 'bg-brand text-white' : 'text-gray-700'"
             @click="tampilan = t"
           >{{ t }}</button>
@@ -159,13 +225,25 @@ useHead({ title: 'landai — peta aksesibilitas' })
 
     <!-- Baris penyaring kebutuhan. Hanya penyaring, tidak lagi bercampur dengan
          kontrol pindah tampilan. -->
-    <div class="flex shrink-0 items-center gap-2 overflow-x-auto border-b border-gray-200 bg-white px-4 py-2.5 sm:flex-wrap sm:overflow-visible">
-      <ChipKebutuhan
-        v-for="k in DAFTAR_KEBUTUHAN" :key="k"
-        :jenis="k"
-        :aktif="filterAktif.includes(k)"
-        :jumlah="jumlahPerKebutuhan[k]"
-        @ubah="ubahFilter"
+    <div class="relative shrink-0 border-b border-gray-200 bg-white">
+      <div
+        ref="barisChip"
+        class="baris-chip flex items-center gap-2 overflow-x-auto px-4 py-2.5 sm:flex-wrap sm:overflow-visible"
+        @scroll="ukurLanjutan"
+      >
+        <ChipKebutuhan
+          v-for="k in DAFTAR_KEBUTUHAN" :key="k"
+          :jenis="k"
+          :aktif="filterAktif.includes(k)"
+          :jumlah="jumlahPerKebutuhan[k]"
+          @ubah="ubahFilter"
+        />
+      </div>
+
+      <div
+        v-show="adaLanjutan"
+        class="kabut-gulir pointer-events-none absolute inset-y-0 right-0 w-12 sm:hidden"
+        aria-hidden="true"
       />
     </div>
 
@@ -264,12 +342,6 @@ useHead({ title: 'landai — peta aksesibilitas' })
             <path d="M12 1.5v3M12 19.5v3M1.5 12h3M19.5 12h3" />
           </svg>
         </button>
-
-        <p
-          v-if="errorGps"
-          role="alert"
-          class="absolute inset-x-4 bottom-48 z-20 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-skor-kurang shadow-lg sm:max-w-sm"
-        >{{ errorGps }}</p>
 
         <!-- Tombol tambah lokasi, hanya layar kecil -->
         <NuxtLink

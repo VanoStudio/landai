@@ -21,6 +21,7 @@ withDefaults(defineProps<{
     :is="ke ? NuxtLink : 'div'"
     :to="ke ?? undefined"
     class="flex shrink-0 items-center gap-2"
+    :class="ke ? '-my-2.5 py-2.5' : ''"
   >
     <TandaLandai :ukuran="ukuran" />
     <span class="block leading-none">

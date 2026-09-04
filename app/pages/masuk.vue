@@ -38,13 +38,13 @@ async function masuk() {
       <div>
         <label for="email" class="block text-sm font-medium">Email</label>
         <input id="email" v-model="email" type="email" required autocomplete="email"
-          class="mt-1 w-full rounded border border-gray-400 px-3 py-2">
+          class="mt-1 min-h-11 w-full rounded border border-gray-400 px-3 py-2">
       </div>
       <div>
         <label for="password" class="block text-sm font-medium">Kata sandi</label>
         <input id="password" v-model="password" type="password" required
           autocomplete="current-password"
-          class="mt-1 w-full rounded border border-gray-400 px-3 py-2">
+          class="mt-1 min-h-11 w-full rounded border border-gray-400 px-3 py-2">
       </div>
 
       <p v-if="pesanError" role="alert" class="text-sm text-skor-kurang">{{ pesanError }}</p>

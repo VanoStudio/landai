@@ -32,4 +32,8 @@ useSeoMeta({
 
 <template>
   <NuxtPage />
+
+  <!-- Satu wadah notifikasi untuk seluruh aplikasi, bukan kotak pesan yang
+       ditulis ulang per halaman. -->
+  <TumpukanNotifikasi />
 </template>

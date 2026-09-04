@@ -14,6 +14,10 @@ export interface LokasiPeta {
   lift_tersedia_berfungsi: boolean
   /** Foto pertama, dipakai sebagai gambar kecil di kartu ringkas. */
   foto_utama: string | null
+  /** Jumlah warga yang menyatakan data ini masih akurat. */
+  jumlah_akurat: number
+  /** Jumlah warga yang menyatakan kondisinya sudah berubah. */
+  jumlah_berubah: number
 }
 
 export type Kebutuhan = 'kursi_roda' | 'tunanetra' | 'lansia_stroller'
@@ -40,6 +44,12 @@ export const LABEL_KATEGORI: Record<KategoriLokasi, string> = {
   lainnya: 'Lainnya',
 }
 
+// Lebih banyak laporan "sudah berubah" daripada "masih akurat". Dipakai bersama oleh
+// kartu ringkas dan halaman detail supaya ambangnya tidak ditulis dua kali.
+export function perluDiperbarui(l: { jumlah_akurat: number, jumlah_berubah: number }): boolean {
+  return l.jumlah_berubah > l.jumlah_akurat && l.jumlah_berubah > 0
+}
+
 export function useDaftarLokasi() {
   const supabase = useSupabaseClient()
 
@@ -52,7 +62,8 @@ export function useDaftarLokasi() {
         ramp_tersedia, guiding_block_tersambung,
         tempat_duduk_tersedia, lift_tersedia_berfungsi
       ),
-      location_photos ( photo_url )
+      location_photos ( photo_url ),
+      confirmations ( is_accurate )
     `)
       .order('created_at', { ascending: false })
 
@@ -67,6 +78,13 @@ export function useDaftarLokasi() {
 
       const foto = Array.isArray(baris.location_photos) ? baris.location_photos : []
 
+      // Konfirmasi ikut diambil dalam kueri yang sama, bukan lewat permintaan kedua:
+      // jumlahnya puluhan baris, dan memisahkannya berarti dua perjalanan jaringan
+      // untuk satu tampilan. Dihitung di sini karena PostgREST tidak bisa memberi dua
+      // agregat dengan penyaring berbeda dalam satu kueri.
+      const konfirmasi = Array.isArray(baris.confirmations) ? baris.confirmations : []
+      const akurat = konfirmasi.filter((k: any) => k.is_accurate).length
+
       return {
         id: baris.id,
         nama: baris.nama,
@@ -80,6 +98,8 @@ export function useDaftarLokasi() {
         tempat_duduk_tersedia: c?.tempat_duduk_tersedia ?? false,
         lift_tersedia_berfungsi: c?.lift_tersedia_berfungsi ?? false,
         foto_utama: foto[0]?.photo_url ?? null,
+        jumlah_akurat: akurat,
+        jumlah_berubah: konfirmasi.length - akurat,
       }
     })
   }, { default: () => [] })

@@ -27,7 +27,7 @@ const terurut = computed(() =>
 
       <button
         type="button" aria-label="Tutup daftar lokasi"
-        class="-mr-1 grid h-8 w-8 shrink-0 place-items-center rounded text-gray-500 hover:bg-gray-100 hover:text-gray-900"
+        class="-my-2 -mr-2 grid h-11 w-11 shrink-0 place-items-center rounded text-gray-500 hover:bg-gray-100 hover:text-gray-900"
         @click="emit('tutup')"
       >
         <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor"

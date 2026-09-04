@@ -62,7 +62,7 @@ const TINGKAT = [
 
     <button
       type="button" aria-label="Tutup legenda"
-      class="-mr-1 ml-auto shrink-0 rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-900"
+      class="-my-2 -mr-2 ml-auto grid h-11 w-11 shrink-0 place-items-center rounded text-gray-500 hover:bg-gray-100 hover:text-gray-900"
       @click="tutup"
     >
       <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor"

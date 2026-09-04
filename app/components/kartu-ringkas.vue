@@ -34,7 +34,7 @@ const fasilitas = computed(() => ([
 
       <button
         type="button" aria-label="Tutup"
-        class="-m-1 shrink-0 rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-900"
+        class="-my-2 -mr-2 grid h-11 w-11 shrink-0 place-items-center rounded text-gray-500 hover:bg-gray-100 hover:text-gray-900"
         @click="$emit('tutup')"
       >
         <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2"
@@ -114,7 +114,20 @@ const fasilitas = computed(() => ([
       </a>
     </div>
 
-    <p v-if="props.lokasi.status === 'belum_terverifikasi'" class="mt-2 text-xs text-gray-600">
+    <!-- Ajakan memperbarui, bukan tuduhan bahwa datanya salah. Yang melaporkan pun
+         belum tentu benar, dan yang mengisi data ini warga yang menyempatkan diri
+         datang ke sana. -->
+    <p
+      v-if="perluDiperbarui(props.lokasi)"
+      class="mt-2 flex items-start gap-1.5 text-xs text-gray-700"
+    >
+      <span class="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-skor-sedang" aria-hidden="true" />
+      <span>
+        {{ props.lokasi.jumlah_berubah }} warga bilang kondisinya sudah berubah.
+        Kalau kamu baru dari sana, datanya perlu diperbarui.
+      </span>
+    </p>
+    <p v-else-if="props.lokasi.status === 'belum_terverifikasi'" class="mt-2 text-xs text-gray-600">
       Belum dikonfirmasi warga lain
     </p>
   </article>

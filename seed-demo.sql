@@ -3,7 +3,10 @@
 -- Tujuannya cuma satu: mengisi peta supaya tampilan penanda, filter, kartu ringkas,
 -- dan halaman detail bisa diuji sebelum data lapangan Husein masuk.
 --
--- Koordinat hanya perkiraan. Isi checklist TIDAK diverifikasi di lokasi.
+-- Koordinat versi pertama DIKETIK TANGAN, bukan hasil geocoding, dan ketiganya
+-- meleset. Sekarang ketiganya diambil dari simpul OpenStreetMap lalu diperiksa
+-- balik lewat reverse geocoding, rinciannya di komentar blok koreksi di bawah.
+-- Isi checklist tetap TIDAK diverifikasi di lokasi.
 -- Setiap baris membawa catatan yang menyatakan itu, dan `created_by` sengaja NULL
 -- supaya tidak ada warga yang seolah-olah bertanggung jawab atas data ini.
 --
@@ -20,10 +23,34 @@ begin;
 -- Id tetap supaya bisa dijalankan ulang tanpa menumpuk baris kembar,
 -- dan supaya perintah hapus di bawah presisi.
 insert into locations (id, nama, kategori, lat, lng, status, created_by) values
-  ('11111111-1111-4111-8111-111111111111', 'Stasiun MRT Blok M',                'stasiun',           -6.24400, 106.79830, 'terverifikasi',        null),
-  ('22222222-2222-4222-8222-222222222222', 'Blok M Plaza',                      'mal',               -6.24430, 106.79950, 'belum_terverifikasi',  null),
-  ('33333333-3333-4333-8333-333333333333', 'Kantor Kecamatan Kebayoran Baru',   'kantor_pemerintah', -6.24180, 106.79690, 'belum_terverifikasi',  null)
+  ('11111111-1111-4111-8111-111111111111', 'Stasiun MRT Blok M',                'stasiun',           -6.24444, 106.79812, 'terverifikasi',        null),
+  ('22222222-2222-4222-8222-222222222222', 'Blok M Plaza',                      'mal',               -6.24431, 106.79764, 'belum_terverifikasi',  null),
+  ('33333333-3333-4333-8333-333333333333', 'Kantor Kecamatan Kebayoran Baru',   'kantor_pemerintah', -6.24008, 106.78861, 'belum_terverifikasi',  null)
 on conflict (id) do nothing;
+
+-- ---------------------------------------------------------------------------
+-- Koreksi koordinat untuk baris yang sudah terlanjur masuk.
+--
+-- Insert di atas memakai `on conflict do nothing`, jadi baris yang sudah ada tidak
+-- ikut berubah. Tanpa blok ini, memperbaiki angka di atas tidak memperbaiki apa pun
+-- di basis data yang sedang berjalan.
+--
+-- Ketiga titik lama diketik tangan dan tidak satu pun jatuh di gedung yang benar.
+-- Diperiksa dengan reverse geocoding Nominatim, dan hasilnya:
+--
+--   lama -6.24180, 106.79690  ->  SMA Negeri 70 Jakarta        (bukan kantor kecamatan)
+--   lama -6.24400, 106.79830  ->  Jalan Panglima Polim Raya    (badan jalan, bukan stasiun)
+--   lama -6.24430, 106.79950  ->  Shinhan Bank                 (bukan mal)
+--
+-- Titik baru diambil dari simpul OSM yang namanya cocok, lalu diperiksa balik:
+--
+--   -6.24444, 106.79812  ->  building/train_station  Stasiun MRT Blok M BCA
+--   -6.24431, 106.79764  ->  shop/mall               Plaza Blok M
+--   -6.24008, 106.78861  ->  office/government       Kantor Camat Kebayoran Baru
+-- ---------------------------------------------------------------------------
+update locations set lat = -6.24444, lng = 106.79812 where id = '11111111-1111-4111-8111-111111111111';
+update locations set lat = -6.24431, lng = 106.79764 where id = '22222222-2222-4222-8222-222222222222';
+update locations set lat = -6.24008, lng = 106.78861 where id = '33333333-3333-4333-8333-333333333333';
 
 -- Skor tidak diisi manual. Trigger hitung_skor_lokasi() yang menghitungnya dari
 -- baris di bawah ini, jadi seed ini sekaligus menguji trigger itu benar jalan.

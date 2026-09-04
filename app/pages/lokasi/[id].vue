@@ -44,6 +44,21 @@ const konfirmasiSaya = computed(() =>
   konfirmasi.value.find((k: any) => k.user_id === idPengguna.value) ?? null,
 )
 
+// Tombol sunting hanya untuk pemiliknya. Ini lapisan tampilan saja: yang benar-benar
+// menahan orang lain adalah aturan keamanan tingkat baris, ditambah pemeriksaan
+// kepemilikan di halaman formulirnya sendiri.
+const pemilik = computed(() =>
+  !!idPengguna.value && lokasi.value?.created_by === idPengguna.value,
+)
+
+// Laporan "sudah berubah" lebih banyak daripada "masih akurat". Kalimatnya mengajak
+// memperbarui, bukan menuduh datanya salah: yang melaporkan pun belum tentu benar,
+// dan yang mengisi data ini warga yang menyempatkan diri datang ke sana.
+// Ambangnya dipakai bersama dengan kartu ringkas, ditulis sekali di use-lokasi.
+const butuhPembaruan = computed(() =>
+  perluDiperbarui({ jumlah_akurat: jumlahAkurat.value, jumlah_berubah: jumlahBerubah.value }),
+)
+
 // Baris tanpa created_by berarti data contoh yang dimasukkan lewat SQL, bukan
 // kiriman warga. Jangan menyebut kontributor yang tidak pernah ada.
 const namaKontributor = computed(() => {
@@ -132,9 +147,29 @@ useHead(() => ({ title: lokasi.value ? `${lokasi.value.nama} — landai` : 'land
         </div>
       </div>
 
-      <a
+      <!-- Penanda perlu diperbarui. Ditaruh tepat di bawah skor karena justru
+           angka itulah yang sedang diragukan warga. -->
+      <p
+        v-if="butuhPembaruan" role="status"
+        class="mt-4 rounded-lg border border-skor-sedang bg-white px-3 py-2.5 text-sm text-gray-800"
+      >
+        <span class="font-medium">Mungkin sudah berubah.</span>
+        {{ jumlahBerubah }} warga melaporkan kondisi di sini tidak lagi sesuai catatan ini.
+        Kalau kamu baru dari sana, foto dan daftar periksa yang baru sangat membantu.
+      </p>
+
+      <div class="mt-5 flex flex-wrap gap-3">
+        <NuxtLink
+          v-if="pemilik"
+          :to="`/tambah-lokasi?ubah=${lokasi.id}`"
+          class="tombol tombol-sekunder"
+        >
+          Edit lokasi
+        </NuxtLink>
+
+        <a
         :href="rute" target="_blank" rel="noopener noreferrer"
-        class="tombol tombol-sekunder mt-5"
+        class="tombol tombol-sekunder"
       >
         Buka rute di Google Maps
         <svg
@@ -146,7 +181,8 @@ useHead(() => ({ title: lokasi.value ? `${lokasi.value.nama} — landai` : 'land
             <path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5" />
           </svg>
         <span class="sr-only">membuka tab baru</span>
-      </a>
+        </a>
+      </div>
 
       <ul v-if="foto.length" class="mt-5 grid gap-2" :class="foto.length > 1 ? 'grid-cols-2' : 'grid-cols-1'">
         <li v-for="f in foto" :key="f.id">

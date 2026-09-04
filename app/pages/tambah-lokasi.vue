@@ -3,10 +3,21 @@
 // mengisi ini berulang kali di lokasi berbeda (DESIGN-BRIEF).
 const supabase = useSupabaseClient()
 const idPengguna = useIdPengguna()
+const route = useRoute()
+const { tampilkan } = useNotifikasi()
 
 const LANGKAH = ['Titik', 'Tempat', 'Fasilitas', 'Foto'] as const
 const MAKS_FOTO_UNGGAH = 3
 const langkah = ref(0)
+
+// Menyunting memakai halaman yang sama persis dengan menambah: empat langkah yang
+// sama, komponen yang sama, hanya isian awalnya diambil dari baris yang sudah ada.
+// Membuat halaman kedua berarti dua alur yang harus dijaga sejalan selamanya.
+const idUbah = computed(() => {
+  const q = route.query.ubah
+  return typeof q === 'string' && q.length > 0 ? q : null
+})
+const modeUbah = computed(() => idUbah.value !== null)
 
 // Titik awal: koridor Blok M (PRD bagian 9).
 const titik = ref({ lat: -6.2440, lng: 106.7983 })
@@ -19,6 +30,59 @@ const catatan = ref('')
 const mengirim = ref(false)
 const pesanError = ref('')
 const idLokasiTersimpan = ref<string | null>(null)
+
+// Kepemilikan diperiksa saat rute dibuka, bukan hanya dengan menyembunyikan tombol
+// di halaman detail. Tanpa ini, siapa pun yang menebak alamatnya bisa membuka
+// formulir berisi data orang lain, dan walaupun aturan keamanan tingkat baris akan
+// menolak penyimpanannya, memperlihatkan formulirnya saja sudah salah.
+if (idUbah.value) {
+  const { data: asal, error: galatAsal } = await useAsyncData(
+    () => `ubah-${idUbah.value}`,
+    async () => {
+      const { data, error } = await supabase
+        .from('locations')
+        .select('id, nama, kategori, lat, lng, created_by, accessibility_checklist (*)')
+        .eq('id', idUbah.value as string)
+        .maybeSingle()
+      if (error) throw error
+      return data as any
+    },
+  )
+
+  if (galatAsal.value || !asal.value) {
+    throw createError({ statusCode: 404, statusMessage: 'Lokasi tidak ditemukan', fatal: true })
+  }
+
+  if (asal.value.created_by !== idPengguna.value) {
+    throw createError({
+      statusCode: 403,
+      statusMessage: 'Hanya kontributor lokasi ini yang bisa mengubahnya',
+      fatal: true,
+    })
+  }
+
+  const c = Array.isArray(asal.value.accessibility_checklist)
+    ? asal.value.accessibility_checklist[0]
+    : asal.value.accessibility_checklist
+
+  titik.value = { lat: asal.value.lat, lng: asal.value.lng }
+  nama.value = asal.value.nama
+  kategori.value = asal.value.kategori
+  if (c) {
+    checklist.value = {
+      ramp_tersedia: c.ramp_tersedia,
+      lebar_pintu_cukup: c.lebar_pintu_cukup,
+      toilet_difabel: c.toilet_difabel,
+      parkir_difabel: c.parkir_difabel,
+      lift_tersedia_berfungsi: c.lift_tersedia_berfungsi,
+      guiding_block_tersambung: c.guiding_block_tersambung,
+      tempat_duduk_tersedia: c.tempat_duduk_tersedia,
+      permukaan_jalan_rata: c.permukaan_jalan_rata,
+    }
+    catatan.value = c.catatan ?? ''
+  }
+  idLokasiTersimpan.value = asal.value.id
+}
 
 const bolehLanjut = computed(() => {
   if (langkah.value === 1) return nama.value.trim().length >= 3
@@ -42,9 +106,24 @@ async function kirim() {
   mengirim.value = true
 
   try {
-    // 1. Lokasi. Kalau langkah berikutnya gagal lalu user mencoba lagi,
-    //    id yang sama dipakai ulang supaya tidak menumpuk baris kembar.
-    if (!idLokasiTersimpan.value) {
+    // 1. Lokasi. Saat menyunting, barisnya diperbarui; saat menambah, dibuat.
+    //    Kolom skor dan status sengaja tidak ikut dikirim: hak tulis kedua kolom itu
+    //    dicabut dari peran klien di schema-patch-3.sql, dan hanya pemicu basis data
+    //    yang boleh mengisinya.
+    if (modeUbah.value) {
+      const { error } = await supabase
+        .from('locations')
+        .update({
+          nama: nama.value.trim(),
+          kategori: kategori.value as any,
+          lat: titik.value.lat,
+          lng: titik.value.lng,
+        })
+        .eq('id', idUbah.value as string)
+
+      if (error) throw new Error(`Perubahan lokasi gagal disimpan. ${error.message}`)
+    }
+    else if (!idLokasiTersimpan.value) {
       const { data, error } = await supabase
         .from('locations')
         .insert({
@@ -63,7 +142,10 @@ async function kirim() {
 
     const idLokasi = idLokasiTersimpan.value!
 
-    // 2. Checklist. Trigger di database yang menghitung skor dari sini.
+    // 2. Checklist. Trigger di database yang menghitung skor dari sini, dan pada
+    //    penyuntingan pemicu kedua menghapus konfirmasi lama lalu menurunkan status
+    //    kembali ke belum terverifikasi. Keduanya di basis data, bukan di sini, jadi
+    //    tidak ada jalan menyunting data tanpa ikut menurunkan statusnya.
     const { error: errChecklist } = await supabase
       .from('accessibility_checklist')
       .upsert({
@@ -89,6 +171,9 @@ async function kirim() {
       await supabase.from('location_photos').insert({ location_id: idLokasi, photo_url: pub.publicUrl })
     }
 
+    if (modeUbah.value) {
+      tampilkan('Perubahan tersimpan. Lokasi ini kembali berstatus belum terverifikasi.')
+    }
     await navigateTo(`/lokasi/${idLokasi}`)
   }
   catch (e: any) {
@@ -99,14 +184,17 @@ async function kirim() {
   }
 }
 
-useHead({ title: 'Tambah lokasi — landai' })
+useHead(() => ({ title: modeUbah.value ? 'Edit lokasi — landai' : 'Tambah lokasi — landai' }))
 </script>
 
 <template>
   <div class="mx-auto flex min-h-[100dvh] max-w-lg flex-col">
     <header class="border-b border-gray-200 px-4 py-3">
       <div class="flex items-center gap-3">
-        <NuxtLink to="/" class="tombol tombol-tersier -ml-2">Batal</NuxtLink>
+        <NuxtLink
+          :to="modeUbah ? `/lokasi/${idUbah}` : '/'"
+          class="tombol tombol-tersier -ml-2"
+        >Batal</NuxtLink>
         <MerekLandai class="mx-auto" :ukuran="20" tulisan="text-sm" />
         <p class="shrink-0 text-sm text-gray-600 tabular-nums">Langkah {{ langkah + 1 }} dari {{ LANGKAH.length }}</p>
       </div>
@@ -118,6 +206,11 @@ useHead({ title: 'Tambah lokasi — landai' })
           :class="i <= langkah ? 'bg-brand' : 'bg-gray-200'"
         />
       </ol>
+      <p v-if="modeUbah" class="mt-3 text-sm text-gray-600">
+        Mengubah data lokasi ini. Setelah disimpan, statusnya kembali menjadi belum
+        terverifikasi, karena konfirmasi warga sebelumnya berlaku untuk data versi lama.
+      </p>
+
       <h1 class="mt-3 text-xl font-bold">
         <template v-if="langkah === 0">Di mana tempatnya</template>
         <template v-else-if="langkah === 1">Tempat apa ini</template>
@@ -160,7 +253,7 @@ useHead({ title: 'Tambah lokasi — landai' })
           class="tombol tombol-utama flex-1"
           @click="kirim"
         >
-          {{ mengirim ? 'Menyimpan' : 'Simpan lokasi' }}
+          {{ mengirim ? 'Menyimpan' : (modeUbah ? 'Simpan perubahan' : 'Simpan lokasi') }}
         </button>
       </div>
 

@@ -296,6 +296,42 @@ mendaftar. Kartu ini ditumpuk satu kolom dengan legenda skor di sudut kiri atas,
 disebar ke sudut berbeda, karena keduanya menjawab pertanyaan yang sama: ini sebenarnya
 apa.
 
+## Lapisan pembuka
+
+Latar hijau merek pekat, tanpa gradien dan tanpa elemen apa pun di luar wordmark.
+Isinya wordmark itu sendiri yang menganimasikan filosofinya: tiga anak tangga di kiri
+melebur menjadi satu garis diagonal halus. Bukan animasi generik seperti putaran atau
+titik memantul, karena merek ini sudah punya gerak sendiri yang bermakna.
+
+**Batasnya dua detik, dan yang menegakkannya CSS, bukan JavaScript.** Animasi keluar
+berjalan sejak lapisan itu terpasang, jadi kalau skrip gagal dimuat sekalipun lapisan
+ini tetap padam dan tidak pernah mengurung aplikasi. JavaScript hanya boleh
+mempercepatnya, tidak pernah memperpanjangnya.
+
+Dirender server, bukan dipasang setelah hidrasi. Yang perlu ditutupi adalah jendela
+sebelum hidrasi; lapisan yang baru muncul sesudahnya justru menutupi rangka pemuatan
+yang seharusnya mengambil alih. Ada jeda minimum 480 milidetik supaya pada muat cepat
+ia tidak sekadar berkedip, dan hanya tampil sekali per sesi.
+
+Peleburannya memakai animasi properti `d` dengan dua jalur yang urutan perintahnya sama
+persis, hanya titiknya berbeda. Titik pada jalur akhir semuanya duduk pada satu garis
+lurus. Kalau peramban tidak mendukung animasi `d`, jalurnya tetap tergambar sebagai
+tangga dari atribut `d`, dan yang hilang hanya peralihannya.
+
+## Notifikasi singkat
+
+Satu antrean untuk seluruh aplikasi, dipasang sekali di `app.vue`. Muncul di tepi atas
+di tengah, padam sendiri setelah empat detik, dan punya tombol tutup.
+
+Tepi bawah tidak boleh dipakai karena sudah menjadi milik kartu ringkas lokasi, dan
+sudut kanan bawah milik kendali perbesar peta serta tombol lokasi saya. Wadahnya tembus
+klik; hanya kartunya yang menangkap ketukan, jadi tidak ada bagian layar yang menjadi
+mati hanya karena sebuah pesan sedang lewat.
+
+Dipakai untuk pesan yang memang sementara, terutama kegagalan membaca lokasi.
+Kesalahan yang menempel pada satu kolom isian tetap ditulis di dekat kolomnya, karena
+pesan seperti itu harus bertahan sampai diperbaiki.
+
 ## Do's and Don'ts
 
 ### Do:
