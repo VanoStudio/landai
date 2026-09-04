@@ -1,0 +1,13 @@
+# Normalkan akhir baris supaya riwayat tidak penuh perubahan palsu antar Windows,
+# macOS, dan mesin build Vercel.
+* text=auto eol=lf
+
+# Berkas biner jangan disentuh normalisasi.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.pdf binary
+*.ico binary
+*.woff binary
+*.woff2 binary

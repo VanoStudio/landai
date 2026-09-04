@@ -1,0 +1,1040 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Laporan Progres landai</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --brand: #0F6E56;
+    --brand-gelap: #0B5442;
+    --baik: #639922;
+    --sedang: #BA7517;
+    --kurang: #E24B4A;
+    --teks: #101828;
+    --teks-2: #4B5563;
+    --teks-3: #6B7280;
+    --garis: #E5E7EB;
+    --tenang: #F9FAFB;
+  }
+
+  @page {
+    size: A4;
+    margin: 18mm 20mm 20mm 20mm;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    font-family: 'Public Sans', ui-sans-serif, system-ui, sans-serif;
+    font-size: 10pt;
+    line-height: 1.55;
+    color: var(--teks);
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  h1, h2, h3 { line-height: 1.25; }
+
+  h2 {
+    font-size: 15pt;
+    font-weight: 700;
+    margin: 0 0 10pt;
+    padding-bottom: 5pt;
+    border-bottom: 1.5pt solid var(--teks);
+  }
+
+  h3 {
+    font-size: 11pt;
+    font-weight: 600;
+    margin: 16pt 0 5pt;
+  }
+
+  p { margin: 0 0 8pt; }
+  ul, ol { margin: 0 0 8pt; padding-left: 16pt; }
+  li { margin-bottom: 3pt; }
+
+  code {
+    font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace;
+    font-size: 8.5pt;
+    background: var(--tenang);
+    border: 0.5pt solid var(--garis);
+    border-radius: 2pt;
+    padding: 0.5pt 3pt;
+  }
+
+  .halaman { page-break-after: always; }
+  .halaman:last-child { page-break-after: auto; }
+  .jaga { page-break-inside: avoid; }
+
+  /* ---------- sampul ---------- */
+  .sampul {
+    height: 245mm;
+    display: flex;
+    flex-direction: column;
+  }
+  .sampul .merek {
+    font-size: 30pt;
+    font-weight: 700;
+    color: var(--brand);
+    letter-spacing: -0.01em;
+    line-height: 1;
+  }
+  .sampul .sub { font-size: 11pt; color: var(--teks-2); margin-top: 3pt; }
+  .sampul .judul {
+    margin-top: auto;
+    font-size: 26pt;
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.015em;
+  }
+  .sampul .kalimat { font-size: 11pt; color: var(--teks-2); margin-top: 10pt; max-width: 125mm; }
+  .sampul .meta {
+    margin-top: 20pt;
+    padding-top: 12pt;
+    border-top: 1.5pt solid var(--teks);
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10pt;
+    font-size: 9pt;
+  }
+  .sampul .meta dt { color: var(--teks-3); margin-bottom: 2pt; }
+  .sampul .meta dd { margin: 0; font-weight: 600; }
+
+  .skor-baris { display: flex; gap: 14pt; margin-top: 18pt; }
+  .skor-kotak { flex: 1; border: 1pt solid var(--garis); border-radius: 4pt; padding: 9pt 11pt; }
+  .skor-kotak .angka { font-size: 26pt; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
+  .skor-kotak .label { font-size: 8.5pt; color: var(--teks-2); margin-top: 4pt; }
+
+  /* ---------- tabel ---------- */
+  table { width: 100%; border-collapse: collapse; font-size: 9pt; margin: 0 0 10pt; }
+  th, td { text-align: left; vertical-align: top; padding: 5pt 6pt; border-bottom: 0.5pt solid var(--garis); }
+  th { font-weight: 600; border-bottom: 1pt solid var(--teks); }
+  td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+  .lencana {
+    display: inline-block;
+    font-size: 7.5pt;
+    font-weight: 600;
+    padding: 1pt 5pt;
+    border-radius: 8pt;
+    white-space: nowrap;
+  }
+  .l-selesai { background: #E8F2E0; color: #3F6414; }
+  .l-tertahan { background: #FBEEDC; color: #8A560F; }
+  .l-belum { background: #F3F4F6; color: var(--teks-2); }
+
+  /* ---------- figur ---------- */
+  figure { margin: 0 0 14pt; page-break-inside: avoid; }
+  .pasangan { display: flex; gap: 5mm; align-items: center; }
+  .pasangan img { border: 0.5pt solid var(--garis); border-radius: 3pt; display: block; }
+  .pasangan .dsk { width: 118mm; }
+  .pasangan .mbl { width: 44mm; }
+  .penuh img { width: 100%; border: 0.5pt solid var(--garis); border-radius: 3pt; }
+  .tinggi img { max-height: 210mm; width: auto; margin: 0 auto; display: block; }
+  figcaption { font-size: 8.5pt; color: var(--teks-2); margin-top: 5pt; }
+  figcaption b { color: var(--teks); font-weight: 600; }
+  .ukuran { font-size: 7.5pt; color: var(--teks-3); margin-top: 2pt; }
+
+  .bug { border-left: 2pt solid var(--kurang); padding-left: 9pt; margin-bottom: 12pt; page-break-inside: avoid; }
+  .bug h4 { margin: 0 0 3pt; font-size: 10pt; font-weight: 600; }
+  .bug p { margin: 0 0 4pt; font-size: 9pt; }
+  .bug .cap { font-size: 8pt; color: var(--teks-3); text-transform: none; }
+
+  .catatan {
+    background: var(--tenang);
+    border: 0.5pt solid var(--garis);
+    border-radius: 4pt;
+    padding: 8pt 10pt;
+    font-size: 9pt;
+    margin: 0 0 10pt;
+  }
+  .catatan b { font-weight: 600; }
+</style>
+</head>
+<body>
+
+<!-- ============ SAMPUL ============ -->
+<section class="halaman sampul">
+  <div>
+    <div class="merek">landai</div>
+    <div class="sub">Peta aksesibilitas difabel berbasis kontribusi warga</div>
+  </div>
+
+  <h1 class="judul">Laporan Progres<br>Pengembangan</h1>
+  <p class="kalimat">
+    Catatan teknis internal atas pembangunan aplikasi landai untuk ITechno Cup 2026,
+    kategori Web Development, subtema Smart Sustainable Digital Solution for Inclusive Society.
+    Memuat status per tahap, dokumentasi seluruh antarmuka, cacat yang ditemukan beserta akar
+    masalahnya, dan pekerjaan yang belum selesai.
+  </p>
+
+  <div class="skor-baris">
+    <div class="skor-kotak"><div class="angka" style="color: var(--baik)">8</div><div class="label">dari 8 tahap tuntas</div></div>
+    <div class="skor-kotak"><div class="angka" style="color: var(--baik)">14</div><div class="label">dari 14 langkah uji menyeluruh lolos</div></div>
+    <div class="skor-kotak"><div class="angka" style="color: var(--kurang)">10</div><div class="label">cacat ditemukan, semua diperbaiki</div></div>
+    <div class="skor-kotak"><div class="angka">38</div><div class="label">tangkapan antarmuka</div></div>
+  </div>
+
+  <dl class="meta">
+    <div><dt>Tanggal</dt><dd>4 September 2026</dd></div>
+    <div><dt>Repositori</dt><dd>landai, cabang main</dd></div>
+    <div><dt>Status build</dt><dd>lolos, 847 kB gzip</dd></div>
+    <div><dt>Pengembang</dt><dd>Vano</dd></div>
+    <div><dt>Survei lapangan</dt><dd>Husein</dd></div>
+    <div><dt>Riset kriteria</dt><dd>Dakara</dd></div>
+  </dl>
+</section>
+
+<!-- ============ RINGKASAN ============ -->
+<section class="halaman">
+  <h2>Ringkasan eksekutif</h2>
+
+  <p>
+    Seluruh alur inti aplikasi sudah terbangun dan berjalan: peta penuh layar dengan penanda berwarna
+    menurut skor, penyaringan berdasarkan tiga kategori kebutuhan, formulir tambah lokasi empat langkah,
+    halaman detail dengan rincian delapan fasilitas, serta konfirmasi akurasi oleh warga lain. Build
+    produksi lolos tanpa galat, dan seluruh tiga puluh delapan tangkapan antarmuka diambil tanpa satu pun
+    galat konsol.
+  </p>
+
+  <p>
+    Uji menyeluruh sudah dijalankan melalui antarmuka sungguhan, bukan melalui antarmuka pemrograman,
+    dengan akun nyata dari mendaftar sampai keluar. Empat belas dari empat belas langkah lolos, tanpa satu
+    pun galat konsol. Rangkaian pertama menyisakan dua kegagalan yang membuka dua cacat; keduanya sudah
+    diperbaiki dan rangkaiannya dijalankan ulang di atas data yang sudah dibersihkan.
+  </p>
+
+  <p>
+    Uji itu menyingkap cacat terpenting periode ini: seluruh jalur kontribusi tidak berfungsi. Setiap
+    upaya menyimpan lokasi ditolak oleh keamanan tingkat baris, dan pesannya seolah menuduh aturan
+    keamanannya yang salah, padahal aturannya benar. Cacat kedua membuat angka yang dilihat kontributor
+    berbeda dari angka yang tersimpan. Keduanya hanya muncul karena aplikasi benar-benar dijalankan dari
+    ujung ke ujung. Rinciannya pada bagian cacat nomor tujuh dan delapan.
+  </p>
+
+  <h3>Yang paling berdampak dari periode ini</h3>
+  <p>
+    Ditemukan cacat yang hanya muncul setelah dibangun untuk produksi: berkas worker MapLibre tidak ikut
+    masuk ke hasil build. Peta akan tampak normal di komputer pengembang namun kosong sama sekali setelah
+    dipasang di Vercel, tanpa pesan galat apa pun. Cacat semacam ini biasanya baru ketahuan saat demo di
+    depan penilai. Akar masalah, perbaikan, dan buktinya diuraikan pada bagian cacat.
+  </p>
+
+  <div class="catatan">
+    <b>Cara membaca dokumen ini.</b> Bagian dokumentasi antarmuka menampilkan setiap layar dalam dua ukuran
+    berdampingan: tampilan desktop 1440&times;900 di kiri dan tampilan ponsel 390&times;844 di kanan. Semua
+    gambar adalah tangkapan asli dari aplikasi yang berjalan, bukan mockup, diambil otomatis lewat Chromium
+    headless terhadap basis data sungguhan.
+  </div>
+
+  <h3>Data yang dipakai pada dokumen ini</h3>
+  <p>
+    Basis data berisi tiga lokasi contoh di koridor Blok M yang dimasukkan lewat <code>seed-demo.sql</code>
+    untuk keperluan pengujian tampilan. Ketiganya belum disurvei di lapangan, ditandai jelas pada catatan
+    tiap baris, dan wajib dihapus sebelum pengumpulan karya. Skornya tidak diisi manual: nilai 88, 50, dan
+    25 dihitung oleh pemicu basis data dari isi daftar periksa, sehingga pengisian data contoh ini sekaligus
+    membuktikan pemicu penghitung skor bekerja.
+  </p>
+</section>
+
+<!-- ============ STATUS TAHAP ============ -->
+<section class="halaman">
+  <h2>Status per tahap pengerjaan</h2>
+
+  <table>
+    <thead>
+      <tr><th style="width:7%">Tahap</th><th style="width:26%">Pekerjaan</th><th style="width:15%">Status</th><th>Keterangan</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="num">1</td><td>Setup dan koneksi Supabase</td>
+        <td><span class="lencana l-selesai">Selesai</span></td>
+        <td>Nuxt 4.5.2, Tailwind 4, koneksi terverifikasi lewat kueri nyata ke tabel <code>locations</code>.</td>
+      </tr>
+      <tr>
+        <td class="num">2</td><td>Autentikasi</td>
+        <td><span class="lencana l-selesai">Selesai</span></td>
+        <td>Halaman daftar, masuk, dan pendaratan konfirmasi. Penjaga rute terbukti melempar pengunjung anonim dari <code>/tambah-lokasi</code> ke <code>/masuk</code>.</td>
+      </tr>
+      <tr>
+        <td class="num">3</td><td>Peta utama</td>
+        <td><span class="lencana l-selesai">Selesai</span></td>
+        <td>Penanda berwarna menurut skor, tiga penyaring kebutuhan, kartu ringkas, legenda yang bisa ditutup.</td>
+      </tr>
+      <tr>
+        <td class="num">4</td><td>Formulir tambah lokasi</td>
+        <td><span class="lencana l-selesai">Selesai</span></td>
+        <td>Empat langkah: titik, identitas tempat, daftar periksa, foto dan catatan. Penyimpanan sungguhan terverifikasi, termasuk unggahan foto ke penyimpanan berkas.</td>
+      </tr>
+      <tr>
+        <td class="num">5</td><td>Halaman detail lokasi</td>
+        <td><span class="lencana l-selesai">Selesai</span></td>
+        <td>Terverifikasi memakai data sungguhan dari basis data.</td>
+      </tr>
+      <tr>
+        <td class="num">6</td><td>Sistem desain</td>
+        <td><span class="lencana l-selesai">Selesai</span></td>
+        <td><code>PRODUCT.md</code> dan <code>DESIGN.md</code> tersusun. Pemeriksa mekanis bersih kecuali lima peringatan nilai alfa bayangan.</td>
+      </tr>
+      <tr>
+        <td class="num">7</td><td>Uji menyeluruh</td>
+        <td><span class="lencana l-selesai">Selesai</span></td>
+        <td>Empat belas dari empat belas langkah lolos lewat antarmuka sungguhan, dari mendaftar sampai keluar, tanpa galat konsol.</td>
+      </tr>
+      <tr>
+        <td class="num">8</td><td>Dokumentasi repositori</td>
+        <td><span class="lencana l-selesai">Selesai</span></td>
+        <td><code>README.md</code> memuat masalah, solusi, fitur, teknologi, cara menjalankan, dan cara pasang.</td>
+      </tr>
+      <tr>
+        <td class="num">&mdash;</td><td>Pemasangan ke Vercel</td>
+        <td><span class="lencana l-belum">Belum</span></td>
+        <td>Menunggu tahap 7. Diperlukan sebelum Husein bisa mulai survei, karena kamera dan GPS menuntut koneksi aman.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Ruang lingkup yang sengaja tidak dibangun</h3>
+  <p>
+    Pembekuan fitur dipatuhi penuh sepanjang periode ini. Tidak dibangun: penunjuk arah atau navigasi rute,
+    percakapan atau pemberitahuan, papan kendali admin terpisah, sistem poin, aplikasi ponsel native, dan
+    sistem pembayaran. Satu penambahan di luar daftar semula dilakukan atas dasar kebutuhan penilaian, yaitu
+    halaman Tentang, karena kriteria kesesuaian tema menuntut kaitan eksplisit ke SDG 11 dapat dilihat dari
+    dalam produk, bukan hanya dari berkas README.
+  </p>
+</section>
+
+<!-- ============ ARSITEKTUR ============ -->
+<section class="halaman">
+  <h2>Arsitektur dan pilihan teknologi</h2>
+
+  <table>
+    <thead><tr><th style="width:22%">Lapisan</th><th style="width:30%">Pilihan</th><th>Alasan memilihnya</th></tr></thead>
+    <tbody>
+      <tr><td>Kerangka kerja</td><td>Nuxt 4.5.2, Vue 3.5</td><td>Perenderan sisi server mempercepat tampilan pertama peta, dan satu bahasa dipakai untuk sisi klien maupun rute server.</td></tr>
+      <tr><td>Basis data dan akun</td><td>Supabase, Postgres</td><td>Keamanan tingkat baris dan pemicu memindahkan aturan kualitas data ke lapisan yang tidak bisa dilewati dari sisi peramban.</td></tr>
+      <tr><td>Pustaka peta</td><td>MapLibre GL JS 6.7</td><td>Sumber terbuka, tanpa keterikatan vendor pada pustakanya sendiri.</td></tr>
+      <tr><td>Peta dasar</td><td>MapTiler dataviz-light</td><td>Sengaja dipilih yang bernuansa abu netral, supaya tiga warna skor menjadi satu-satunya warna kuat di layar. Tersedia penurunan otomatis ke ubin OpenStreetMap bila gaya gagal dimuat.</td></tr>
+      <tr><td>Pencarian tempat</td><td>Nominatim lewat rute server</td><td>Dari peramban, tajuk pengenal aplikasi tidak bisa disetel. Melewati rute server memungkinkan tajuk itu dipasang sesuai ketentuan pemakaian, sekaligus menghindari halangan lintas asal.</td></tr>
+      <tr><td>Gaya tampilan</td><td>Tailwind CSS 4</td><td>Token warna dan tipografi didefinisikan sekali melalui blok <code>@theme</code>.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Susunan berkas</h3>
+  <table>
+    <tbody>
+      <tr><td style="width:38%"><code>app/components/</code></td><td>Komponen antarmuka. Komponen peta berakhiran <code>.client.vue</code> agar tidak ikut dirender di sisi server.</td></tr>
+      <tr><td><code>app/composables/</code></td><td>Aturan skor, pengambilan data lokasi, definisi daftar periksa, pembacaan GPS, pengecilan foto, penerjemahan pesan galat.</td></tr>
+      <tr><td><code>app/pages/</code></td><td>Peta, daftar, masuk, konfirmasi, tambah lokasi, detail lokasi, tentang.</td></tr>
+      <tr><td><code>server/api/geocode.get.ts</code></td><td>Perantara pencarian nama tempat ke Nominatim.</td></tr>
+      <tr><td><code>scripts/</code></td><td>Penyalin berkas worker MapLibre ke folder publik, dijalankan otomatis saat pasang, pengembangan, dan build.</td></tr>
+      <tr><td><code>schema.sql</code>, <code>schema-patch.sql</code></td><td>Skema basis data dan tambalannya.</td></tr>
+      <tr><td><code>PRODUCT.md</code>, <code>DESIGN.md</code></td><td>Konteks produk dan sistem desain.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Aturan penghitungan skor</h3>
+  <p>
+    Skor adalah jumlah fasilitas yang tersedia dibagi delapan, dikali seratus, lalu dibulatkan. Karena
+    pembaginya delapan, nilainya selalu kelipatan 12,5. Penghitungan dilakukan oleh pemicu di dalam basis
+    data setiap kali daftar periksa berubah, bukan dikirim dari peramban, sehingga tidak dapat dimanipulasi
+    melalui formulir.
+  </p>
+  <table>
+    <thead><tr><th style="width:22%">Tingkat</th><th style="width:20%">Rentang skor</th><th style="width:24%">Jumlah terpenuhi</th><th>Warna</th></tr></thead>
+    <tbody>
+      <tr><td>Ramah akses</td><td class="num">63 sampai 100</td><td class="num">5 sampai 8 dari 8</td><td><span style="color:var(--baik);font-weight:600">Hijau #639922</span></td></tr>
+      <tr><td>Sebagian ramah</td><td class="num">38 sampai 62</td><td class="num">3 sampai 4 dari 8</td><td><span style="color:var(--sedang);font-weight:600">Amber #BA7517</span></td></tr>
+      <tr><td>Belum ramah</td><td class="num">0 sampai 37</td><td class="num">0 sampai 2 dari 8</td><td><span style="color:var(--kurang);font-weight:600">Merah #E24B4A</span></td></tr>
+    </tbody>
+  </table>
+
+  <h3>Pertahanan kualitas data</h3>
+  <ul>
+    <li>Foto wajib diambil langsung lewat kamera perangkat, bukan dipilih dari galeri.</li>
+    <li>Setiap lokasi mencatat siapa kontributornya dan kapan.</li>
+    <li>Keamanan tingkat baris membatasi daftar periksa sebuah lokasi hanya dapat diubah oleh pembuatnya, sehingga skor milik orang lain tidak bisa disetir.</li>
+    <li>Lokasi baru berstatus belum terverifikasi dan tetap tampil di peta dengan penanda berongga. Setelah tiga konfirmasi akurat dari warga lain, pemicu basis data menaikkan statusnya dan penandanya berubah menjadi terisi penuh.</li>
+  </ul>
+</section>
+
+<!-- ============ UI: PETA ============ -->
+<section class="halaman">
+  <h2>Dokumentasi antarmuka</h2>
+  <p>
+    Seluruh gambar berikut adalah tangkapan langsung dari aplikasi yang berjalan terhadap basis data
+    sungguhan, diambil otomatis melalui Chromium headless. Tidak ada gambar yang disunting atau disusun ulang.
+    Susunan tiap figur: tampilan desktop 1440&times;900 di kiri, tampilan ponsel 390&times;844 di kanan.
+  </p>
+
+  <h3>1. Peta utama</h3>
+  <figure>
+    <div class="pasangan">
+      <img class="dsk" src="gambar/peta-desktop.png" alt="Peta utama pada layar desktop">
+      <img class="mbl" src="gambar/peta-mobile.png" alt="Peta utama pada layar ponsel">
+    </div>
+    <figcaption>
+      <b>Layar pertama yang dilihat pengunjung.</b> Peta langsung tampil penuh tanpa halaman pembuka.
+      Tiga penanda menunjukkan skor: 88 hijau terisi berarti sudah terverifikasi warga, 50 amber berongga
+      dan 25 merah berongga berarti belum dikonfirmasi. Bentuk yang membedakan status, bukan warna, sehingga
+      tetap terbaca oleh mata yang tidak membedakan warna. Angka pada penyaring menunjukkan berapa lokasi
+      yang memenuhi tiap kebutuhan. Di ponsel, deretan penyaring membungkus menjadi dua baris agar tidak ada
+      kendali yang tersembunyi di luar layar, dan tombol tambah lokasi mengambang di kiri bawah.
+      <div class="ukuran">Peta dasar MapTiler dataviz-light. Wilayah tampilan: koridor Blok M, Jakarta Selatan.</div>
+    </figcaption>
+  </figure>
+</section>
+
+<section class="halaman">
+  <h3>2. Kartu ringkas setelah penanda diketuk</h3>
+  <figure>
+    <div class="pasangan">
+      <img class="dsk" src="gambar/peta-kartu-desktop.png" alt="Kartu ringkas pada layar desktop">
+      <img class="mbl" src="gambar/peta-kartu-mobile.png" alt="Kartu ringkas pada layar ponsel">
+    </div>
+    <figcaption>
+      <b>Ringkasan satu lokasi tanpa meninggalkan peta.</b> Angka skor menjadi elemen terbesar pada kartu,
+      tanpa cincin kemajuan atau hiasan di sekelilingnya. Tiga ikon fasilitas memakai simbol aksesibilitas
+      standar internasional dan tetap netral warnanya; ikon yang tidak tersedia diredupkan dan diberi tanda
+      silang, bukan sekadar dibedakan warna. Penanda terpilih ditandai cincin ganda. Di ponsel kartu naik
+      selebar layar dari sisi bawah, di desktop menempel di kiri bawah dengan lebar terbatas.
+    </figcaption>
+  </figure>
+</section>
+
+<section class="halaman">
+  <h3>3. Peta dengan penyaring kebutuhan aktif</h3>
+  <figure>
+    <div class="pasangan">
+      <img class="dsk" src="gambar/peta-filter-desktop.png" alt="Peta dengan penyaring tunanetra aktif pada desktop">
+      <img class="mbl" src="gambar/peta-filter-mobile.png" alt="Peta dengan penyaring tunanetra aktif pada ponsel">
+    </div>
+    <figcaption>
+      <b>Penyaring kebutuhan tunanetra dinyalakan.</b> Hanya lokasi dengan guiding block tersambung yang
+      tersisa, dan peta menyesuaikan bingkainya. Bila beberapa penyaring dinyalakan bersamaan, lokasi harus
+      memenuhi seluruhnya, bukan salah satu, karena rombongan dengan kebutuhan campuran memerlukan tempat
+      yang memenuhi semuanya sekaligus.
+    </figcaption>
+  </figure>
+</section>
+
+<!-- ============ UI: DETAIL ============ -->
+<section class="halaman">
+  <h3>4. Halaman detail lokasi</h3>
+  <figure>
+    <div class="pasangan">
+      <img class="dsk" src="gambar/detail-desktop.png" alt="Halaman detail lokasi pada desktop">
+      <img class="mbl" src="gambar/detail-mobile.png" alt="Halaman detail lokasi pada ponsel">
+    </div>
+    <figcaption>
+      <b>Kartu tunggal memanjang, bukan kisi kartu kecil.</b> Angka skor tampil paling besar di halaman ini.
+      Di bawahnya berurutan: foto kondisi, rincian delapan fasilitas, catatan kontributor, sumber data, dan
+      tombol konfirmasi akurasi. Karena data yang tampil berasal dari pengisian melalui SQL dan tidak memiliki
+      kontributor, halaman menuliskannya apa adanya sebagai kontributor tidak tercatat, bukan mengarang nama.
+    </figcaption>
+  </figure>
+</section>
+
+<section class="halaman">
+  <h3>5. Halaman detail, tampilan utuh</h3>
+  <figure class="tinggi">
+    <img src="gambar/detail-penuh-mobile.png" alt="Halaman detail lokasi secara utuh pada ponsel">
+    <figcaption>
+      <b>Seluruh isi halaman detail dalam satu bidang.</b> Rincian delapan fasilitas memakai tanda centang
+      dan tanda silang, disertai keterangan tersembunyi untuk pembaca layar, sehingga ketersediaan fasilitas
+      tidak hanya dibedakan oleh warna. Bagian sumber data menyebutkan jumlah konfirmasi dan berapa lagi yang
+      dibutuhkan untuk berstatus terverifikasi.
+    </figcaption>
+  </figure>
+</section>
+
+<!-- ============ UI: FORM ============ -->
+<section class="halaman">
+  <h3>6. Tambah lokasi, langkah 1: menentukan titik</h3>
+  <figure>
+    <div class="pasangan">
+      <img class="dsk" src="gambar/form-1-titik-desktop.png" alt="Langkah menentukan titik pada desktop">
+      <img class="mbl" src="gambar/form-1-titik-mobile.png" alt="Langkah menentukan titik pada ponsel">
+    </div>
+    <figcaption>
+      <b>Tiga jalur berurutan untuk satu koordinat.</b> Pencarian nama tempat memberi perkiraan kasar,
+      tombol pakai lokasi saya mengambil koordinat GPS perangkat, lalu pin dapat digeser manual bila meleset.
+      Formulir sengaja dipecah menjadi empat langkah pendek, bukan satu halaman panjang, karena kontributor
+      lapangan mengisinya berulang kali di lokasi berbeda dalam satu hari.
+    </figcaption>
+  </figure>
+</section>
+
+<section class="halaman">
+  <h3>7. Tambah lokasi, langkah 2: identitas tempat</h3>
+  <figure>
+    <div class="pasangan">
+      <img class="dsk" src="gambar/form-2-tempat-desktop.png" alt="Langkah identitas tempat pada desktop">
+      <img class="mbl" src="gambar/form-2-tempat-mobile.png" alt="Langkah identitas tempat pada ponsel">
+    </div>
+    <figcaption>
+      <b>Nama tempat dan jenisnya.</b> Enam jenis tempat disajikan sebagai kisi tombol besar, bukan menu
+      gulung, agar dapat dipilih dengan satu ketukan sambil berdiri. Tombol lanjut dinonaktifkan sampai nama
+      tempat terisi minimal tiga huruf, dengan keterangan alasannya di bawah tombol.
+    </figcaption>
+  </figure>
+</section>
+
+<section class="halaman">
+  <h3>8. Tambah lokasi, langkah 3: daftar periksa fasilitas</h3>
+  <figure>
+    <div class="pasangan">
+      <img class="dsk" src="gambar/form-3-checklist-desktop.png" alt="Langkah daftar periksa pada desktop">
+      <img class="mbl" src="gambar/form-3-checklist-mobile.png" alt="Langkah daftar periksa pada ponsel">
+    </div>
+    <figcaption>
+      <b>Delapan pertanyaan, satu angka yang bergerak.</b> Skor sementara diperbarui seketika setiap
+      centang berubah, sehingga kontributor melihat dampak jawabannya. Angka ini hanya pratinjau; nilai yang
+      tersimpan tetap dihitung ulang oleh basis data. Setiap butir disertai kalimat bantuan yang konkret dan
+      dapat diperiksa dengan mata, ditulis untuk orang yang sedang berdiri di lokasi sambil memegang ponsel.
+    </figcaption>
+  </figure>
+</section>
+
+<section class="halaman">
+  <h3>9. Tambah lokasi, langkah 4: bukti dan catatan</h3>
+  <figure>
+    <div class="pasangan">
+      <img class="dsk" src="gambar/form-4-foto-desktop.png" alt="Langkah foto dan catatan pada desktop">
+      <img class="mbl" src="gambar/form-4-foto-mobile.png" alt="Langkah foto dan catatan pada ponsel">
+    </div>
+    <figcaption>
+      <b>Foto diambil di tempat, maksimal tiga.</b> Kolom unggah memakai atribut yang memanggil kamera
+      belakang perangkat secara langsung. Foto dikecilkan di dalam peramban sebelum dikirim, ke sisi terpanjang
+      1600 piksel dengan mutu 0,8, karena berkas dari kamera ponsel kerap berukuran beberapa megabita dan
+      gagal terkirim pada jaringan lapangan. Catatan bebas bersifat opsional.
+    </figcaption>
+  </figure>
+</section>
+
+<!-- ============ UI: AUTH ============ -->
+<section class="halaman">
+  <h3>10. Daftar akun</h3>
+  <figure>
+    <div class="pasangan">
+      <img class="dsk" src="gambar/daftar-desktop.png" alt="Halaman daftar akun pada desktop">
+      <img class="mbl" src="gambar/daftar-mobile.png" alt="Halaman daftar akun pada ponsel">
+    </div>
+    <figcaption>
+      <b>Akun hanya diperlukan untuk berkontribusi.</b> Mencari informasi tidak menuntut pendaftaran, sesuai
+      pemisahan dua kelompok pengguna. Nama yang diisi di sini diteruskan ke pemicu basis data yang membuat
+      baris profil, sehingga jejak kontributor pada tiap lokasi terisi otomatis. Setiap halaman menyediakan
+      satu jalan pulang ke peta.
+    </figcaption>
+  </figure>
+
+  <h3>11. Masuk</h3>
+  <figure>
+    <div class="pasangan">
+      <img class="dsk" src="gambar/masuk-desktop.png" alt="Halaman masuk pada desktop">
+      <img class="mbl" src="gambar/masuk-mobile.png" alt="Halaman masuk pada ponsel">
+    </div>
+    <figcaption>
+      <b>Pesan galat ditulis dalam bahasa Indonesia sederhana.</b> Pesan bawaan Supabase berbahasa Inggris
+      teknis diterjemahkan menjadi kalimat yang menyebut masalah sekaligus jalan keluarnya. Galat yang belum
+      dikenali tidak lagi ditelan menjadi kalimat kosong: pesan aslinya selalu dicatat ke konsol dan
+      ditampilkan saat mode pengembangan.
+    </figcaption>
+  </figure>
+</section>
+
+<!-- ============ UI: TENTANG ============ -->
+<section class="halaman">
+  <h3>12. Halaman tentang</h3>
+  <figure>
+    <div class="pasangan">
+      <img class="dsk" src="gambar/tentang-desktop.png" alt="Halaman tentang pada desktop">
+      <img class="mbl" src="gambar/tentang-mobile.png" alt="Halaman tentang pada ponsel">
+    </div>
+    <figcaption>
+      <b>Menjawab kriteria kesesuaian tema dari dalam produk.</b> Memuat masalah yang dijawab, kaitan
+      eksplisit dengan SDG 11 termasuk target 11.7 tentang akses universal ke ruang publik, cara data
+      dikumpulkan, cara skor dihitung, cara data dijaga, dan susunan tim. Seluruh isinya diturunkan dari
+      dokumen kebutuhan produk yang sudah ada, tanpa klaim baru yang tidak berdasar.
+    </figcaption>
+  </figure>
+</section>
+
+<section class="halaman">
+  <h3>13. Halaman tentang, tampilan utuh</h3>
+  <figure class="tinggi">
+    <img src="gambar/tentang-penuh-mobile.png" alt="Halaman tentang secara utuh pada ponsel">
+    <figcaption>
+      <b>Seluruh isi halaman tentang.</b> Bagian riset dampak dari Dakara belum masuk; teks yang ada
+      sekarang berasal dari dokumen kebutuhan produk dan disiapkan untuk ditimpa tanpa mengubah struktur.
+    </figcaption>
+  </figure>
+</section>
+
+
+<!-- ============ HASIL UJI ============ -->
+<section class="halaman">
+  <h2>Hasil uji menyeluruh</h2>
+  <p>
+    Rangkaian ini dijalankan melalui antarmuka sungguhan memakai peramban, bukan melalui antarmuka
+    pemrograman, dengan akun nyata yang didaftarkan lewat halaman daftar. Setiap langkah memeriksa keadaan
+    aplikasi setelahnya, bukan sekadar memastikan tidak ada galat.
+  </p>
+  <p>
+    Hasil di bawah berasal dari rangkaian kedua, dijalankan setelah kedua cacat diperbaiki dan basis data
+    dibersihkan dari baris sisa pengujian. Rangkaian pertama meloloskan dua belas langkah; dua kegagalannya
+    tetap dicatat pada kolom bukti karena dari sanalah kedua cacat itu ditemukan.
+  </p>
+
+  <table>
+    <thead><tr><th style="width:6%">No</th><th style="width:42%">Langkah</th><th style="width:14%">Hasil</th><th>Bukti</th></tr></thead>
+    <tbody>
+      <tr><td class="num">1</td><td>Masuk dengan akun uji</td><td><span class="lencana l-selesai">Lolos</span></td><td>Dialihkan ke peta.</td></tr>
+      <tr><td class="num">2</td><td>Header berubah setelah masuk</td><td><span class="lencana l-selesai">Lolos</span></td><td>Tombol keluar muncul.</td></tr>
+      <tr><td class="num">3</td><td>Penjaga rute melepas pengguna yang sudah masuk</td><td><span class="lencana l-selesai">Lolos</span></td><td>Formulir terbuka tanpa pengalihan.</td></tr>
+      <tr><td class="num">4</td><td>Titik dipindah dengan mengetuk peta</td><td><span class="lencana l-selesai">Lolos</span></td><td>Pin berpindah ke posisi ketukan.</td></tr>
+      <tr><td class="num">5</td><td>Nama dan jenis tempat terisi</td><td><span class="lencana l-selesai">Lolos</span></td><td>Kategori taman terpilih.</td></tr>
+      <tr><td class="num">6</td><td>Skor pratinjau bergerak mengikuti centang</td><td><span class="lencana l-selesai">Lolos</span></td><td>Lima dari delapan terpenuhi, pratinjau menunjukkan 63.</td></tr>
+      <tr><td class="num">7</td><td>Foto diproses dan dikecilkan di peramban</td><td><span class="lencana l-selesai">Lolos</span></td><td>Satu pratinjau muncul dari berkas kamera tiruan.</td></tr>
+      <tr><td class="num">8</td><td>Lokasi tersimpan dan dialihkan ke detailnya</td><td><span class="lencana l-selesai">Lolos</span></td><td>Berhasil setelah cacat nomor tujuh diperbaiki.</td></tr>
+      <tr><td class="num">9</td><td>Skor dihitung pemicu basis data</td><td><span class="lencana l-selesai">Lolos</span></td><td>Pratinjau 63, tersimpan 63. Rangkaian pertama menghasilkan 62 dan membuka cacat nomor delapan.</td></tr>
+      <tr><td class="num">10</td><td>Foto terunggah ke penyimpanan berkas dan tampil</td><td><span class="lencana l-selesai">Lolos</span></td><td>Gambar termuat dari bucket foto lokasi.</td></tr>
+      <tr><td class="num">11</td><td>Jejak kontributor tercatat</td><td><span class="lencana l-selesai">Lolos</span></td><td>Halaman menulis nama akun uji beserta tanggalnya.</td></tr>
+      <tr><td class="num">12</td><td>Konfirmasi akurasi tersimpan</td><td><span class="lencana l-selesai">Lolos</span></td><td>Hitungan berubah menjadi satu warga menyatakan masih akurat.</td></tr>
+      <tr><td class="num">13</td><td>Lokasi baru langsung muncul di peta</td><td><span class="lencana l-selesai">Lolos</span></td><td>Empat penanda: tiga data contoh ditambah satu hasil kontribusi.</td></tr>
+      <tr><td class="num">14</td><td>Keluar mengembalikan ke mode lihat</td><td><span class="lencana l-selesai">Lolos</span></td><td>Tombol masuk muncul kembali.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="catatan">
+    <b>Nol galat konsol sepanjang rangkaian.</b> Empat belas langkah dijalankan berurutan pada satu sesi
+    peramban, mencakup pendaftaran, penyimpanan, unggahan berkas, konfirmasi, dan keluar, tanpa satu pun
+    pesan galat muncul di konsol.
+  </div>
+
+  <h3>Antarmuka dalam keadaan sudah masuk</h3>
+  <figure>
+    <div class="pasangan">
+      <img class="mbl" src="gambar/form-masuk-1-titik-mobile.png" alt="Langkah titik saat sudah masuk">
+      <img class="mbl" src="gambar/form-masuk-4-foto-mobile.png" alt="Langkah foto dengan berkas terlampir">
+    </div>
+    <figcaption>
+      <b>Kiri:</b> langkah menentukan titik, diambil saat sesi pengguna aktif, dengan pin sudah dipindah
+      melalui ketukan pada peta. <b>Kanan:</b> langkah bukti setelah satu foto terlampir, menampilkan
+      pratinjau kecil beserta tombol hapusnya. Kedua tangkapan berasal dari rangkaian pengujian yang sama,
+      bukan dari sesi terpisah.
+    </figcaption>
+  </figure>
+
+  <h3>Hasil kontribusi yang tersimpan</h3>
+  <figure>
+    <div class="pasangan">
+      <img class="mbl" src="gambar/detail-masuk-mobile.png" alt="Detail lokasi hasil kontribusi">
+      <img class="mbl" src="gambar/detail-konfirmasi-mobile.png" alt="Detail setelah konfirmasi akurasi">
+      <img class="mbl" src="gambar/peta-masuk-mobile.png" alt="Peta dalam keadaan sudah masuk">
+    </div>
+    <figcaption>
+      <b>Kiri:</b> halaman detail lokasi yang baru saja disimpan lewat formulir, menampilkan skor 63 hasil
+      hitungan pemicu basis data, foto yang terunggah ke penyimpanan berkas, dan jejak kontributor lengkap
+      dengan tanggalnya. <b>Tengah:</b> halaman yang sama setelah tombol konfirmasi ditekan; hitungan berubah
+      menjadi satu warga menyatakan masih akurat, dan tombolnya berpindah ke keadaan terpilih.
+      <b>Kanan:</b> peta dalam keadaan sudah masuk, memperlihatkan empat penanda dan tombol keluar pada
+      header. Ketiganya berasal dari rangkaian pengujian yang sama.
+    </figcaption>
+  </figure>
+</section>
+
+
+<!-- ============ VERIFIKASI LANJUTAN ============ -->
+<section class="halaman">
+  <h2>Verifikasi lanjutan</h2>
+  <p>
+    Tiga hal berikut sebelumnya berstatus belum terbukti atau belum diuji sama sekali. Ketiganya
+    diselesaikan pada putaran ini, dan salah satunya membuka cacat baru.
+  </p>
+
+  <h3>Ambang tiga konfirmasi</h3>
+  <p>
+    Pengujian dijalankan memakai tiga akun berbeda melalui antarmuka pemrograman dengan token masing-masing,
+    bukan melalui penulisan langsung ke basis data. Cara ini sekaligus membuktikan aturan keamanan tingkat
+    baris bekerja, karena setiap akun hanya boleh menuliskan konfirmasi atas namanya sendiri.
+  </p>
+  <table>
+    <thead><tr><th style="width:34%">Tindakan</th><th style="width:14%">Balasan</th><th style="width:26%">Konfirmasi akurat</th><th>Status lokasi</th></tr></thead>
+    <tbody>
+      <tr><td>Keadaan awal</td><td class="num">&mdash;</td><td class="num">1</td><td>belum terverifikasi</td></tr>
+      <tr><td>Akun kedua mengonfirmasi</td><td class="num">201</td><td class="num">2</td><td>belum terverifikasi</td></tr>
+      <tr><td>Akun ketiga mengonfirmasi</td><td class="num">201</td><td class="num">3</td><td><b>terverifikasi</b></td></tr>
+      <tr><td>Akun ketiga menarik konfirmasinya</td><td class="num">204</td><td class="num">2</td><td>belum terverifikasi</td></tr>
+      <tr><td>Akun ketiga mengonfirmasi lagi</td><td class="num">201</td><td class="num">3</td><td><b>terverifikasi</b></td></tr>
+    </tbody>
+  </table>
+  <p>
+    Status berubah tepat pada konfirmasi ketiga, bukan sebelumnya, dan turun kembali begitu satu konfirmasi
+    ditarik. Ambangnya bekerja dua arah, bukan sekadar naik sekali lalu terkunci.
+  </p>
+
+  <h3>Setiap penyaring kebutuhan, diuji terpisah</h3>
+  <p>
+    Jumlah penanda yang tersisa di peta dibandingkan dengan jumlah lokasi yang benar-benar memenuhi syarat
+    menurut isi basis data, bukan sekadar dilihat mata. Delapan pemeriksaan, empat kasus dikali dua ukuran
+    layar, seluruhnya cocok.
+  </p>
+  <table>
+    <thead><tr><th style="width:34%">Penyaring aktif</th><th style="width:22%">Penanda tersisa</th><th style="width:16%">Diharapkan</th><th>Yang tersaring keluar</th></tr></thead>
+    <tbody>
+      <tr><td>Kursi roda</td><td class="num">4 menjadi 3</td><td class="num">3</td><td>Kantor kecamatan, tidak punya ramp.</td></tr>
+      <tr><td>Lansia atau stroller</td><td class="num">4 menjadi 4</td><td class="num">4</td><td>Tidak ada. Keempat lokasi punya tempat duduk atau lift.</td></tr>
+      <tr><td>Tunanetra</td><td class="num">4 menjadi 2</td><td class="num">2</td><td>Dua lokasi tanpa guiding block tersambung.</td></tr>
+      <tr><td>Kursi roda dan tunanetra bersamaan</td><td class="num">4 menjadi 2</td><td class="num">2</td><td>Hanya lokasi yang memenuhi keduanya bertahan.</td></tr>
+    </tbody>
+  </table>
+  <p>
+    Catatan jujur: dengan data yang ada sekarang, penyaring lansia tidak menyingkirkan apa pun. Itu bukan
+    cacat, melainkan kebetulan isi data. Nilainya sebagai bukti memang lemah, dan baru akan berarti setelah
+    data survei sungguhan masuk.
+  </p>
+
+  <figure>
+    <div class="pasangan">
+      <img class="dsk" src="gambar/filter-kursi-roda-desktop.png" alt="Penyaring kursi roda aktif pada desktop">
+      <img class="mbl" src="gambar/filter-kursi-roda-mobile.png" alt="Penyaring kursi roda aktif pada ponsel">
+    </div>
+    <figcaption>
+      <b>Penyaring kursi roda.</b> Tiga penanda bertahan dari empat. Dua penanda hijau di tengah adalah
+      lokasi yang sudah berstatus terverifikasi sehingga terisi penuh, sedangkan yang amber masih berongga.
+      Keduanya kebetulan berdempet karena lokasi hasil pengujian ditaruh berdekatan dengan stasiun; pada data
+      survei sungguhan ketiga titik Blok M berjarak ratusan meter. Memperbesar peta memisahkannya.
+    </figcaption>
+  </figure>
+</section>
+
+<section class="halaman">
+  <figure>
+    <div class="pasangan">
+      <img class="dsk" src="gambar/filter-lansia-desktop.png" alt="Penyaring lansia atau stroller aktif pada desktop">
+      <img class="mbl" src="gambar/filter-lansia-mobile.png" alt="Penyaring lansia atau stroller aktif pada ponsel">
+    </div>
+    <figcaption>
+      <b>Penyaring lansia atau stroller.</b> Keempat penanda bertahan, karena semuanya memiliki tempat duduk
+      atau lift yang berfungsi. Chip menyala dan angka di sampingnya tetap menunjukkan empat, yang berarti
+      penyaringnya bekerja dan memang tidak ada yang perlu disingkirkan.
+    </figcaption>
+  </figure>
+
+  <figure>
+    <div class="pasangan">
+      <img class="dsk" src="gambar/filter-gabungan-desktop.png" alt="Dua penyaring aktif bersamaan pada desktop">
+      <img class="mbl" src="gambar/filter-gabungan-mobile.png" alt="Dua penyaring aktif bersamaan pada ponsel">
+    </div>
+    <figcaption>
+      <b>Dua penyaring bersamaan.</b> Kursi roda dan tunanetra dinyalakan sekaligus, tersisa dua penanda.
+      Lokasi harus memenuhi keduanya, bukan salah satu, karena rombongan dengan kebutuhan campuran
+      memerlukan tempat yang memenuhi semuanya.
+    </figcaption>
+  </figure>
+</section>
+
+<!-- ============ CACAT ============ -->
+<section class="halaman">
+  <h2>Cacat yang ditemukan dan diperbaiki</h2>
+  <p>
+    Sepuluh persoalan ditemukan melalui pemeriksaan langsung, bukan dari asumsi, dan seluruhnya sudah
+    diselesaikan. Tujuh berada di dalam kode, satu pada setelan layanan, dan dua pada basis data. Empat di
+    antaranya hanya muncul karena aplikasi benar-benar dijalankan dari ujung ke ujung, karena berkas
+    tambalannya benar-benar dijalankan dua kali, dan karena batas yang diumumkan benar-benar dicoba
+    ditembus, bukan karena kodenya dibaca ulang.
+  </p>
+
+  <div class="bug">
+    <h4>1. Berkas worker MapLibre tidak ikut ke hasil build</h4>
+    <p class="cap">Tingkat: merusak pemasangan. Status: diperbaiki.</p>
+    <p>
+      MapLibre memuat berkas worker-nya melalui alamat yang dirakit saat program berjalan, dengan nama berkas
+      yang disusun dari potongan teks. Perkakas pembungkus tidak dapat melihat rujukan semacam itu secara statis,
+      sehingga berkas worker tidak pernah ikut disalin ke hasil build. Akibatnya peta akan tampak normal di
+      komputer pengembang namun kosong sama sekali setelah dipasang, tanpa pesan galat apa pun. Diperiksa dan
+      terbukti: folder hasil build sama sekali tidak memuat berkas tersebut.
+    </p>
+    <p>
+      <b>Perbaikan.</b> Skrip penyalin menaruh berkas worker ke folder publik, dan sebuah plugin sisi klien
+      menunjuk MapLibre ke salinan itu. Skrip dijalankan otomatis saat pasang, pengembangan, dan build.
+    </p>
+  </div>
+
+  <div class="bug">
+    <h4>2. Berkas pendamping worker ikut hilang</h4>
+    <p class="cap">Tingkat: merusak tampilan peta. Status: diperbaiki.</p>
+    <p>
+      Perbaikan pertama ternyata setengah jalan. Berkas worker itu sendiri memuat rujukan ke berkas pendamping
+      berukuran sekitar 492 kilobita yang tidak ikut disalin. Worker berhenti dengan galat berkas tidak ditemukan
+      secara diam-diam, tidak ada thread yang mengurai ubin peta, dan kanvas tetap kosong. Kendali perbesaran serta
+      baris atribusi tetap tampak karena keduanya elemen halaman biasa, bukan hasil penggambaran, sehingga peta
+      terlihat seolah hampir berhasil.
+    </p>
+    <p>
+      <b>Perbaikan.</b> Kedua berkas kini disalin berdampingan. Terbukti setelahnya: worker terbentuk tanpa
+      galat, berkas pendamping terlayani utuh, dan basis peta terender pada seluruh tangkapan dalam dokumen ini.
+    </p>
+  </div>
+
+  <div class="bug">
+    <h4>3. Rujukan elemen kosong pada komponen khusus sisi klien</h4>
+    <p class="cap">Tingkat: peta tidak pernah terbentuk. Status: diperbaiki.</p>
+    <p>
+      Pembungkus komponen khusus sisi klien pada Nuxt memasang elemen akarnya setelah kait pemasangan berjalan.
+      Akibatnya rujukan elemen masih kosong pada pemuatan pertama, peta tidak pernah dibuat, dan tidak ada galat
+      yang dilaporkan. Terbukti dari catatan konsol: pada pemuatan pertama rujukan bernilai kosong, sedangkan pada
+      pemuatan ulang panas rujukan terisi.
+    </p>
+    <p>
+      <b>Perbaikan.</b> Pembuatan peta digantungkan pada pengamat terhadap rujukan itu sendiri, bukan pada kait
+      pemasangan.
+    </p>
+  </div>
+
+  <div class="bug">
+    <h4>4. Pustaka peta versi enam tidak lagi menyediakan ekspor bawaan</h4>
+    <p class="cap">Tingkat: halaman gagal dimuat. Status: diperbaiki.</p>
+    <p>
+      Pola impor bawaan yang lazim dipakai pada versi sebelumnya melempar galat sintaksis pada versi enam,
+      sehingga seluruh halaman peta gagal. Diganti menjadi impor ruang nama.
+    </p>
+  </div>
+
+  <div class="bug">
+    <h4>5. Pesan galat menelan penyebab sebenarnya</h4>
+    <p class="cap">Tingkat: menghambat penelusuran. Status: diperbaiki.</p>
+    <p>
+      Ketika pendaftaran gagal, antarmuka hanya menampilkan kalimat umum tanpa isi. Penyebab sesungguhnya,
+      yaitu provider Email yang dinonaktifkan, tersembunyi. Waktu terbuang untuk menebak.
+    </p>
+    <p>
+      <b>Perbaikan.</b> Tiga kesalahan setelan layanan kini memiliki kalimat sendiri yang menyebut tempat
+      memperbaikinya. Galat yang belum dikenali selalu dicatat ke konsol dan ditampilkan saat mode pengembangan.
+    </p>
+  </div>
+
+  <div class="bug" style="border-left-color: var(--baik)">
+    <h4>6. Provider Email pada Supabase berstatus nonaktif</h4>
+    <p class="cap">Tingkat: menahan tahap 7. Status: sudah dinyalakan, tahap 7 terbuka.</p>
+    <p>
+      Permintaan pendaftaran yang dikirim langsung ke antarmuka pemrograman layanan dibalas dengan kode
+      <code>email_provider_disabled</code> dan keterangan <code>Email signups are disabled</code>. Selama
+      status ini bertahan, tidak ada akun yang dapat dibuat, sehingga penyimpanan lokasi, unggahan foto, dan
+      konfirmasi akurasi belum dapat diuji dari ujung ke ujung.
+    </p>
+    <p>
+      <b>Tindakan yang diperlukan.</b> Pada dasbor Supabase, buka Authentication lalu Sign In / Providers.
+      Saklarnya berada di bagian Auth Providers pada baris Email, terpisah dari bagian User Signups di
+      atasnya, dan masing-masing bagian memiliki tombol simpan sendiri. Setelah dinyalakan, pendaftaran
+      berhasil dan pemicu pembuat profil terbukti bekerja: baris profil terbentuk otomatis lengkap
+      dengan namanya.
+    </p>
+  </div>
+
+  <div class="bug">
+    <h4>7. Seluruh jalur kontribusi ditolak keamanan tingkat baris</h4>
+    <p class="cap">Tingkat: fitur inti mati total. Status: diperbaiki.</p>
+    <p>
+      Setiap upaya menyimpan lokasi dibalas kode 42501 dengan keterangan bahwa baris baru melanggar aturan
+      keamanan tingkat baris. Pesannya menuduh aturan keamanan, sehingga arah penelusuran mudah tersesat ke
+      sana. Pemeriksaan terpisah membuktikan aturannya benar: pengiriman langsung memakai token pengguna asli
+      berhasil dengan kode 201.
+    </p>
+    <p>
+      Penyebab sebenarnya terlihat setelah badan permintaan yang gagal dibuka: kolom pemilik sama sekali
+      tidak ikut terkirim. Modul Supabase untuk Nuxt yang dipakai mengisi penampung pengguna dengan dua
+      bentuk berbeda. Di sisi server berupa objek pengguna yang memiliki kolom <code>id</code>, di sisi
+      peramban berupa klaim token yang memiliki <code>sub</code> dan sama sekali tidak memiliki
+      <code>id</code>. Kode membaca <code>id</code>, yang setelah halaman terhidrasi bernilai kosong,
+      sehingga kolom pemilik lenyap dari permintaan dan aturan keamanan menolaknya.
+    </p>
+    <p>
+      Cacat ini menyamar dengan baik karena alamat surel tersedia pada kedua bentuk, sehingga header yang
+      menyapa pengguna tetap terlihat normal. Dampaknya menyentuh dua tempat sekaligus: menyimpan lokasi dan
+      mengirim konfirmasi akurasi. Artinya seluruh kemampuan berkontribusi tidak berfungsi.
+    </p>
+    <p>
+      <b>Perbaikan.</b> Satu pembaca identitas pengguna dibuat terpusat, menerima kedua bentuk, dan dipakai
+      di kedua tempat. Setelah itu penyimpanan lokasi, unggahan foto, dan konfirmasi akurasi seluruhnya
+      berhasil pada pengujian menyeluruh.
+    </p>
+  </div>
+
+  <div class="bug" style="border-left-color: var(--baik)">
+    <h4>8. Pembulatan skor berbeda antara pratinjau dan yang tersimpan</h4>
+    <p class="cap">Tingkat: angka yang dilihat berbeda dari yang disimpan. Status: diperbaiki dan terverifikasi.</p>
+    <p>
+      Lima dari delapan fasilitas terpenuhi menghasilkan 62,5. Peramban membulatkannya menjadi 63, basis
+      data menjadi 62. Penyebabnya dua aturan pembulatan yang berbeda: peramban membulatkan setengah ke atas,
+      sedangkan fungsi pembulatan basis data pada bilangan pecahan membulatkan setengah ke bilangan genap
+      terdekat.
+    </p>
+    <p>
+      Karena daftar periksa berisi delapan butir, setiap jumlah ganjil mendarat tepat pada setengah, yaitu
+      12,5, 37,5, 62,5, dan 87,5. Separuh dari nilai yang mungkin karena itu berpeluang meleset satu angka.
+      Pada 62,5 selisih itu melompati ambang warna: kontributor melihat 63 berwarna hijau dengan keterangan
+      ramah akses, sementara yang tersimpan 62 berwarna amber dengan keterangan sebagian ramah.
+    </p>
+    <p>
+      <b>Perbaikan.</b> Pembulatan pada basis data diubah agar melewati tipe bilangan tetap, yang
+      membulatkan setengah menjauh dari nol persis seperti peramban. Tambalannya sekaligus menghitung ulang
+      skor yang sudah terlanjur tersimpan. Setelah dijalankan, lokasi dengan lima dari delapan fasilitas
+      tersimpan sebagai 63 dan pengujian menyeluruh lolos penuh.
+    </p>
+  </div>
+
+  <div class="bug" style="border-left-color: var(--baik)">
+    <h4>9. Berkas tambalan basis data gagal saat dijalankan ulang</h4>
+    <p class="cap">Tingkat: menghentikan penambalan di tengah jalan. Status: diperbaiki.</p>
+    <p>
+      Menjalankan berkas tambalan untuk kedua kalinya berhenti dengan kode 42710, yang menyatakan sebuah
+      aturan keamanan sudah ada. Penyebabnya berkas itu menjatuhkan aturan bernama lama lalu membuat aturan
+      bernama baru, tanpa lebih dulu menjatuhkan nama barunya. Jalan pertama mulus karena nama baru memang
+      belum ada, jalan kedua bertabrakan.
+    </p>
+    <p>
+      Dampaknya lebih besar daripada sekadar pesan galat. Berkas itu belum dibungkus transaksi, sehingga
+      kegagalan di tengah meninggalkan basis data dalam keadaan separuh tertambal: fungsi penghitung skor
+      sudah diperbarui, tetapi aturan konfirmasi, aturan penghapusan, penghitungan ulang skor, dan
+      penyiapan penyimpanan berkas seluruhnya tidak pernah dijalankan.
+    </p>
+    <p>
+      <b>Perbaikan.</b> Setiap aturan keamanan kini dijatuhkan lebih dulu dengan namanya sendiri, dan
+      seluruh isi berkas dibungkus satu transaksi. Kegagalan sekarang berarti tidak ada yang berubah sama
+      sekali, bukan setengah berubah. Pemeriksaan menyeluruh atas berkas itu mencatat tujuh dari tujuh
+      aturan sudah aman dijalankan berulang.
+    </p>
+  </div>
+
+  <div class="bug">
+    <h4>10. Batas tiga foto hanya kosmetik</h4>
+    <p class="cap">Tingkat: batas yang diumumkan tidak ditegakkan. Status: diperbaiki.</p>
+    <p>
+      Formulir menyatakan maksimal tiga foto, dan tombol pengambilnya memang menghilang setelah foto ketiga.
+      Tetapi penghilangan itu satu-satunya penghalang: fungsi penanganannya tidak memeriksa jumlah sama
+      sekali, dan titik pengunggahannya juga tidak.
+    </p>
+    <p>
+      Percobaan biasa memang tertahan, tetapi itu kebetulan waktu, bukan bukti. Empat peristiwa pemilihan
+      berkas yang ditembakkan serentak sebelum satu pun selesai diproses membuat elemen pemilih belum sempat
+      menghilang, dan <b>empat foto lolos masuk</b>. Di jaringan lapangan yang lambat, celah waktu itu justru
+      melebar, bukan menyempit.
+    </p>
+    <p>
+      <b>Perbaikan.</b> Batas dijaga di tiga lapis: sebelum pemrosesan, sesudah pemrosesan karena beberapa
+      berkas bisa diproses bersamaan, dan sekali lagi saat pengunggahan. Pengujian ulang dengan serangan yang
+      sama menghasilkan tepat tiga foto, dan jalur pemakaian biasa tidak terganggu.
+    </p>
+  </div>
+</section>
+
+<!-- ============ VERIFIKASI ============ -->
+<section class="halaman">
+  <h2>Pemeriksaan yang dijalankan</h2>
+  <p>Seluruh pernyataan pada dokumen ini bersandar pada pemeriksaan berikut, bukan pada dugaan.</p>
+
+  <table>
+    <thead><tr><th style="width:34%">Yang diperiksa</th><th style="width:26%">Cara memeriksa</th><th>Hasil</th></tr></thead>
+    <tbody>
+      <tr><td>Build produksi</td><td>Perintah build penuh</td><td>Lolos. Total 847 kilobita setelah pemampatan.</td></tr>
+      <tr><td>Berkas worker peta</td><td>Penelusuran folder hasil build</td><td>Kedua berkas hadir di folder publik.</td></tr>
+      <tr><td>Seluruh rute halaman</td><td>Permintaan berurutan ke setiap alamat</td><td>Peta, tentang, masuk, daftar, konfirmasi seluruhnya berhasil. Rute tambah lokasi mengalihkan pengunjung anonim, sebagaimana seharusnya.</td></tr>
+      <tr><td>Perantara pencarian tempat</td><td>Kueri nyata dengan kata kunci Blok M</td><td>Berhasil, mengembalikan hasil beserta koordinat.</td></tr>
+      <tr><td>Layanan peta dasar</td><td>Pemeriksaan gaya, sprite, huruf, dan ubin</td><td>Seluruhnya berhasil dimuat.</td></tr>
+      <tr><td>Pemicu penghitung skor</td><td>Pengisian data contoh melalui SQL</td><td>Menghasilkan 88, 50, dan 25 tanpa nilai diisi manual.</td></tr>
+      <tr><td>Galat konsol peramban</td><td>Pengambilan dua puluh empat tangkapan otomatis</td><td>Nol galat pada seluruh halaman, dua ukuran layar.</td></tr>
+      <tr><td>Perilaku responsif</td><td>Pemeriksaan lebar gulung terhadap lebar layar</td><td>Tidak ada limpahan mendatar pada 390 piksel maupun 1440 piksel.</td></tr>
+      <tr><td>Sasaran ketuk</td><td>Pengukuran tinggi kendali utama</td><td>Penyaring dan tombol utama memenuhi 44 piksel.</td></tr>
+      <tr><td>Pemuatan huruf</td><td>Pemeriksaan status huruf pada peramban</td><td>Public Sans termuat.</td></tr>
+      <tr><td>Pemeriksa mekanis desain</td><td>Penelusuran seluruh berkas antarmuka</td><td>Lima peringatan anjuran, seluruhnya nilai alfa bayangan yang memang sudah didokumentasikan pada sistem desain.</td></tr>
+      <tr><td>Pendaftaran akun</td><td>Permintaan langsung ke layanan</td><td>Berhasil, sesi langsung diberikan.</td></tr>
+      <tr><td>Pemicu pembuat profil</td><td>Pemeriksaan tabel profil setelah mendaftar</td><td>Baris terbentuk otomatis lengkap dengan namanya.</td></tr>
+      <tr><td>Aturan keamanan tingkat baris</td><td>Pengiriman langsung memakai token pengguna asli</td><td>Berhasil dengan kode 201, membuktikan aturannya benar dan masalahnya di sisi pengirim.</td></tr>
+      <tr><td>Alur kontribusi menyeluruh</td><td>Empat belas langkah berurutan lewat peramban</td><td>Dua belas lolos. Satu selisih pembulatan, satu anggapan skrip yang keliru.</td></tr>
+      <tr><td>Unggahan foto</td><td>Berkas tiruan melalui formulir sungguhan</td><td>Terkecilkan di peramban, tersimpan di penyimpanan berkas, dan tampil di halaman detail.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Catatan kejujuran atas pengujian</h3>
+  <p>
+    Satu hal masih belum terbukti: perilaku aplikasi pada tautan hosting sungguhan. Seluruh pengujian pada
+    dokumen ini berjalan di komputer pengembang. Kamera perangkat dan pembacaan posisi hanya berfungsi pada
+    koneksi aman, sehingga keduanya baru bisa dibuktikan setelah pemasangan selesai.
+  </p>
+  <p>
+    Basis data yang menghasilkan seluruh tangkapan pada dokumen ini berisi empat lokasi: tiga data contoh
+    yang ditandai jelas, dan satu hasil kontribusi sungguhan melalui formulir aplikasi lengkap dengan
+    fotonya. Keempatnya wajib dihapus dan diganti data survei, tetapi baru pada langkah paling akhir:
+    selama data survei belum masuk, data contoh inilah yang menjaga tautan hosting tidak terlihat kosong.
+  </p>
+</section>
+
+<!-- ============ SISA ============ -->
+<section class="halaman">
+  <h2>Sisa pekerjaan dan risiko</h2>
+
+  <h3>Yang harus diselesaikan sebelum pengumpulan</h3>
+  <table>
+    <thead><tr><th style="width:6%">No</th><th style="width:36%">Pekerjaan</th><th>Keterangan</th></tr></thead>
+    <tbody>
+      <tr><td class="num">1</td><td>Memasang ke Vercel</td><td>Jalur kritis. Kamera dan GPS hanya berfungsi pada koneksi aman, jadi survei lapangan tidak bisa dimulai sebelum ini.</td></tr>
+      <tr><td class="num">2</td><td>Memasukkan data survei Blok M</td><td>Dua puluh sampai tiga puluh titik dari Husein melalui formulir pada tautan hosting.</td></tr>
+      <tr><td class="num">3</td><td>Memasukkan naskah dari Dakara</td><td>Bagian riset dampak pada halaman tentang dan bagian terkait pada README.</td></tr>
+      <tr><td class="num">4</td><td>Mencantumkan tautan hosting</td><td>Pada README, setelah pemasangan berhasil.</td></tr>
+      <tr><td class="num">5</td><td>Menghapus data contoh dan data uji</td><td>Langkah paling akhir, dan hanya setelah data survei asli sudah cukup banyak. Menghapusnya lebih awal membuat tautan hosting terlihat kosong bagi siapa pun yang membukanya sebelum hari pengumpulan. Berkas pembersih menampilkan daftar calon hapus sebelum menghapus.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Risiko yang perlu diawasi</h3>
+  <table>
+    <thead><tr><th style="width:32%">Risiko</th><th style="width:14%">Dampak</th><th>Penanganan</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>Pengumpulan data lapangan menjadi jalur kritis</td>
+        <td>Tinggi</td>
+        <td>Pemasangan sebaiknya dilakukan segera setelah tahap 7 selesai, agar survei dapat berjalan bersamaan dengan sisa pekerjaan.</td>
+      </tr>
+      <tr>
+        <td>Kamera dan GPS diuji lewat alamat jaringan lokal</td>
+        <td>Sedang</td>
+        <td>Peramban memblokir keduanya di luar koneksi aman tanpa penjelasan yang jelas, dan mudah disalahartikan sebagai kerusakan aplikasi. Seluruh uji lapangan harus melalui tautan hosting.</td>
+      </tr>
+      <tr>
+        <td>Pemasangan belum dilakukan</td>
+        <td>Tinggi</td>
+        <td>Selama belum terpasang, survei lapangan tidak bisa dimulai sama sekali, dan pengumpulan data adalah pekerjaan terpanjang yang tersisa.</td>
+      </tr>
+      <tr>
+        <td>Data contoh terbawa sampai penilaian</td>
+        <td>Sedang</td>
+        <td>Ketiga barisnya sudah memuat keterangan bahwa data belum disurvei, namun tetap harus dihapus. Perintahnya sudah disiapkan.</td>
+      </tr>
+      <tr>
+        <td>Ketergantungan pada kuota peta dasar</td>
+        <td>Rendah</td>
+        <td>Sudah tersedia penurunan otomatis ke ubin OpenStreetMap bila gaya berbayar gagal dimuat, sehingga peta tidak pernah kosong saat demonstrasi.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Penutup</h3>
+  <p>
+    Kondisi saat ini: kedelapan tahap tuntas. Seluruh alur inti terbangun, terperiksa dari ujung ke ujung
+    dengan akun sungguhan, dan terdokumentasi lengkap dengan tangkapan antarmukanya. Sembilan cacat
+    ditemukan sepanjang periode ini dan seluruhnya diselesaikan.
+  </p>
+  <p>
+    Pekerjaan menulis kode pada dasarnya selesai. Yang tersisa berpindah ke pemasangan dan pengumpulan data
+    lapangan, dan yang kedua itulah jalur terpanjang menuju batas waktu. Setiap hari tertundanya pemasangan
+    adalah satu hari yang hilang dari waktu survei, bukan dari waktu pemrograman.
+  </p>
+</section>
+
+</body>
+</html>

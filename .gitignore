@@ -1,0 +1,21 @@
+.env
+.env.*
+!.env.example
+.nuxt
+.output
+.data
+node_modules
+.DS_Store
+dist
+.vercel
+*.log
+public/maplibre-gl-worker.mjs
+public/maplibre-gl-shared.mjs
+
+# Konfigurasi hook khusus mesin, konvensinya tidak dibagikan.
+.claude/settings.local.json
+
+# Hasil dokumentasi berukuran besar. Sumbernya tetap ikut: docs/laporan.html
+# beserta skrip pembangunnya, jadi tangkapan dan PDF bisa dibuat ulang kapan saja.
+docs/tangkapan/
+*.pdf
