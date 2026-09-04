@@ -15,6 +15,13 @@ const PETA_PESAN: Record<string, string> = {
   'Email signups are disabled': 'Pendaftaran lewat email sedang dimatikan di pengaturan Supabase. Aktifkan provider Email di Authentication, Sign In / Providers.',
   'Signups not allowed for this instance': 'Pendaftaran akun baru sedang ditutup di pengaturan Supabase.',
   'Database error saving new user': 'Akun gagal dibuat di database. Cek trigger handle_new_user di Supabase.',
+
+  // Alur OAuth. Balasan aslinya HTTP 400 berisi JSON mentah tanpa pengalihan balik,
+  // jadi tanpa terjemahan ini pengguna mendarat di halaman kode tanpa penjelasan.
+  'provider is not enabled': 'Masuk dengan Google belum aktif. Nyalakan provider Google di Supabase, Authentication, Sign In / Providers, lalu isi Client ID dan Client Secret-nya.',
+  'Unsupported provider': 'Cara masuk ini belum diaktifkan di pengaturan Supabase.',
+  'OAuth state parameter missing': 'Proses masuk terputus di tengah jalan. Coba lagi dari awal.',
+  'Error getting user email from external provider': 'Google tidak memberikan alamat email. Coba akun Google lain, atau masuk lewat email.',
 }
 
 export function terjemahkanError(pesan: string): string {

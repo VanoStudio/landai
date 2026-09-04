@@ -169,20 +169,21 @@
     Catatan teknis internal atas pembangunan aplikasi landai untuk ITechno Cup 2026,
     kategori Web Development, subtema Smart Sustainable Digital Solution for Inclusive Society.
     Memuat status per tahap, dokumentasi seluruh antarmuka, cacat yang ditemukan beserta akar
-    masalahnya, dan pekerjaan yang belum selesai.
+    masalahnya, hasil putaran peningkatan antarmuka setelah pemasangan, dan pekerjaan yang
+    belum selesai.
   </p>
 
   <div class="skor-baris">
     <div class="skor-kotak"><div class="angka" style="color: var(--baik)">8</div><div class="label">dari 8 tahap tuntas</div></div>
     <div class="skor-kotak"><div class="angka" style="color: var(--baik)">14</div><div class="label">dari 14 langkah uji menyeluruh lolos</div></div>
-    <div class="skor-kotak"><div class="angka" style="color: var(--kurang)">10</div><div class="label">cacat ditemukan, semua diperbaiki</div></div>
-    <div class="skor-kotak"><div class="angka">38</div><div class="label">tangkapan antarmuka</div></div>
+    <div class="skor-kotak"><div class="angka" style="color: var(--kurang)">14</div><div class="label">cacat ditemukan, semua diperbaiki</div></div>
+    <div class="skor-kotak"><div class="angka">54</div><div class="label">tangkapan antarmuka</div></div>
   </div>
 
   <dl class="meta">
     <div><dt>Tanggal</dt><dd>4 September 2026</dd></div>
     <div><dt>Repositori</dt><dd>landai, cabang main</dd></div>
-    <div><dt>Status build</dt><dd>lolos, 847 kB gzip</dd></div>
+    <div><dt>Status build</dt><dd>lolos, 854 kB gzip</dd></div>
     <div><dt>Pengembang</dt><dd>Vano</dd></div>
     <div><dt>Survei lapangan</dt><dd>Husein</dd></div>
     <div><dt>Riset kriteria</dt><dd>Dakara</dd></div>
@@ -739,6 +740,160 @@
   </figure>
 </section>
 
+
+<!-- ============ PUTARAN PENINGKATAN ANTARMUKA ============ -->
+<section class="halaman">
+  <h2>Putaran peningkatan antarmuka</h2>
+  <p>
+    Dikerjakan setelah aplikasi terpasang di <b>landai-zeta.vercel.app</b> dan lolos empat belas
+    langkah uji menyeluruh. Seluruhnya bersifat tambahan di atas fondasi yang sudah ada: pembacaan
+    posisi, penghitung skor di basis data, aturan keamanan tingkat baris, dan alur autentikasi tidak
+    dibuka sama sekali. Composable yang sudah ada dipakai ulang apa adanya, tidak ditulis ulang.
+  </p>
+
+  <table>
+    <thead><tr><th style="width:5%">No</th><th style="width:30%">Pekerjaan</th><th style="width:13%">Status</th><th>Bukti</th></tr></thead>
+    <tbody>
+      <tr><td class="num">1</td><td>Foto sungguhan di kartu ringkas dan halaman detail</td><td><span class="lencana l-selesai">Selesai</span></td><td>Empat pemeriksaan lolos, gambar 1200 kali 900 piksel asli, dari unggahan pengujian sungguhan.</td></tr>
+      <tr><td class="num">2</td><td>Transisi kartu, umpan balik penanda, easing gerakan peta</td><td><span class="lencana l-selesai">Selesai</span></td><td>Kartu memudar masuk 260 milidetik, penanda berdenyut sekali, peta bergeser bertahap.</td></tr>
+      <tr><td class="num">3</td><td>Rangka pemuatan peta</td><td><span class="lencana l-selesai">Selesai</span></td><td>Tujuh bentuk, ikut dirender server, hilang saat ubin pertama terlukis.</td></tr>
+      <tr><td class="num">4</td><td>Tombol lokasi saya dengan titik posisi</td><td><span class="lencana l-selesai">Selesai</span></td><td>Titik biru muncul di posisi perangkat, peta memusat ke sana, dua ukuran layar.</td></tr>
+      <tr><td class="num">5</td><td>Kolom pencarian area yang selalu terlihat</td><td><span class="lencana l-selesai">Selesai</span></td><td>Hasil pencarian muncul, memilih salah satunya memindahkan pandangan peta.</td></tr>
+      <tr><td class="num">6</td><td>Panel daftar lokasi</td><td><span class="lencana l-selesai">Selesai</span></td><td>Bersanding dengan peta di layar lebar, bergantian lewat tab di ponsel.</td></tr>
+      <tr><td class="num">7</td><td>Pengelompokan penanda berdempet</td><td><span class="lencana l-selesai">Selesai</span></td><td>Tiga penanda berdempet melebur, sekali ketuk memisahkan seluruhnya.</td></tr>
+      <tr><td class="num">8</td><td>Tombol masuk dengan Google</td><td><span class="lencana l-selesai">Selesai</span></td><td>Ada di halaman masuk dan daftar, mengalihkan ke layar izin Google dengan alamat balik yang benar.</td></tr>
+      <tr><td class="num">9</td><td>Baris profil terbentuk dari akun Google</td><td><span class="lencana l-tertahan">Belum terbukti</span></td><td>Menuntut kredensial akun Google sungguhan, yang tidak boleh dimasukkan dari sesi ini.</td></tr>
+      <tr><td class="num">10</td><td>Pesan jelas saat provider Google mati</td><td><span class="lencana l-selesai">Selesai</span></td><td>Diuji sungguhan selagi provider memang mati, lalu diuji ulang setelah dinyalakan.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Batasan yang dipatuhi</h3>
+  <p>
+    Tidak ada sistem penilaian bintang, tidak ada tampilan jalanan, tidak ada kartu informasi bisnis.
+    Palet skor hijau, amber, dan merah tidak diubah, begitu pula pembedaan status lewat bentuk penanda
+    terisi atau berongga. Satu warna baru memang ditambahkan, biru untuk titik posisi pengguna, karena
+    warna itu konvensi peta yang sudah dikenal universal dan memakai hijau justru akan tertukar dengan
+    arti skor. Warna itu didaftarkan sebagai token resmi dan dicatat di dokumen sistem desain, bukan
+    ditulis sebagai nilai lepas di dalam kode.
+  </p>
+</section>
+
+<section class="halaman">
+  <h3>Panel daftar lokasi</h3>
+  <figure>
+    <div class="pasangan">
+      <img class="dsk" src="gambar/panel-daftar-desktop.png" alt="Panel daftar bersanding dengan peta">
+      <img class="mbl" src="gambar/panel-daftar-mobile.png" alt="Daftar lokasi sebagai tampilan penuh di ponsel">
+    </div>
+    <figcaption>
+      <b>Kiri, layar lebar:</b> daftar duduk di samping peta selebar 340 piksel, peta tetap mendapat 1100
+      piksel. Lencana angka pada tiap butir memakai bentuk yang sama persis dengan penanda peta, terisi
+      untuk yang sudah terverifikasi dan berongga untuk yang belum, supaya keduanya dikenali sebagai
+      benda yang sama. <b>Kanan, ponsel:</b> peta dan daftar bergantian lewat tombol pindah tampilan.
+      Tombol itu tinggal di baris penyaring yang dipakai bersama, bukan di dalam kolom peta, supaya
+      tidak ikut hilang saat kolom petanya disembunyikan. Menekan satu butir memindahkan fokus peta ke
+      lokasi itu, membuka kartunya, dan di ponsel sekaligus kembali ke tampilan peta.
+    </figcaption>
+  </figure>
+</section>
+
+<section class="halaman">
+  <h3>Pengelompokan penanda</h3>
+  <figure>
+    <div class="pasangan">
+      <img class="mbl" src="gambar/kluster-penanda-mobile.png" alt="Tiga penanda berdempet melebur jadi satu kelompok">
+      <img class="mbl" src="gambar/kluster-terbuka-mobile.png" alt="Kelompok terpisah setelah diketuk">
+      <img class="mbl" src="gambar/lokasi-saya-mobile.png" alt="Titik posisi pengguna">
+    </div>
+    <figcaption>
+      <b>Kiri:</b> tiga penanda yang saling menutupi dilebur jadi satu lingkaran berangka tiga.
+      Warnanya netral gelap, bukan warna skor, karena satu kelompok memuat beberapa skor sekaligus dan
+      memberinya satu warna akan menyampaikan hal yang keliru. <b>Tengah:</b> sekali ketuk, peta
+      memperbesar dan ketiganya terpisah lengkap dengan angka skornya masing-masing. Pengelompokan
+      dihitung dari jarak di layar, bukan jarak sebenarnya, sehingga bubar sendiri saat peta diperbesar
+      tanpa aturan zoom terpisah. <b>Kanan:</b> titik posisi pengguna beserta halo denyutnya.
+    </figcaption>
+  </figure>
+</section>
+
+<section class="halaman">
+  <h3>Rangka pemuatan, pencarian area, dan masuk dengan Google</h3>
+  <figure>
+    <div class="pasangan">
+      <img class="mbl" src="gambar/rangka-pemuatan-mobile.png" alt="Rangka pemuatan peta">
+      <img class="mbl" src="gambar/cari-area-mobile.png" alt="Hasil pencarian area">
+      <img class="mbl" src="gambar/google-provider-mati-mobile.png" alt="Pesan saat provider Google mati">
+    </div>
+    <figcaption>
+      <b>Kiri:</b> rangka pemuatan meniru blok kota dan garis jalan, bukan deretan batang abu generik,
+      supaya jelas yang sedang dimuat adalah sebuah peta. <b>Tengah:</b> pencarian area memakai rute
+      server yang sama dengan langkah pertama formulir, tetapi hanya memindahkan pandangan peta tanpa
+      menaruh titik apa pun. <b>Kanan:</b> keadaan ketika provider Google masih mati. Pesannya menyebut
+      persis di mana memperbaikinya, dan pengguna tidak dialihkan ke mana pun.
+    </figcaption>
+  </figure>
+</section>
+
+<section class="halaman">
+  <h2>Cacat pada putaran peningkatan</h2>
+  <p>
+    Empat cacat ditemukan, seluruhnya karena hasilnya benar-benar dijalankan dan diukur, bukan dibaca
+    ulang. Semuanya sudah diperbaiki.
+  </p>
+
+  <div class="bug">
+    <h4>11. Rangka pemuatan justru absen pada jendela paling kosong</h4>
+    <p class="cap">Tingkat: fitur tidak melakukan tugasnya. Status: diperbaiki.</p>
+    <p>
+      Rangka mula-mula ditaruh di dalam komponen peta. Pengujian menolaknya dengan keterangan rangka
+      tidak ada. Penyebabnya komponen itu khusus sisi klien dan tidak dirender server sama sekali,
+      sehingga rangkanya baru lahir setelah hidrasi selesai, padahal justru sebelum hidrasi itulah layar
+      paling kosong. Rangka dipindah ke halaman, dan komponen peta hanya memberi tahu kapan rangka boleh
+      dilepas. Terbukti setelahnya: penanda rangka hadir di HTML hasil server, bukan hanya setelah
+      JavaScript berjalan.
+    </p>
+  </div>
+
+  <div class="bug">
+    <h4>12. Kolom pencarian terpotong di layar 390 piksel</h4>
+    <p class="cap">Tingkat: teks bantuan tidak terbaca. Status: diperbaiki.</p>
+    <p>
+      Tombol Cari yang berdiri terpisah di sebelah kolom menyisakan lebar kolom hanya sekitar sembilan
+      puluh piksel, sehingga tulisan bantuannya terpotong di tengah kata. Tombol kirim dipindahkan ke
+      dalam kolom sebagai ikon, dan lebar kolom naik menjadi 168 piksel pada layar yang sama.
+    </p>
+  </div>
+
+  <div class="bug">
+    <h4>13. Tombol lokasi saya menempel pada kontrol perbesar</h4>
+    <p class="cap">Tingkat: dua kendali saling menindih. Status: diperbaiki.</p>
+    <p>
+      Tombol dinaikkan menjadi 128 piksel dari dasar, dan di ponsel disembunyikan saat kartu ringkas
+      sedang terbuka, karena kartu itu menutupi wilayah yang sama.
+    </p>
+  </div>
+
+  <div class="bug">
+    <h4>14. Kelompok penanda tidak terpisah dalam satu ketukan</h4>
+    <p class="cap">Tingkat: fitur bekerja setengah. Status: diperbaiki.</p>
+    <p>
+      Menekan kelompok hanya memisahkan satu anggota, sisanya tetap melebur. Penyebabnya bantalan tepi
+      sebesar 140 piksel pada layar selebar 390 piksel menyisakan bidang yang terlalu sempit, sehingga
+      perbesarannya tidak cukup. Bantalan diperkecil ke 70 piksel dan batas perbesaran dinaikkan. Setelah
+      itu satu ketukan memisahkan seluruh isinya, dari satu penanda tunggal menjadi empat.
+    </p>
+  </div>
+
+  <div class="catatan">
+    <b>Catatan tentang alat uji.</b> Tiga kegagalan lain muncul pada putaran ini dan seluruhnya berasal
+    dari skrip pengujiannya sendiri, bukan dari aplikasi. Panel daftar memakai kelas lencana yang sama
+    dengan penanda peta, sehingga penghitung penanda sempat menghitung lencana daftar sebagai penanda
+    peta dan melaporkan delapan penanda untuk empat lokasi. Setelah pengelompokan dipasang, penanda yang
+    dicari juga bisa tersembunyi di dalam kelompok. Ketiganya dicatat di sini karena angka yang
+    menyesatkan pada laporan pengujian sama berbahayanya dengan cacat pada produknya.
+  </div>
+</section>
+
 <!-- ============ CACAT ============ -->
 <section class="halaman">
   <h2>Cacat yang ditemukan dan diperbaiki</h2>
@@ -954,6 +1109,11 @@
       <tr><td>Pemuatan huruf</td><td>Pemeriksaan status huruf pada peramban</td><td>Public Sans termuat.</td></tr>
       <tr><td>Pemeriksa mekanis desain</td><td>Penelusuran seluruh berkas antarmuka</td><td>Lima peringatan anjuran, seluruhnya nilai alfa bayangan yang memang sudah didokumentasikan pada sistem desain.</td></tr>
       <tr><td>Pendaftaran akun</td><td>Permintaan langsung ke layanan</td><td>Berhasil, sesi langsung diberikan.</td></tr>
+      <tr><td>Foto pada kartu dan halaman detail</td><td>Pemeriksaan ukuran gambar asli di peramban</td><td>Empat pemeriksaan lolos, 1200 kali 900 piksel.</td></tr>
+      <tr><td>Transisi dan rangka pemuatan</td><td>Pembacaan gaya terhitung dan posisi penanda</td><td>Lima pemeriksaan lolos.</td></tr>
+      <tr><td>Lokasi saya dan pencarian area</td><td>Posisi perangkat dipalsukan di Blok M</td><td>Delapan pemeriksaan lolos, dua ukuran layar.</td></tr>
+      <tr><td>Panel daftar dan pengelompokan</td><td>Pemeriksaan tata letak dan jumlah penanda</td><td>Sepuluh pemeriksaan lolos.</td></tr>
+      <tr><td>Alur masuk dengan Google</td><td>Penelusuran rantai pengalihan sampai layar izin</td><td>Sembilan pemeriksaan lolos, sebelum dan sesudah provider dinyalakan.</td></tr>
       <tr><td>Pemicu pembuat profil</td><td>Pemeriksaan tabel profil setelah mendaftar</td><td>Baris terbentuk otomatis lengkap dengan namanya.</td></tr>
       <tr><td>Aturan keamanan tingkat baris</td><td>Pengiriman langsung memakai token pengguna asli</td><td>Berhasil dengan kode 201, membuktikan aturannya benar dan masalahnya di sisi pengirim.</td></tr>
       <tr><td>Alur kontribusi menyeluruh</td><td>Empat belas langkah berurutan lewat peramban</td><td>Dua belas lolos. Satu selisih pembulatan, satu anggapan skrip yang keliru.</td></tr>
@@ -963,9 +1123,12 @@
 
   <h3>Catatan kejujuran atas pengujian</h3>
   <p>
-    Satu hal masih belum terbukti: perilaku aplikasi pada tautan hosting sungguhan. Seluruh pengujian pada
-    dokumen ini berjalan di komputer pengembang. Kamera perangkat dan pembacaan posisi hanya berfungsi pada
-    koneksi aman, sehingga keduanya baru bisa dibuktikan setelah pemasangan selesai.
+    Satu hal masih belum terbukti: pembuatan baris profil dari akun Google sungguhan. Membuktikannya
+    menuntut memasukkan kredensial akun Google, yang tidak boleh dilakukan dari sesi ini. Yang sudah
+    terbukti adalah seluruh rantai sampai layar izin Google, termasuk alamat balik yang menunjuk ke
+    callback layanan dan alamat pulang yang menunjuk ke halaman konfirmasi aplikasi. Pemicu pembuat
+    profil sendiri tidak diubah sama sekali pada putaran ini, dan jalur yang dipakai akun Google adalah
+    jalur yang sama dengan pendaftaran lewat email, yang sudah terbukti bekerja.
   </p>
   <p>
     Basis data yang menghasilkan seluruh tangkapan pada dokumen ini berisi empat lokasi: tiga data contoh
@@ -983,7 +1146,7 @@
   <table>
     <thead><tr><th style="width:6%">No</th><th style="width:36%">Pekerjaan</th><th>Keterangan</th></tr></thead>
     <tbody>
-      <tr><td class="num">1</td><td>Memasang ke Vercel</td><td>Jalur kritis. Kamera dan GPS hanya berfungsi pada koneksi aman, jadi survei lapangan tidak bisa dimulai sebelum ini.</td></tr>
+      <tr><td class="num">1</td><td>Masuk sekali dengan akun Google</td><td>Menuntaskan butir sembilan. Cukup satu kali di tautan hosting, lalu baris profil diperiksa.</td></tr>
       <tr><td class="num">2</td><td>Memasukkan data survei Blok M</td><td>Dua puluh sampai tiga puluh titik dari Husein melalui formulir pada tautan hosting.</td></tr>
       <tr><td class="num">3</td><td>Memasukkan naskah dari Dakara</td><td>Bagian riset dampak pada halaman tentang dan bagian terkait pada README.</td></tr>
       <tr><td class="num">4</td><td>Mencantumkan tautan hosting</td><td>Pada README, setelah pemasangan berhasil.</td></tr>
@@ -1025,7 +1188,7 @@
 
   <h3>Penutup</h3>
   <p>
-    Kondisi saat ini: kedelapan tahap tuntas. Seluruh alur inti terbangun, terperiksa dari ujung ke ujung
+    Kondisi saat ini: kedelapan tahap tuntas, aplikasi terpasang, dan satu putaran peningkatan antarmuka selesai. Seluruh alur inti terbangun, terperiksa dari ujung ke ujung
     dengan akun sungguhan, dan terdokumentasi lengkap dengan tangkapan antarmukanya. Sembilan cacat
     ditemukan sepanjang periode ini dan seluruhnya diselesaikan.
   </p>

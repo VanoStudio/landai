@@ -12,6 +12,8 @@ export interface LokasiPeta {
   guiding_block_tersambung: boolean
   tempat_duduk_tersedia: boolean
   lift_tersedia_berfungsi: boolean
+  /** Foto pertama, dipakai sebagai gambar kecil di kartu ringkas. */
+  foto_utama: string | null
 }
 
 export type Kebutuhan = 'kursi_roda' | 'tunanetra' | 'lansia_stroller'
@@ -49,7 +51,8 @@ export function useDaftarLokasi() {
       accessibility_checklist (
         ramp_tersedia, guiding_block_tersambung,
         tempat_duduk_tersedia, lift_tersedia_berfungsi
-      )
+      ),
+      location_photos ( photo_url )
     `)
       .order('created_at', { ascending: false })
 
@@ -61,6 +64,8 @@ export function useDaftarLokasi() {
       const c = Array.isArray(baris.accessibility_checklist)
         ? baris.accessibility_checklist[0]
         : baris.accessibility_checklist
+
+      const foto = Array.isArray(baris.location_photos) ? baris.location_photos : []
 
       return {
         id: baris.id,
@@ -74,6 +79,7 @@ export function useDaftarLokasi() {
         guiding_block_tersambung: c?.guiding_block_tersambung ?? false,
         tempat_duduk_tersedia: c?.tempat_duduk_tersedia ?? false,
         lift_tersedia_berfungsi: c?.lift_tersedia_berfungsi ?? false,
+        foto_utama: foto[0]?.photo_url ?? null,
       }
     })
   }, { default: () => [] })

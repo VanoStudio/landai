@@ -7,7 +7,19 @@ import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 
 const BASIS = 'http://localhost:3000'
-const AKUN = { email: 'uji.landai@example.com', sandi: 'UjiLandai2026' }
+// Kredensial akun uji dibaca dari environment, tidak ditulis di dalam berkas ini.
+// Repo ini publik, dan sandi yang tertulis mentah di dalamnya berarti siapa pun bisa
+// masuk sebagai kontributor. Isi lewat .env atau di depan perintahnya:
+//   AKUN_UJI_EMAIL=... AKUN_UJI_SANDI=... node docs/uji-menyeluruh.mjs
+const AKUN = {
+  email: process.env.AKUN_UJI_EMAIL,
+  sandi: process.env.AKUN_UJI_SANDI,
+}
+
+if (!AKUN.email || !AKUN.sandi) {
+  console.error('AKUN_UJI_EMAIL dan AKUN_UJI_SANDI belum diisi. Lihat docs/README.md.')
+  process.exit(1)
+}
 
 const b64 = (await readFile(join(process.cwd(), 'foto-uji.jpg'))).toString('base64')
 
@@ -23,13 +35,14 @@ const klik = async (t) => {
   await page.waitForTimeout(500)
 }
 
-await page.goto(`${BASIS}/masuk`, { waitUntil: 'networkidle' })
+await page.goto(`${BASIS}/masuk`, { waitUntil: 'domcontentloaded' })
+await page.waitForTimeout(1500)
 await page.fill('#email', AKUN.email)
 await page.fill('#password', AKUN.sandi)
 await klik('Masuk')
 await page.waitForURL(BASIS + '/', { timeout: 20000 })
 
-await page.goto(`${BASIS}/tambah-lokasi`, { waitUntil: 'networkidle' })
+await page.goto(`${BASIS}/tambah-lokasi`, { waitUntil: 'domcontentloaded' })
 await page.waitForTimeout(4000)
 await klik('Lanjut')
 await page.fill('#nama-tempat', 'Uji Batas Foto Ketat')

@@ -88,6 +88,14 @@ async function daftar() {
       </button>
     </form>
 
+    <div class="my-5 flex items-center gap-3">
+      <span class="h-px flex-1 bg-gray-200" />
+      <span class="text-xs text-gray-500">atau</span>
+      <span class="h-px flex-1 bg-gray-200" />
+    </div>
+
+    <TombolGoogle />
+
     <p class="mt-4 text-sm">
       Sudah punya akun?
       <NuxtLink to="/masuk" class="font-medium text-brand underline">Masuk</NuxtLink>

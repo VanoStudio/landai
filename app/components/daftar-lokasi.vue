@@ -1,0 +1,71 @@
+<script setup lang="ts">
+// Panel daftar lokasi. Di layar lebar duduk di samping peta, di ponsel jadi tampilan
+// yang bisa dipindah lewat tombol. Menekan satu butir memindahkan fokus peta ke
+// lokasi itu sekaligus membuka kartunya, jadi daftar dan peta selalu sinkron.
+
+const props = defineProps<{
+  lokasi: LokasiPeta[]
+  terpilih?: string | null
+}>()
+
+const emit = defineEmits<{ pilih: [LokasiPeta] }>()
+
+// Diurutkan dari skor tertinggi. Orang membuka daftar untuk mencari tempat yang
+// bisa dimasuki, bukan untuk membaca urutan pemasukan data.
+const terurut = computed(() =>
+  [...props.lokasi].sort((a, b) => b.skor - a.skor || a.nama.localeCompare(b.nama, 'id')),
+)
+</script>
+
+<template>
+  <div class="flex h-full flex-col bg-white">
+    <div class="flex items-baseline justify-between gap-3 border-b border-gray-200 px-4 py-3">
+      <h2 class="text-base font-semibold">Daftar lokasi</h2>
+      <p class="text-sm text-gray-600 tabular-nums">{{ terurut.length }} tempat</p>
+    </div>
+
+    <p v-if="terurut.length === 0" class="px-4 py-6 text-sm text-gray-600">
+      Tidak ada lokasi yang memenuhi kebutuhan terpilih.
+    </p>
+
+    <ul v-else class="min-h-0 flex-1 divide-y divide-gray-200 overflow-y-auto">
+      <li v-for="l in terurut" :key="l.id">
+        <button
+          type="button"
+          class="flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-gray-50"
+          :class="l.id === props.terpilih ? 'bg-gray-50' : ''"
+          :aria-current="l.id === props.terpilih ? 'true' : undefined"
+          @click="emit('pilih', l)"
+        >
+          <!-- Angka skor memakai bentuk yang sama dengan penanda peta: terisi berarti
+               terverifikasi, berongga berarti belum. Bentuknya yang membedakan, bukan
+               warnanya, supaya tetap terbaca tanpa membedakan warna. -->
+          <span
+            class="penanda-skor penanda-daftar shrink-0"
+            :style="{ '--warna-skor': warnaSkor(l.skor) }"
+            :data-status="l.status"
+            aria-hidden="true"
+          >{{ l.skor }}</span>
+
+          <span class="min-w-0 flex-1">
+            <span class="block truncate text-sm font-medium">{{ l.nama }}</span>
+            <span class="mt-0.5 block text-xs text-gray-600">
+              {{ LABEL_KATEGORI[l.kategori] }}, {{ labelSkor(l.skor) }}
+            </span>
+          </span>
+
+          <span class="sr-only">
+            skor {{ l.skor }} dari 100,
+            {{ l.status === 'terverifikasi' ? 'terverifikasi warga' : 'belum dikonfirmasi' }}
+          </span>
+
+          <img
+            v-if="l.foto_utama"
+            :src="l.foto_utama" alt="" loading="lazy" decoding="async"
+            class="h-10 w-10 shrink-0 rounded object-cover"
+          >
+        </button>
+      </li>
+    </ul>
+  </div>
+</template>

@@ -43,7 +43,12 @@ for (const [label, viewport] of [
     await page.waitForSelector('.maplibregl-canvas')
     await page.waitForTimeout(9000)
 
-    const sebelum = await page.evaluate(() => document.querySelectorAll('.penanda-skor').length)
+    const sebelum = await page.evaluate(() => (() => {
+      const tunggal = document.querySelectorAll('.penanda-skor.maplibregl-marker').length
+      const dalamKluster = [...document.querySelectorAll('.penanda-kluster.maplibregl-marker')]
+        .reduce((s, e) => s + Number(e.textContent), 0)
+      return tunggal + dalamKluster
+    })())
 
     for (const teks of kasus.pilih) {
       await page.evaluate((t) => {
@@ -55,7 +60,12 @@ for (const [label, viewport] of [
     await page.waitForTimeout(3500)
     await sembunyikanDevtools(page)
 
-    const sesudah = await page.evaluate(() => document.querySelectorAll('.penanda-skor').length)
+    const sesudah = await page.evaluate(() => (() => {
+      const tunggal = document.querySelectorAll('.penanda-skor.maplibregl-marker').length
+      const dalamKluster = [...document.querySelectorAll('.penanda-kluster.maplibregl-marker')]
+        .reduce((s, e) => s + Number(e.textContent), 0)
+      return tunggal + dalamKluster
+    })())
     const ditekan = await page.evaluate(() =>
       [...document.querySelectorAll('[aria-pressed="true"]')].map(b => b.innerText.split('\n')[0].trim()))
 

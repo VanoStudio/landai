@@ -10,6 +10,11 @@
   --color-skor-baik: #639922;
   --color-skor-sedang: #BA7517;
   --color-skor-kurang: #E24B4A;
+
+  /* Posisi pengguna di peta. Bukan warna kode skor, dan tidak pernah dipakai di
+     elemen lain. Biru dipilih karena "kamu di sini" adalah konvensi peta yang
+     sudah dikenal universal, dan hijau akan tertukar dengan arti skor. */
+  --color-posisi: #1D6FE0;
 }
 
 html {
@@ -95,13 +100,189 @@ body {
   box-shadow: inset 0 0 0 3px var(--warna-skor), 0 0 0 3px #fff, 0 0 0 6px var(--warna-skor), 0 3px 10px rgb(0 0 0 / 0.4);
 }
 
+/* Penanda kelompok. Netral gelap, bukan warna skor: satu kelompok memuat beberapa
+   skor sekaligus, jadi memberinya satu warna akan menyampaikan hal yang keliru.
+   Bentuknya tetap lingkaran berangka supaya sekeluarga dengan penanda tunggal. */
+.penanda-kluster {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 9999px;
+  background: var(--color-gray-800);
+  color: #fff;
+  font-family: var(--font-sans);
+  font-size: 15px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 0 0 2px #fff, 0 1px 5px rgb(0 0 0 / 0.35);
+  transition: transform 140ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.penanda-kluster:hover {
+  transform: scale(1.09);
+}
+
+.penanda-kluster:focus-visible {
+  outline: 2px solid var(--color-gray-900);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .penanda-kluster {
+    transition: none;
+  }
+}
+
+/* Varian penanda untuk panel daftar: bentuk dan kode statusnya sama persis dengan
+   penanda peta, hanya lebih kecil dan tanpa perilaku interaktif, supaya pembaca
+   mengenali keduanya sebagai benda yang sama. */
+.penanda-daftar {
+  width: 38px;
+  height: 38px;
+  font-size: 13px;
+  cursor: inherit;
+  transition: none;
+}
+
+.penanda-daftar:hover {
+  transform: none;
+}
+
+/* Titik posisi pengguna. Biru dipakai sebagai konvensi peta yang sudah dikenal,
+   bukan sebagai warna kode skor, dan tidak pernah muncul di elemen lain. */
+.titik-saya {
+  width: 18px;
+  height: 18px;
+  border-radius: 9999px;
+  background: var(--color-posisi);
+  box-shadow: 0 0 0 3px #fff, 0 1px 4px rgb(0 0 0 / 0.35);
+  position: relative;
+}
+
+.titik-saya::after {
+  content: '';
+  position: absolute;
+  inset: -11px;
+  border-radius: 9999px;
+  background: color-mix(in srgb, var(--color-posisi) 18%, transparent);
+  animation: denyut-posisi 2.2s ease-out infinite;
+}
+
+@keyframes denyut-posisi {
+  0%   { transform: scale(0.6); opacity: 0.85; }
+  100% { transform: scale(1.35); opacity: 0; }
+}
+
 /* Kontrol MapLibre disamakan sudutnya dengan bahasa visual sisanya. */
 .maplibregl-ctrl-group {
   border-radius: 6px;
 }
 
+/* Rangka pemuatan peta. Denyutnya pelan dan kontrasnya rendah: ini penanda tunggu,
+   bukan sesuatu yang perlu ditonton. */
+.rangka-peta span {
+  position: absolute;
+  display: block;
+  background: var(--color-gray-200);
+  animation: rangka-denyut 1.6s ease-in-out infinite;
+}
+
+.rangka-jalan {
+  height: 10px;
+  border-radius: 9999px;
+}
+
+.rangka-jalan-tegak {
+  width: 12px;
+}
+
+.rangka-blok {
+  border-radius: 6px;
+  opacity: 0.7;
+}
+
+.rangka-peta span:nth-child(even) {
+  animation-delay: 0.4s;
+}
+
+@keyframes rangka-denyut {
+  0%, 100% { opacity: 0.45; }
+  50%      { opacity: 0.9; }
+}
+
+.rangka-leave-active {
+  transition: opacity 320ms ease-out;
+}
+
+.rangka-leave-to {
+  opacity: 0;
+}
+
+/* Kartu ringkas naik dari bawah sambil memudar masuk. Easing keluar eksponensial
+   supaya berhenti dengan lembut, bukan mengerem mendadak. */
+.kartu-enter-active {
+  transition: opacity 220ms ease-out, transform 260ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.kartu-leave-active {
+  transition: opacity 140ms ease-in, transform 160ms ease-in;
+}
+
+.kartu-enter-from,
+.kartu-leave-to {
+  opacity: 0;
+  transform: translateY(12px);
+}
+
+/* Umpan balik saat penanda diketuk: satu denyut singkat lalu berhenti di ukuran
+   terpilih. Hanya sekali, tidak berdenyut terus, supaya tidak menarik perhatian
+   dari angka skornya sendiri. */
+@keyframes denyut-penanda {
+  0%   { transform: scale(1); }
+  45%  { transform: scale(1.32); }
+  100% { transform: scale(1.18); }
+}
+
+.penanda-skor[data-terpilih='true'] {
+  animation: denyut-penanda 260ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.penanda-skor:active {
+  transform: scale(0.94);
+  transition-duration: 80ms;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .penanda-skor {
     transition: none;
+  }
+
+  .penanda-skor[data-terpilih='true'] {
+    animation: none;
+  }
+
+  .kartu-enter-active,
+  .kartu-leave-active {
+    transition: opacity 100ms linear;
+  }
+
+  .kartu-enter-from,
+  .kartu-leave-to {
+    transform: none;
+  }
+
+  .rangka-peta span {
+    animation: none;
+    opacity: 0.6;
+  }
+
+  .titik-saya::after {
+    animation: none;
+    opacity: 0.25;
   }
 }

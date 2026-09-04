@@ -7,7 +7,19 @@ import { join } from 'node:path'
 
 const BASIS = 'http://localhost:3000'
 const KELUARAN = join(process.cwd(), 'gambar')
-const AKUN = { email: 'uji.landai@example.com', sandi: 'UjiLandai2026' }
+// Kredensial akun uji dibaca dari environment, tidak ditulis di dalam berkas ini.
+// Repo ini publik, dan sandi yang tertulis mentah di dalamnya berarti siapa pun bisa
+// masuk sebagai kontributor. Isi lewat .env atau di depan perintahnya:
+//   AKUN_UJI_EMAIL=... AKUN_UJI_SANDI=... node docs/uji-menyeluruh.mjs
+const AKUN = {
+  email: process.env.AKUN_UJI_EMAIL,
+  sandi: process.env.AKUN_UJI_SANDI,
+}
+
+if (!AKUN.email || !AKUN.sandi) {
+  console.error('AKUN_UJI_EMAIL dan AKUN_UJI_SANDI belum diisi. Lihat docs/README.md.')
+  process.exit(1)
+}
 
 const langkah = []
 function catat(nama, lolos, ket = '') {
@@ -170,9 +182,13 @@ await page.goto(BASIS, { waitUntil: 'networkidle' })
 await page.waitForSelector('.maplibregl-canvas')
 await page.waitForTimeout(9000)
 await sembunyikanDevtools(page)
-const jumlahPenanda = await page.evaluate(() =>
-  document.querySelectorAll('.penanda-skor').length)
-catat('Lokasi baru langsung muncul di peta', jumlahPenanda === 4, `${jumlahPenanda} penanda, 3 seed ditambah 1 baru`)
+const jumlahPenanda = await page.evaluate(() => (() => {
+      const tunggal = document.querySelectorAll('.penanda-skor.maplibregl-marker').length
+      const dalamKluster = [...document.querySelectorAll('.penanda-kluster.maplibregl-marker')]
+        .reduce((s, e) => s + Number(e.textContent), 0)
+      return tunggal + dalamKluster
+    })())
+catat('Lokasi baru langsung muncul di peta', jumlahPenanda === 4, `${jumlahPenanda} lokasi terwakili di peta, 3 seed ditambah 1 baru`)
 
 // --- 12. keluar ---
 await klik(page, 'Keluar')

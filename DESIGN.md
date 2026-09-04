@@ -7,6 +7,7 @@ colors:
   skor-baik: "#639922"
   skor-sedang: "#BA7517"
   skor-kurang: "#E24B4A"
+  posisi: "#1D6FE0"
   teks: "#101828"
   teks-sekunder: "#4B5563"
   teks-redup: "#6B7280"
@@ -129,6 +130,9 @@ Tiga warna kode skor. Dipakai pada penanda peta dan angka skor, tidak di tempat 
 - **Hijau skor** (`#639922`): skor 63 sampai 100, lima item checklist ke atas terpenuhi.
 - **Amber skor** (`#BA7517`): skor 38 sampai 62, tiga atau empat item terpenuhi.
 - **Merah skor** (`#E24B4A`): skor 0 sampai 37, dua item atau kurang.
+
+### Posisi pengguna
+- **Biru posisi** (`#1D6FE0`): titik "kamu di sini" pada peta, beserta halo denyutnya. Satu-satunya warna di luar palet skor, dan tidak pernah muncul di elemen lain. Dipakai karena biru untuk posisi pengguna adalah konvensi peta yang sudah dikenal umum, sedangkan memakai hijau merek akan tertukar dengan arti skor.
 
 ### Neutral
 - **Teks utama** (`#101828`): judul, isi, dan angka skor pada penanda berongga.

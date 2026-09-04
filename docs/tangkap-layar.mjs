@@ -38,6 +38,24 @@ async function klik(page, teks) {
   await page.waitForTimeout(500)
 }
 
+// Penanda yang dicari bisa tersembunyi di dalam kelompok setelah pengelompokan
+// dipasang. Kelompok dibuka dulu sampai penanda tunggalnya muncul.
+async function bukaKelompok(page, angka) {
+  for (let i = 0; i < 4; i++) {
+    const ada = await page.evaluate(a =>
+      [...document.querySelectorAll('.penanda-skor.maplibregl-marker')].some(e => e.textContent === a), angka)
+    if (ada) return
+    const adaKluster = await page.evaluate(() => {
+      const k = document.querySelector('.penanda-kluster.maplibregl-marker')
+      if (!k) return false
+      k.click()
+      return true
+    })
+    if (!adaKluster) return
+    await page.waitForTimeout(2600)
+  }
+}
+
 async function tungguFont(page) {
   await page.evaluate(() => document.fonts.ready).catch(() => {})
   await page.waitForTimeout(400)
@@ -54,11 +72,12 @@ const LAYAR = [
     url: '/',
     siap: async (page) => {
       await tungguPeta(page)
+      await bukaKelompok(page, '50')
       await page.evaluate(() => {
-        const m = [...document.querySelectorAll('.penanda-skor')].find(e => e.textContent === '50')
+        const m = [...document.querySelectorAll('.penanda-skor.maplibregl-marker')].find(e => e.textContent === '50')
         m?.click()
       })
-      await page.waitForTimeout(1200)
+      await page.waitForTimeout(1400)
     },
   },
   {

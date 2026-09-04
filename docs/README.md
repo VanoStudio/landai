@@ -30,3 +30,16 @@ supaya tidak menambah beban build. Pasang sementara saat perlu:
 ```bash
 npm install playwright && npx playwright install chromium
 ```
+
+## Menjalankan skrip pengujian
+
+Dua skrip perlu masuk sebagai kontributor, jadi kredensial akun ujinya dibaca dari
+environment dan tidak pernah ditulis di dalam berkas. Tambahkan ke `.env` di akar repo:
+
+```
+AKUN_UJI_EMAIL=alamat-akun-uji
+AKUN_UJI_SANDI=sandi-akun-uji
+```
+
+Akun uji itu bukan akun sungguhan siapa pun dan dihapus bersama pembersihan data
+terakhir sebelum pengumpulan.

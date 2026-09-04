@@ -2,6 +2,11 @@
 const props = defineProps<{ lokasi: LokasiPeta }>()
 defineEmits<{ tutup: [] }>()
 
+// Tautan foto bisa mati kalau berkasnya dihapus dari penyimpanan. Gambar rusak
+// lebih buruk daripada tidak ada gambar, jadi disembunyikan begitu gagal dimuat.
+const fotoGagal = ref(false)
+watch(() => props.lokasi.id, () => { fotoGagal.value = false })
+
 const fasilitas = computed(() => ([
   { jenis: 'kursi_roda' as const, ada: props.lokasi.ramp_tersedia, label: 'Ramp tersedia' },
   { jenis: 'tunanetra' as const, ada: props.lokasi.guiding_block_tersambung, label: 'Guiding block tersambung' },
@@ -31,15 +36,29 @@ const fasilitas = computed(() => ([
       </button>
     </div>
 
-    <div class="mt-3 flex items-end gap-4">
-      <p class="flex items-baseline gap-1 leading-none">
-        <span
-          class="text-5xl font-bold tabular-nums"
-          :style="{ color: warnaSkor(props.lokasi.skor) }"
-        >{{ props.lokasi.skor }}</span>
-        <span class="text-sm text-gray-500">/100</span>
-      </p>
-      <p class="pb-1 text-sm font-medium text-gray-700">{{ labelSkor(props.lokasi.skor) }}</p>
+    <div class="mt-3 flex items-end justify-between gap-4">
+      <div class="flex items-end gap-4">
+        <p class="flex items-baseline gap-1 leading-none">
+          <span
+            class="text-5xl font-bold tabular-nums"
+            :style="{ color: warnaSkor(props.lokasi.skor) }"
+          >{{ props.lokasi.skor }}</span>
+          <span class="text-sm text-gray-500">/100</span>
+        </p>
+        <p class="pb-1 text-sm font-medium text-gray-700">{{ labelSkor(props.lokasi.skor) }}</p>
+      </div>
+
+      <!-- Foto kondisi, kalau kontributornya mengunggah. Ukurannya sengaja kecil
+           supaya angka skor tetap elemen terbesar di kartu ini. Tidak ada kotak
+           kosong saat foto belum ada, karena bingkai hampa bukan informasi. -->
+      <img
+        v-if="props.lokasi.foto_utama && !fotoGagal"
+        :src="props.lokasi.foto_utama"
+        :alt="`Kondisi ${props.lokasi.nama}`"
+        loading="lazy" decoding="async"
+        class="h-16 w-16 shrink-0 rounded object-cover"
+        @error="fotoGagal = true"
+      >
     </div>
 
     <ul class="mt-4 flex gap-4">
