@@ -7,6 +7,12 @@ defineEmits<{ tutup: [] }>()
 const fotoGagal = ref(false)
 watch(() => props.lokasi.id, () => { fotoGagal.value = false })
 
+// Serah terima ke Google Maps, bukan navigasi buatan sendiri. Tidak ada logika rute
+// yang ditulis di aplikasi ini: hanya tautan biasa berisi koordinat tujuan.
+const rute = computed(() =>
+  `https://www.google.com/maps/dir/?api=1&destination=${props.lokasi.lat},${props.lokasi.lng}`,
+)
+
 const fasilitas = computed(() => ([
   { jenis: 'kursi_roda' as const, ada: props.lokasi.ramp_tersedia, label: 'Ramp tersedia' },
   { jenis: 'tunanetra' as const, ada: props.lokasi.guiding_block_tersambung, label: 'Guiding block tersambung' },
@@ -77,16 +83,39 @@ const fasilitas = computed(() => ([
       </li>
     </ul>
 
-    <div class="mt-4 flex items-center gap-3">
+    <div class="mt-4 flex flex-wrap items-center gap-2">
       <NuxtLink
         :to="`/lokasi/${props.lokasi.id}`"
         class="tombol tombol-utama"
       >
         Lihat detail
       </NuxtLink>
-      <p v-if="props.lokasi.status === 'belum_terverifikasi'" class="text-xs text-gray-600">
-        Belum dikonfirmasi warga lain
-      </p>
+
+      <!-- Gaya sekunder, bukan utama: perhatian harus tetap jatuh pada informasi
+           aksesibilitasnya dulu, bukan pada cara ke sana. -->
+      <a
+        :href="rute" target="_blank" rel="noopener noreferrer"
+        class="tombol tombol-sekunder"
+      >
+        <!-- Teks yang tampak diperpendek supaya muat berdampingan dengan tombol
+             lihat detail pada kartu selebar 384px. Nama aksesibelnya tetap utuh
+             lewat teks khusus pembaca layar. -->
+        Buka rute
+        <span class="sr-only">di Google Maps,</span>
+        <svg
+            viewBox="0 0 24 24" class="h-4 w-4 shrink-0" fill="none" stroke="currentColor"
+            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
+          >
+            <path d="M14 4h6v6" />
+            <path d="M20 4 11 13" />
+            <path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5" />
+          </svg>
+        <span class="sr-only">membuka tab baru</span>
+      </a>
     </div>
+
+    <p v-if="props.lokasi.status === 'belum_terverifikasi'" class="mt-2 text-xs text-gray-600">
+      Belum dikonfirmasi warga lain
+    </p>
   </article>
 </template>

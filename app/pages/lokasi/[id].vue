@@ -61,6 +61,13 @@ const tanggal = computed(() =>
     : '',
 )
 
+// Sama seperti di kartu ringkas: tautan biasa ke Google Maps, bukan navigasi sendiri.
+const rute = computed(() =>
+  lokasi.value
+    ? `https://www.google.com/maps/dir/?api=1&destination=${lokasi.value.lat},${lokasi.value.lng}`
+    : '',
+)
+
 const mengirim = ref(false)
 const pesanError = ref('')
 
@@ -121,6 +128,22 @@ useHead(() => ({ title: lokasi.value ? `${lokasi.value.nama} — landai` : 'land
           </p>
         </div>
       </div>
+
+      <a
+        :href="rute" target="_blank" rel="noopener noreferrer"
+        class="tombol tombol-sekunder mt-5"
+      >
+        Buka rute di Google Maps
+        <svg
+            viewBox="0 0 24 24" class="h-4 w-4 shrink-0" fill="none" stroke="currentColor"
+            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
+          >
+            <path d="M14 4h6v6" />
+            <path d="M20 4 11 13" />
+            <path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5" />
+          </svg>
+        <span class="sr-only">membuka tab baru</span>
+      </a>
 
       <ul v-if="foto.length" class="mt-5 grid gap-2" :class="foto.length > 1 ? 'grid-cols-2' : 'grid-cols-1'">
         <li v-for="f in foto" :key="f.id">

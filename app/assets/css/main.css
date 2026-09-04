@@ -263,6 +263,15 @@ body {
   100% { transform: scale(1.35); opacity: 0; }
 }
 
+/* Basemap streets-v2 membawa warnanya sendiri: jalan kuning, taman hijau, dan ikon
+   kategori termasuk salib merah rumah sakit yang bersaing langsung dengan penanda
+   merah skor. Saturasinya diredam di lapisan kanvas, bukan dengan mengubah warna
+   skor. Penanda adalah elemen DOM bersaudara dengan kanvas, bukan anaknya, jadi
+   sama sekali tidak terkena penapis ini dan tetap berwarna penuh. */
+.maplibregl-canvas {
+  filter: saturate(0.6);
+}
+
 /* Kontrol MapLibre disamakan sudutnya dengan bahasa visual sisanya. */
 .maplibregl-ctrl-group {
   border-radius: 6px;

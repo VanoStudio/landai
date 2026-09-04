@@ -77,6 +77,29 @@ useHead({ title: 'Tentang landai' })
         membuat peta kosong, menyamarkannya membuat peta berbohong.
       </p>
 
+      <h2 class="mt-8 text-base font-semibold">Papan kontributor</h2>
+      <p class="mt-2 text-gray-700">
+        Setiap lokasi mencatat siapa yang menambahkannya, dan papan kontributor menampilkan
+        warga yang sudah mengisi peta ini beserta jumlahnya. Ini bentuk pengakuan komunitas,
+        bukan program hadiah: tidak ada yang bisa diklaim atau ditukar dari sana.
+      </p>
+      <NuxtLink to="/papan-kontributor" class="tombol tombol-sekunder mt-3">
+        Lihat papan kontributor
+      </NuxtLink>
+
+      <h2 class="mt-8 text-base font-semibold">Rencana pengembangan</h2>
+      <p class="mt-2 text-gray-700">
+        Masa lomba ini fokus pada satu hal: alur inti berjalan tanpa cacat, bukan daftar fitur
+        yang panjang. Beberapa arah pengembangan sudah terlihat tetapi sengaja belum dikerjakan,
+        antara lain memperluas cakupan survei ke koridor lain dan membuka data ini agar bisa
+        dipakai pihak yang ingin membenahi fasilitas.
+      </p>
+      <p class="mt-3 text-gray-700">
+        Program apresiasi bagi kontributor yang paling aktif dan paling akurat juga menjadi arah
+        pengembangan lanjutan setelah masa lomba. Bentuknya belum ditentukan dan tidak dijanjikan
+        sekarang; yang ada hari ini hanya pengakuan berupa nama pada papan kontributor.
+      </p>
+
       <h2 class="mt-8 text-base font-semibold">Tim</h2>
       <p class="mt-2 text-gray-700">
         Vano mengerjakan pengembangan, Husein melakukan survei lapangan, Dakara meneliti kriteria

@@ -33,7 +33,10 @@ let penandaSaya: maplibregl.Marker | null = null
 // Koridor Blok M, titik mulai survei (PRD bagian 9).
 const PUSAT: [number, number] = [106.7983, -6.2440]
 
-// Basemap netral supaya warna skor jadi satu-satunya warna kuat di layar.
+// Basemap streets-v2: memuat label jalan, nama tempat, dan ikon kategori umum,
+// supaya peta memberi konteks sekitar dan tidak terasa kosong. Konsekuensinya
+// basemap kini berwarna sendiri, jadi saturasinya diredam lewat gaya kanvas di
+// main.css agar penanda skor tetap jadi warna paling menonjol di layar.
 // Kalau kunci tidak ada atau gagal, jatuh ke raster OSM supaya peta tetap muncul.
 const GAYA_OSM: maplibregl.StyleSpecification = {
   version: 8,
@@ -170,7 +173,7 @@ watch(wadah, (el) => {
   peta = new maplibregl.Map({
     container: el,
     style: kunci
-      ? `https://api.maptiler.com/maps/dataviz-light/style.json?key=${kunci}`
+      ? `https://api.maptiler.com/maps/streets-v2/style.json?key=${kunci}`
       : GAYA_OSM,
     center: PUSAT,
     zoom: 14.5,

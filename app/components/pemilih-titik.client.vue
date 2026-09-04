@@ -19,7 +19,7 @@ watch(wadah, (el) => {
   peta = new maplibregl.Map({
     container: el,
     style: kunci
-      ? `https://api.maptiler.com/maps/dataviz-light/style.json?key=${kunci}`
+      ? `https://api.maptiler.com/maps/streets-v2/style.json?key=${kunci}`
       : {
           version: 8,
           sources: { osm: { type: 'raster', tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'], tileSize: 256 } },
