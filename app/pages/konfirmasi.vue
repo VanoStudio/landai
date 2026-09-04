@@ -43,11 +43,11 @@ useHead({ title: 'Mengaktifkan akun — landai' })
       <div class="mt-6 flex flex-wrap gap-3 text-sm">
         <NuxtLink
           to="/masuk"
-          class="flex h-11 items-center rounded bg-brand px-4 font-medium text-white hover:bg-brand-gelap"
+          class="tombol tombol-utama"
         >Coba lagi</NuxtLink>
         <NuxtLink
           to="/"
-          class="flex h-11 items-center rounded border border-gray-400 px-4 font-medium text-gray-800 hover:border-gray-600"
+          class="tombol tombol-sekunder"
         >Kembali ke peta</NuxtLink>
       </div>
     </template>

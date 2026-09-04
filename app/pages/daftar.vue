@@ -83,7 +83,7 @@ async function daftar() {
       <p v-if="pesanError" role="alert" class="text-sm text-skor-kurang">{{ pesanError }}</p>
 
       <button type="submit" :disabled="memuat"
-        class="w-full rounded bg-brand px-4 py-2 font-medium text-white disabled:opacity-50">
+        class="tombol tombol-utama w-full">
         {{ memuat ? 'Memproses' : 'Daftar' }}
       </button>
     </form>
@@ -102,7 +102,7 @@ async function daftar() {
     </p>
 
     <p class="mt-6 border-t border-gray-200 pt-4 text-sm">
-      <NuxtLink to="/" class="font-medium text-gray-700 hover:text-gray-900">Kembali ke peta</NuxtLink>
+      <NuxtLink to="/" class="tombol tombol-tersier">Kembali ke peta</NuxtLink>
     </p>
   </main>
 </template>

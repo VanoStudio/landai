@@ -95,7 +95,7 @@ useHead(() => ({ title: lokasi.value ? `${lokasi.value.nama} — landai` : 'land
 <template>
   <div class="mx-auto max-w-lg">
     <header class="sticky top-0 z-10 border-b border-gray-200 bg-white px-4 py-3">
-      <NuxtLink to="/" class="text-sm font-medium text-gray-700 hover:text-gray-900">
+      <NuxtLink to="/" class="tombol tombol-tersier -ml-2">
         Kembali ke peta
       </NuxtLink>
     </header>
@@ -130,9 +130,7 @@ useHead(() => ({ title: lokasi.value ? `${lokasi.value.nama} — landai` : 'land
           >
         </li>
       </ul>
-      <p v-else class="mt-5 rounded border border-dashed border-gray-300 px-4 py-6 text-center text-sm text-gray-600">
-        Belum ada foto untuk tempat ini.
-      </p>
+      <FotoKosong v-else class="mt-5" />
 
       <h2 class="mt-8 text-base font-semibold">Rincian fasilitas</h2>
       <ul v-if="checklist" class="mt-2 divide-y divide-gray-200">
@@ -181,20 +179,16 @@ useHead(() => ({ title: lokasi.value ? `${lokasi.value.nama} — landai` : 'land
       <div class="mt-3 flex flex-wrap gap-3">
         <button
           type="button" :disabled="mengirim"
-          class="rounded px-4 py-2.5 text-sm font-medium disabled:opacity-50"
-          :class="konfirmasiSaya?.is_accurate === true
-            ? 'bg-brand text-white'
-            : 'border border-gray-400 text-gray-800 hover:border-gray-600'"
+          class="tombol"
+          :class="konfirmasiSaya?.is_accurate === true ? 'tombol-utama' : 'tombol-sekunder'"
           @click="konfirmasiAkurasi(true)"
         >
           Masih akurat
         </button>
         <button
           type="button" :disabled="mengirim"
-          class="rounded px-4 py-2.5 text-sm font-medium disabled:opacity-50"
-          :class="konfirmasiSaya?.is_accurate === false
-            ? 'bg-gray-900 text-white'
-            : 'border border-gray-400 text-gray-800 hover:border-gray-600'"
+          class="tombol"
+          :class="konfirmasiSaya?.is_accurate === false ? 'tombol-dipilih-gelap' : 'tombol-sekunder'"
           @click="konfirmasiAkurasi(false)"
         >
           Sudah berubah

@@ -57,7 +57,7 @@ async function pakaiGps() {
       >
       <button
         type="submit" :disabled="mencari"
-        class="shrink-0 rounded border border-gray-400 px-4 py-2.5 font-medium disabled:opacity-50"
+        class="tombol tombol-sekunder shrink-0"
       >
         {{ mencari ? 'Mencari' : 'Cari' }}
       </button>
@@ -83,7 +83,7 @@ async function pakaiGps() {
 
     <button
       type="button" :disabled="memuatGps"
-      class="w-full rounded border border-brand px-4 py-2.5 font-medium text-brand disabled:opacity-50"
+      class="tombol tombol-sekunder w-full"
       @click="pakaiGps"
     >
       {{ memuatGps ? 'Membaca lokasi' : 'Pakai lokasi saya' }}

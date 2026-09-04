@@ -42,7 +42,7 @@ async function masukGoogle() {
   <div>
     <button
       type="button" :disabled="memuat"
-      class="flex h-11 w-full items-center justify-center gap-2.5 rounded border border-gray-400 bg-white px-4 font-medium text-gray-800 hover:border-gray-600 disabled:opacity-50"
+      class="tombol tombol-sekunder w-full"
       @click="masukGoogle"
     >
       <!-- Lambang Google resmi, empat warna, dipakai apa adanya sesuai ketentuan

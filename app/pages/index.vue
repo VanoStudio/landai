@@ -73,7 +73,17 @@ useHead({ title: 'landai — peta aksesibilitas' })
   <div class="flex h-[100dvh] w-full flex-col overflow-hidden">
     <!-- Identitas, pencarian area, akun -->
     <header class="flex shrink-0 items-center gap-2 border-b border-gray-200 bg-white px-4 py-3">
-      <p class="shrink-0 text-lg font-bold leading-none text-brand">landai</p>
+      <!-- Tanda dan tulisan diperlakukan sebagai satu kesatuan merek, jadi keduanya
+           dibungkus satu elemen dengan jarak tetap. Tinggi tandanya diikat ke tinggi
+           teks di sebelahnya, bukan angka lepas. -->
+      <div class="flex shrink-0 items-center gap-2">
+        <TandaLandai :ukuran="26" />
+        <!-- Di layar tersempit hanya tandanya yang tampil. Tulisannya memakan 70
+             piksel, dan itu persis yang membuat teks bantuan kolom pencarian
+             terpotong. Tanda sendiri sudah cukup mengenali merek, dan judul
+             halaman tetap menyebut namanya. -->
+        <p class="hidden text-lg font-bold leading-none text-brand sm:block">landai</p>
+      </div>
       <p class="hidden shrink-0 text-xs text-gray-600 xl:block">Peta aksesibilitas difabel</p>
 
       <CariArea
@@ -85,7 +95,7 @@ useHead({ title: 'landai — peta aksesibilitas' })
         <NuxtLink
           to="/tentang"
           aria-label="Tentang landai"
-          class="flex h-11 w-11 items-center justify-center rounded font-medium text-gray-700 hover:text-gray-900 sm:w-auto sm:px-2"
+          class="tombol tombol-tersier w-11 sm:w-auto"
         >
           <svg
             viewBox="0 0 24 24" class="h-5 w-5 sm:hidden" fill="none" stroke="currentColor"
@@ -101,17 +111,17 @@ useHead({ title: 'landai — peta aksesibilitas' })
         <template v-if="user">
           <NuxtLink
             to="/tambah-lokasi"
-            class="hidden h-11 items-center rounded bg-brand px-3 font-medium text-white hover:bg-brand-gelap sm:flex"
+            class="tombol tombol-utama hidden sm:inline-flex"
           >Tambah lokasi</NuxtLink>
           <button
-            class="h-11 rounded border border-gray-300 px-3 font-medium text-gray-800 hover:border-gray-500"
+            class="tombol tombol-sekunder"
             @click="keluar()"
           >Keluar</button>
         </template>
         <template v-else>
           <NuxtLink
             to="/masuk"
-            class="flex h-11 items-center rounded border border-gray-300 px-3 font-medium text-gray-800 hover:border-gray-500"
+            class="tombol tombol-sekunder"
           >Masuk</NuxtLink>
         </template>
       </div>
@@ -244,7 +254,7 @@ useHead({ title: 'landai — peta aksesibilitas' })
         <NuxtLink
           v-if="!lokasiTerpilih"
           :to="user ? '/tambah-lokasi' : '/masuk'"
-          class="absolute bottom-10 left-4 z-20 inline-flex min-h-12 items-center rounded-full bg-brand px-5 text-sm font-semibold text-white shadow-lg hover:bg-brand-gelap sm:hidden"
+          class="tombol tombol-utama tombol-pil absolute bottom-10 left-4 z-20 shadow-lg sm:hidden"
         >
           Tambah lokasi
         </NuxtLink>

@@ -100,6 +100,91 @@ body {
   box-shadow: inset 0 0 0 3px var(--warna-skor), 0 0 0 3px #fff, 0 0 0 6px var(--warna-skor), 0 3px 10px rgb(0 0 0 / 0.4);
 }
 
+/* ---------------------------------------------------------------------------
+   Hierarki tombol. Sebelumnya gaya aksi utama ditulis ulang di sepuluh berkas
+   dengan enam varian tinggi dan bantalan yang berbeda-beda, begitu pula aksi
+   sekunder. Didefinisikan sekali di sini, dipakai ulang lewat nama kelas.
+
+   Aturannya satu: aksi utama terisi penuh warna merek, aksi sekunder bergaris,
+   aksi tersier tanpa isian maupun garis. Satu layar tidak boleh punya dua aksi
+   utama yang bersaing.
+   --------------------------------------------------------------------------- */
+.tombol {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  padding-inline: 1rem;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease;
+}
+
+.tombol:disabled,
+.tombol[aria-disabled='true'] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.tombol-utama {
+  background: var(--color-brand);
+  color: #fff;
+}
+
+.tombol-utama:hover:not(:disabled) {
+  background: var(--color-brand-gelap);
+}
+
+.tombol-sekunder {
+  background: #fff;
+  border-color: var(--color-gray-400);
+  color: var(--color-gray-800);
+}
+
+.tombol-sekunder:hover:not(:disabled) {
+  border-color: var(--color-gray-600);
+}
+
+.tombol-tersier {
+  background: transparent;
+  color: var(--color-gray-700);
+  padding-inline: 0.5rem;
+}
+
+.tombol-tersier:hover:not(:disabled) {
+  color: var(--color-gray-900);
+}
+
+/* Keadaan terpilih untuk pilihan yang bukan aksi utama. Dipakai pada tombol
+   "sudah berubah" di halaman detail: pilihan itu perlu terlihat aktif, tetapi
+   tidak boleh memakai warna merek yang berarti aksi utama. */
+.tombol-dipilih-gelap {
+  background: var(--color-gray-900);
+  border-color: var(--color-gray-900);
+  color: #fff;
+}
+
+/* Bentuk pil hanya untuk tombol mengambang di atas peta, yang harus terbaca
+   sebagai benda terpisah dari bidang petanya. */
+.tombol-pil {
+  border-radius: 9999px;
+  padding-inline: 1.25rem;
+  font-weight: 600;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tombol {
+    transition: none;
+  }
+}
+
 /* Penanda kelompok. Netral gelap, bukan warna skor: satu kelompok memuat beberapa
    skor sekaligus, jadi memberinya satu warna akan menyampaikan hal yang keliru.
    Bentuknya tetap lingkaran berangka supaya sekeluarga dengan penanda tunggal. */

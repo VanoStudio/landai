@@ -8,6 +8,10 @@ export default defineNuxtConfig({
     head: {
       htmlAttrs: { lang: 'id' },
       link: [
+        // Favicon SVG untuk peramban modern, PNG untuk yang belum menerimanya.
+        { rel: 'icon', type: 'image/svg+xml', href: '/tanda.svg' },
+        { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/favicon-32.png' },
+        { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' },
         { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
         { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
         {
@@ -45,6 +49,9 @@ export default defineNuxtConfig({
     public: {
       // diisi dari NUXT_PUBLIC_MAPTILER_KEY di .env
       maptilerKey: '',
+      // Alamat mutlak dibutuhkan tag pratinjau tautan: WhatsApp dan Telegram
+      // menolak alamat gambar yang relatif.
+      situsUrl: 'https://landai-zeta.vercel.app',
     },
   },
 })

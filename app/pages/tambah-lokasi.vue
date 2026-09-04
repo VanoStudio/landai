@@ -106,7 +106,7 @@ useHead({ title: 'Tambah lokasi — landai' })
   <div class="mx-auto flex min-h-[100dvh] max-w-lg flex-col">
     <header class="border-b border-gray-200 px-4 py-3">
       <div class="flex items-center justify-between gap-3">
-        <NuxtLink to="/" class="text-sm font-medium text-gray-700 hover:text-gray-900">Batal</NuxtLink>
+        <NuxtLink to="/" class="tombol tombol-tersier -ml-2">Batal</NuxtLink>
         <p class="text-sm text-gray-600 tabular-nums">Langkah {{ langkah + 1 }} dari {{ LANGKAH.length }}</p>
       </div>
 
@@ -140,7 +140,7 @@ useHead({ title: 'Tambah lokasi — landai' })
       <div class="flex gap-3">
         <button
           v-if="langkah > 0" type="button"
-          class="rounded border border-gray-400 px-4 py-2.5 font-medium"
+          class="tombol tombol-sekunder"
           @click="mundur"
         >
           Kembali
@@ -148,7 +148,7 @@ useHead({ title: 'Tambah lokasi — landai' })
 
         <button
           v-if="langkah < LANGKAH.length - 1" type="button" :disabled="!bolehLanjut"
-          class="flex-1 rounded bg-brand px-4 py-2.5 font-medium text-white hover:bg-brand-gelap disabled:opacity-40"
+          class="tombol tombol-utama flex-1"
           @click="maju"
         >
           Lanjut
@@ -156,7 +156,7 @@ useHead({ title: 'Tambah lokasi — landai' })
 
         <button
           v-else type="button" :disabled="mengirim"
-          class="flex-1 rounded bg-brand px-4 py-2.5 font-medium text-white hover:bg-brand-gelap disabled:opacity-50"
+          class="tombol tombol-utama flex-1"
           @click="kirim"
         >
           {{ mengirim ? 'Menyimpan' : 'Simpan lokasi' }}

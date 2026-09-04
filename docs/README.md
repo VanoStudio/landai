@@ -11,6 +11,12 @@ Sumber laporan progres. PDF hasilnya ada di `../laporan-progres-landai.pdf`.
   dan penjaga rute `/tambah-lokasi` dibuka sementara supaya empat langkah form
   bisa direkam tanpa akun.
 - `buat-pdf.mjs` — merender `laporan.html` menjadi PDF A4.
+- `buat-aset.mjs` — merender aset raster dari `public/tanda.svg`: gambar pratinjau
+  tautan 1200x630 dan dua ukuran favicon. Perlu raster karena WhatsApp dan Telegram
+  tidak merender og:image berformat SVG. Jalankan `node buat-aset.mjs ..` dari folder
+  ini setiap kali tandanya berubah.
+- `uji-polish.mjs` — pemeriksaan visual: limpahan mendatar, tindih antar elemen
+  header, teks terpotong, tinggi tombol, dan keberadaan tanda merek.
 - `uji-menyeluruh.mjs` — uji 14 langkah lewat peramban, dari mendaftar sampai keluar,
   memakai akun sungguhan. Menghasilkan juga tangkapan keadaan sudah masuk.
 - `uji-filter.mjs` — menguji tiap penyaring kebutuhan terpisah, mencocokkan jumlah

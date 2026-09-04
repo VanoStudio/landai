@@ -48,9 +48,10 @@ const fasilitas = computed(() => ([
         <p class="pb-1 text-sm font-medium text-gray-700">{{ labelSkor(props.lokasi.skor) }}</p>
       </div>
 
-      <!-- Foto kondisi, kalau kontributornya mengunggah. Ukurannya sengaja kecil
-           supaya angka skor tetap elemen terbesar di kartu ini. Tidak ada kotak
-           kosong saat foto belum ada, karena bingkai hampa bukan informasi. -->
+      <!-- Foto kondisi. Ukurannya sengaja kecil supaya angka skor tetap elemen
+           terbesar di kartu ini. Saat foto belum ada, tempatnya diisi ikon kamera,
+           bukan dibiarkan hilang: tinggi kartu jadi tetap sama antar lokasi, dan
+           bidang kosong itu sekaligus mengabarkan bahwa foto memang bisa ditambah. -->
       <img
         v-if="props.lokasi.foto_utama && !fotoGagal"
         :src="props.lokasi.foto_utama"
@@ -59,6 +60,7 @@ const fasilitas = computed(() => ([
         class="h-16 w-16 shrink-0 rounded object-cover"
         @error="fotoGagal = true"
       >
+      <FotoKosong v-else ringkas />
     </div>
 
     <ul class="mt-4 flex gap-4">
@@ -78,7 +80,7 @@ const fasilitas = computed(() => ([
     <div class="mt-4 flex items-center gap-3">
       <NuxtLink
         :to="`/lokasi/${props.lokasi.id}`"
-        class="rounded bg-brand px-4 py-2 text-sm font-medium text-white hover:bg-brand-gelap"
+        class="tombol tombol-utama"
       >
         Lihat detail
       </NuxtLink>

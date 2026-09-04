@@ -5,7 +5,7 @@ useHead({ title: 'Tentang landai' })
 <template>
   <div class="mx-auto max-w-lg">
     <header class="sticky top-0 z-10 border-b border-gray-200 bg-white px-4 py-3">
-      <NuxtLink to="/" class="text-sm font-medium text-gray-700 hover:text-gray-900">
+      <NuxtLink to="/" class="tombol tombol-tersier -ml-2">
         Kembali ke peta
       </NuxtLink>
     </header>
@@ -95,7 +95,7 @@ useHead({ title: 'Tentang landai' })
 
       <NuxtLink
         to="/"
-        class="mt-6 inline-flex min-h-11 items-center rounded bg-brand px-4 font-medium text-white hover:bg-brand-gelap"
+        class="tombol tombol-utama mt-6"
       >
         Buka peta
       </NuxtLink>
