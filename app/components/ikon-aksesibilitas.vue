@@ -31,15 +31,16 @@ defineProps<{
       <path d="M13 8.5 18 21" />
     </template>
 
-    <!-- Tempat duduk dan kursi dorong -->
+    <!-- Kursi dorong. Digambar ulang supaya sekeluarga dengan dua ikon di atas:
+         kepala sebagai titik pejal berjari-jari 1.8 yang sama, dan roda sebagai
+         lingkaran bergaris seperti roda kursi roda, bukan titik pejal berjari-jari
+         1.3 yang sebelumnya dipakai dan membuat ketebalannya terbaca berbeda. -->
     <template v-else>
-      <path d="M4 20v-6" />
-      <path d="M4 14h11" />
-      <path d="M15 14V6" />
-      <path d="M15 20v-6" />
-      <circle cx="8" cy="20.5" r="1.3" fill="currentColor" stroke="none" />
-      <circle cx="17" cy="20.5" r="1.3" fill="currentColor" stroke="none" />
-      <path d="M15 6h4" />
+      <circle cx="8.7" cy="7.9" r="1.8" fill="currentColor" stroke="none" />
+      <path d="M4 10.5h9.4v2.4A4.7 4.7 0 0 1 8.7 17.6 4.7 4.7 0 0 1 4 12.9Z" />
+      <path d="M13.4 10.5 18.6 5.9" />
+      <circle cx="6.1" cy="19.4" r="1.6" />
+      <circle cx="11.7" cy="19.4" r="1.6" />
     </template>
 
     <title v-if="label">{{ label }}</title>

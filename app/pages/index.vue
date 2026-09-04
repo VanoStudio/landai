@@ -1,8 +1,8 @@
 <script setup lang="ts">
-// Peta adalah hero. Tidak ada halaman pembuka sebelum peta (DESIGN-BRIEF).
-// Di layar lebar, daftar lokasi duduk di sampingnya; di ponsel keduanya bergantian
-// lewat tombol pindah tampilan, karena membelah layar 390px jadi dua tidak menyisakan
-// ruang yang layak untuk keduanya.
+// Peta adalah hero. Tidak ada halaman pembuka sebelum peta (DESIGN-BRIEF), dan peta
+// selalu memakai lebar penuh. Daftar lokasi bukan kolom tetap di sampingnya melainkan
+// panel yang dipanggil lewat pemindah tampilan di header lalu ditutup lagi: kolom tetap
+// memangkas lebar peta selamanya, padahal peta yang dilihat, bukan daftarnya.
 const { data: semua, pending, error, refresh } = useDaftarLokasi()
 const user = useSupabaseUser()
 const keluar = useKeluar()
@@ -57,12 +57,27 @@ function ubahFilter(k: Kebutuhan) {
     : [...filterAktif.value, k]
 }
 
+// Lebar layar dibaca sekali dan diikuti perubahannya. Ini semata keadaan tampilan,
+// bukan data: dipakai hanya untuk memutuskan apakah panel daftar perlu ditutup.
+const layarLebar = ref(false)
+let pantau: MediaQueryList | null = null
+const ikutiLebar = (e: MediaQueryListEvent) => { layarLebar.value = e.matches }
+
+onMounted(() => {
+  pantau = window.matchMedia('(min-width: 1024px)')
+  layarLebar.value = pantau.matches
+  pantau.addEventListener('change', ikutiLebar)
+})
+
+onBeforeUnmount(() => pantau?.removeEventListener('change', ikutiLebar))
+
 // Menekan butir daftar memindahkan fokus peta sekaligus membuka kartunya. Di ponsel
-// tampilan ikut berpindah ke peta, karena kalau tidak, kartu yang baru dibuka berada
-// di layar yang sedang tidak dilihat.
+// panelnya ikut ditutup, karena kalau tidak, kartu yang baru dibuka berada di layar
+// yang sedang tidak dilihat. Di layar lebar panelnya dibiarkan terbuka supaya orang
+// bisa menyusuri daftar satu per satu tanpa membukanya berulang kali.
 function pilihDariDaftar(l: LokasiPeta) {
   terpilihId.value = l.id
-  tampilan.value = 'peta'
+  if (!layarLebar.value) tampilan.value = 'peta'
   nextTick(() => petaRef.value?.pindahKe(l.lat, l.lng, 17))
 }
 
@@ -71,27 +86,34 @@ useHead({ title: 'landai — peta aksesibilitas' })
 
 <template>
   <div class="flex h-[100dvh] w-full flex-col overflow-hidden">
-    <!-- Identitas, pencarian area, akun -->
-    <header class="flex shrink-0 items-center gap-2 border-b border-gray-200 bg-white px-4 py-3">
-      <!-- Tanda dan tulisan diperlakukan sebagai satu kesatuan merek, jadi keduanya
-           dibungkus satu elemen dengan jarak tetap. Tinggi tandanya diikat ke tinggi
-           teks di sebelahnya, bukan angka lepas. -->
-      <div class="flex shrink-0 items-center gap-2">
-        <TandaLandai :ukuran="26" />
-        <!-- Di layar tersempit hanya tandanya yang tampil. Tulisannya memakan 70
-             piksel, dan itu persis yang membuat teks bantuan kolom pencarian
-             terpotong. Tanda sendiri sudah cukup mengenali merek, dan judul
-             halaman tetap menyebut namanya. -->
-        <p class="hidden text-lg font-bold leading-none text-brand sm:block">landai</p>
-      </div>
-      <p class="hidden shrink-0 text-xs text-gray-600 xl:block">Peta aksesibilitas difabel</p>
+    <!-- Identitas, pencarian area, pemindah tampilan, akun.
+         Membungkus jadi dua baris di layar sempit: kolom pencarian diberi lebar penuh
+         supaya teks bantuannya tidak terpotong, dan urutannya ditukar di layar lebar
+         supaya ketiganya duduk dalam satu baris. -->
+    <header class="flex shrink-0 flex-wrap items-center gap-2 border-b border-gray-200 bg-white px-4 py-2.5">
+      <!-- Tanda tidak pernah tampil tanpa tulisan di sampingnya, jadi keduanya satu
+           komponen. Tagline duduk di bawah nama merek, lebih kecil dan lebih pudar,
+           supaya terbaca sebagai keterangan bukan sebagai nama kedua. -->
+      <MerekLandai class="order-1" :ukuran="26" tagline />
 
-      <CariArea
-        class="min-w-0 flex-1"
-        @pilih="tampilan = 'peta'; petaRef?.pindahKe($event.lat, $event.lng)"
-      />
+      <div class="order-2 ml-auto flex shrink-0 items-center gap-2 text-sm lg:order-3 lg:ml-0">
+        <!-- Pemindah tampilan pindah ke sini, terpisah dari baris chip penyaring.
+             Menyaring data dan mengganti cara melihat data adalah dua pekerjaan
+             berbeda, jadi tidak duduk dalam satu baris yang sama. -->
+        <div
+          class="flex h-11 shrink-0 items-center rounded-full border border-gray-300 p-1"
+          role="tablist" aria-label="Pindah tampilan"
+        >
+          <button
+            v-for="t in (['peta', 'daftar'] as const)" :key="t"
+            type="button" role="tab"
+            :aria-selected="tampilan === t"
+            class="h-9 rounded-full px-2.5 text-[13px] font-medium capitalize sm:px-3"
+            :class="tampilan === t ? 'bg-brand text-white' : 'text-gray-700'"
+            @click="tampilan = t"
+          >{{ t }}</button>
+        </div>
 
-      <div class="flex shrink-0 items-center gap-2 text-sm">
         <NuxtLink
           to="/tentang"
           aria-label="Tentang landai"
@@ -108,29 +130,36 @@ useHead({ title: 'landai — peta aksesibilitas' })
           <span class="hidden sm:inline">Tentang</span>
         </NuxtLink>
 
-        <template v-if="user">
-          <NuxtLink
-            to="/tambah-lokasi"
-            class="tombol tombol-utama hidden sm:inline-flex"
-          >Tambah lokasi</NuxtLink>
-          <button
-            class="tombol tombol-sekunder"
-            @click="keluar()"
-          >Keluar</button>
-        </template>
-        <template v-else>
-          <NuxtLink
-            to="/masuk"
-            class="tombol tombol-sekunder"
-          >Masuk</NuxtLink>
-        </template>
+        <!-- Satu-satunya aksi utama di layar ini. Pengunjung yang belum masuk tetap
+             melihatnya dan dialihkan ke halaman masuk, sama seperti tombol mengambang
+             di ponsel: menyembunyikannya membuat pengunjung baru tidak punya jalan
+             masuk untuk berkontribusi sama sekali. -->
+        <NuxtLink
+          :to="user ? '/tambah-lokasi' : '/masuk'"
+          class="tombol tombol-utama hidden md:inline-flex"
+        >Tambah lokasi</NuxtLink>
+
+        <button
+          v-if="user"
+          class="tombol tombol-sekunder"
+          @click="keluar()"
+        >Keluar</button>
+        <NuxtLink
+          v-else
+          to="/masuk"
+          class="tombol tombol-sekunder"
+        >Masuk</NuxtLink>
       </div>
+
+      <CariArea
+        class="order-3 w-full min-w-0 lg:order-2 lg:ml-auto lg:w-auto lg:max-w-md lg:flex-1"
+        @pilih="tampilan = 'peta'; petaRef?.pindahKe($event.lat, $event.lng)"
+      />
     </header>
 
-    <!-- Penyaring kebutuhan dan pemindah tampilan. Satu baris yang membungkus, dipakai
-         bersama oleh peta dan daftar, supaya tombol pindah tidak ikut hilang saat
-         kolom petanya disembunyikan di ponsel. -->
-    <div class="flex shrink-0 flex-wrap items-center gap-2 border-b border-gray-200 bg-white px-4 py-3">
+    <!-- Baris penyaring kebutuhan. Hanya penyaring, tidak lagi bercampur dengan
+         kontrol pindah tampilan. -->
+    <div class="flex shrink-0 items-center gap-2 overflow-x-auto border-b border-gray-200 bg-white px-4 py-2.5 sm:flex-wrap sm:overflow-visible">
       <ChipKebutuhan
         v-for="k in DAFTAR_KEBUTUHAN" :key="k"
         :jenis="k"
@@ -138,28 +167,13 @@ useHead({ title: 'landai — peta aksesibilitas' })
         :jumlah="jumlahPerKebutuhan[k]"
         @ubah="ubahFilter"
       />
-
-      <div
-        class="ml-auto flex h-11 shrink-0 items-center rounded-full border border-gray-300 p-1 lg:hidden"
-        role="tablist" aria-label="Pindah tampilan"
-      >
-        <button
-          v-for="t in (['peta', 'daftar'] as const)" :key="t"
-          type="button" role="tab"
-          :aria-selected="tampilan === t"
-          class="h-9 rounded-full px-3 text-[13px] font-medium capitalize"
-          :class="tampilan === t ? 'bg-brand text-white' : 'text-gray-700'"
-          @click="tampilan = t"
-        >{{ t }}</button>
-      </div>
     </div>
 
-    <div class="flex min-h-0 flex-1">
-      <!-- Kolom peta -->
-      <div
-        class="relative min-w-0 flex-1"
-        :class="tampilan === 'daftar' ? 'hidden lg:block' : 'block'"
-      >
+    <div class="relative flex min-h-0 flex-1">
+      <!-- Peta selalu selebar penuh. Panel daftar melayang di atasnya, bukan memotong
+           lebarnya, jadi kanvas peta tidak pernah berubah ukuran saat panel dibuka
+           atau ditutup. -->
+      <div class="relative min-w-0 flex-1">
         <PetaLokasi
           ref="petaRef"
           :lokasi="lokasiTersaring"
@@ -190,10 +204,17 @@ useHead({ title: 'landai — peta aksesibilitas' })
 
         <p v-if="!petaSiap" class="sr-only" role="status">Memuat peta</p>
 
-        <LegendaSkor
-          v-if="(semua?.length ?? 0) > 0"
-          class="absolute left-4 top-4 z-10 w-fit max-w-[calc(100%-2rem)]"
-        />
+        <!-- Dua kartu orientasi ditumpuk dalam satu kolom di sudut yang sama, bukan
+             disebar ke sudut berbeda: keduanya menjawab pertanyaan yang sama, "ini
+             sebenarnya apa". Wadahnya tembus klik, hanya kartunya yang menangkap
+             ketukan, jadi peta di belakangnya tetap bisa digeser. -->
+        <div class="pointer-events-none absolute left-4 top-4 z-20 flex w-fit max-w-[calc(100%-2rem)] flex-col items-start gap-2">
+          <LegendaSkor
+            v-if="(semua?.length ?? 0) > 0"
+            class="pointer-events-auto"
+          />
+          <KartuPengenalan class="pointer-events-auto max-w-[17.5rem]" />
+        </div>
 
         <!-- Status data -->
         <div
@@ -254,23 +275,29 @@ useHead({ title: 'landai — peta aksesibilitas' })
         <NuxtLink
           v-if="!lokasiTerpilih"
           :to="user ? '/tambah-lokasi' : '/masuk'"
-          class="tombol tombol-utama tombol-pil absolute bottom-10 left-4 z-20 shadow-lg sm:hidden"
+          class="tombol tombol-utama tombol-pil absolute bottom-10 left-4 z-20 shadow-lg md:hidden"
         >
           Tambah lokasi
         </NuxtLink>
       </div>
 
-      <!-- Panel daftar lokasi -->
-      <aside
-        class="w-full shrink-0 border-gray-200 lg:w-[340px] lg:border-l"
-        :class="tampilan === 'peta' ? 'hidden lg:block' : 'block'"
-      >
-        <DaftarLokasi
-          :lokasi="lokasiTersaring"
-          :terpilih="terpilihId"
-          @pilih="pilihDariDaftar"
-        />
-      </aside>
+      <!-- Panel daftar lokasi. Muncul hanya saat diminta, di ponsel menutupi layar,
+           di layar lebar menempel di tepi kanan peta dengan bayangan supaya jelas ia
+           melayang di atas peta, bukan memotongnya. -->
+      <Transition name="panel">
+        <aside
+          v-if="tampilan === 'daftar'"
+          class="absolute inset-0 z-30 bg-white lg:left-auto lg:w-[360px] lg:border-l lg:border-gray-200 lg:shadow-2xl"
+          aria-label="Daftar lokasi"
+        >
+          <DaftarLokasi
+            :lokasi="lokasiTersaring"
+            :terpilih="terpilihId"
+            @pilih="pilihDariDaftar"
+            @tutup="tampilan = 'peta'"
+          />
+        </aside>
+      </Transition>
     </div>
   </div>
 </template>

@@ -126,9 +126,9 @@ for (const [label, viewport] of [
   await p2.evaluate(() => document.fonts.ready)
   await p2.waitForTimeout(1500)
   const tanda = await p2.evaluate(() => {
-    const svg = document.querySelector('header svg[aria-label="landai"]')
+    const svg = document.querySelector('header svg[data-tanda-landai]')
     if (!svg) return null
-    const teks = [...document.querySelectorAll('header p')]
+    const teks = [...document.querySelectorAll('header span')]
       .find(e => e.textContent.trim() === 'landai' && e.offsetParent !== null)
     const a = svg.getBoundingClientRect()
     const b = teks ? teks.getBoundingClientRect() : null

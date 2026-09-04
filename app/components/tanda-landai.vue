@@ -1,23 +1,32 @@
 <script setup lang="ts">
-// Tanda merek landai. Bentuknya ramp: bidang dasar mendatar, lalu bidang yang naik
-// landai dari kiri bawah ke kanan atas dengan lengkung lembut, bukan garis lurus
-// tajam, karena landai justru berarti kemiringan yang ramah dilalui.
+// Tanda merek landai. Filosofinya tercatat penuh di DESIGN.md bagian Tanda merek.
+// Ringkasnya: tiga anak tangga kecil di sisi kiri melebur menjadi satu garis diagonal
+// halus di sisi kanan. Tangga adalah hambatan, landai adalah akses, dan peralihan dari
+// satu ke yang lain adalah misi aplikasi ini.
 //
-// Digambar sebagai SVG murni supaya tajam di ukuran apa pun, dari 16 piksel favicon
-// sampai 1200 piksel gambar pratinjau. Bentuknya sengaja sederhana dan pejal agar
-// tetap terbaca saat dikecilkan, mengikuti vernakular rambu di DESIGN-BRIEF.
+// Digambar sebagai SVG murni, satu jalur terisi, bukan garis bergaris tepi: bidang
+// pejal tetap terbaca ketika dikecilkan, sedangkan garis setipis anak tangganya akan
+// saling melebur jadi bubur di ukuran favicon.
+//
+// Selalu bersifat dekoratif bagi pembaca layar. Nama merek dibawa oleh tulisan di
+// sebelahnya, dan tanda ini tidak pernah tampil tanpa tulisan itu (lihat MerekLandai).
 withDefaults(defineProps<{ ukuran?: number }>(), { ukuran: 28 })
 </script>
 
 <template>
   <svg
     :width="ukuran" :height="ukuran" viewBox="0 0 32 32"
-    class="shrink-0" role="img" aria-label="landai"
+    class="shrink-0" data-tanda-landai aria-hidden="true" focusable="false"
   >
     <rect width="32" height="32" rx="8" fill="var(--color-brand)" />
-    <!-- Bidang dasar, tempat ramp bertumpu -->
-    <rect x="6" y="21.5" width="20" height="3.5" rx="1.75" fill="#fff" opacity="0.45" />
-    <!-- Bidang naik, lengkungnya lembut supaya terbaca sebagai landai bukan tanjakan -->
-    <path d="M6 21 Q17.5 20 26 9.5 L26 21 Z" fill="#fff" />
+    <!-- Sudut anak tangga membulat makin ke kanan: 0.4, lalu 0.5, lalu 0.6, lalu
+         lengkung besar yang menyatukannya dengan garis lurus ke sudut kanan atas.
+         Peleburannya bertahap, bukan patah di satu titik. -->
+    <path
+      d="M5 25 L5 22.6 L7.9 22.6 Q8.3 22.6 8.3 22.2 L8.3 19.6 Q8.3 19.2 8.7 19.2
+         L11.1 19.2 Q11.6 19.2 11.6 18.7 L11.6 16.4 Q11.6 15.8 12.2 15.8 L14 15.8
+         Q15.8 15.8 17.2 14.9 L27 8.4 L27 25 Z"
+      fill="#fff"
+    />
   </svg>
 </template>

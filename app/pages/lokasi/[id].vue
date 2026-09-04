@@ -102,9 +102,12 @@ useHead(() => ({ title: lokasi.value ? `${lokasi.value.nama} — landai` : 'land
 <template>
   <div class="mx-auto max-w-lg">
     <header class="sticky top-0 z-10 border-b border-gray-200 bg-white px-4 py-3">
-      <NuxtLink to="/" class="tombol tombol-tersier -ml-2">
-        Kembali ke peta
-      </NuxtLink>
+      <div class="flex items-center gap-3">
+        <NuxtLink to="/" class="tombol tombol-tersier -ml-2">
+          Kembali ke peta
+        </NuxtLink>
+        <MerekLandai class="ml-auto" :ukuran="22" tulisan="text-sm" />
+      </div>
     </header>
 
     <p v-if="error" class="p-4 text-sm text-skor-kurang">Gagal memuat lokasi ini.</p>
@@ -179,7 +182,7 @@ useHead(() => ({ title: lokasi.value ? `${lokasi.value.nama} — landai` : 'land
         </li>
       </ul>
 
-      <div v-if="checklist?.catatan" class="mt-5 rounded border border-gray-200 bg-gray-50 px-4 py-3">
+      <div v-if="checklist?.catatan" class="mt-5 rounded-lg border border-gray-200 bg-gray-50 px-4 py-3">
         <p class="text-sm font-medium">Catatan kontributor</p>
         <p class="mt-1 text-sm text-gray-700">{{ checklist.catatan }}</p>
       </div>

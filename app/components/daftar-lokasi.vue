@@ -1,14 +1,16 @@
 <script setup lang="ts">
-// Panel daftar lokasi. Di layar lebar duduk di samping peta, di ponsel jadi tampilan
-// yang bisa dipindah lewat tombol. Menekan satu butir memindahkan fokus peta ke
-// lokasi itu sekaligus membuka kartunya, jadi daftar dan peta selalu sinkron.
+// Panel daftar lokasi. Dipanggil lewat pemindah tampilan di header, lalu bisa ditutup
+// lagi: di layar lebar ia melayang di tepi kanan peta, di ponsel menutupi seluruh
+// layar. Peta tidak pernah menyusut karenanya, jadi peta tetap elemen utama berapa pun
+// banyaknya lokasi nanti. Menekan satu butir memindahkan fokus peta ke lokasi itu
+// sekaligus membuka kartunya, jadi daftar dan peta selalu sinkron.
 
 const props = defineProps<{
   lokasi: LokasiPeta[]
   terpilih?: string | null
 }>()
 
-const emit = defineEmits<{ pilih: [LokasiPeta] }>()
+const emit = defineEmits<{ pilih: [LokasiPeta], tutup: [] }>()
 
 // Diurutkan dari skor tertinggi. Orang membuka daftar untuk mencari tempat yang
 // bisa dimasuki, bukan untuk membaca urutan pemasukan data.
@@ -19,9 +21,20 @@ const terurut = computed(() =>
 
 <template>
   <div class="flex h-full flex-col bg-white">
-    <div class="flex items-baseline justify-between gap-3 border-b border-gray-200 px-4 py-3">
+    <div class="flex shrink-0 items-center gap-3 border-b border-gray-200 px-4 py-3">
       <h2 class="text-base font-semibold">Daftar lokasi</h2>
-      <p class="text-sm text-gray-600 tabular-nums">{{ terurut.length }} tempat</p>
+      <p class="ml-auto text-sm text-gray-600 tabular-nums">{{ terurut.length }} tempat</p>
+
+      <button
+        type="button" aria-label="Tutup daftar lokasi"
+        class="-mr-1 grid h-8 w-8 shrink-0 place-items-center rounded text-gray-500 hover:bg-gray-100 hover:text-gray-900"
+        @click="emit('tutup')"
+      >
+        <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor"
+          stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+          <path d="M6 6l12 12M18 6L6 18" />
+        </svg>
+      </button>
     </div>
 
     <p v-if="terurut.length === 0" class="px-4 py-6 text-sm text-gray-600">

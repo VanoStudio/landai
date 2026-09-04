@@ -5,9 +5,12 @@ useHead({ title: 'Tentang landai' })
 <template>
   <div class="mx-auto max-w-lg">
     <header class="sticky top-0 z-10 border-b border-gray-200 bg-white px-4 py-3">
-      <NuxtLink to="/" class="tombol tombol-tersier -ml-2">
-        Kembali ke peta
-      </NuxtLink>
+      <div class="flex items-center gap-3">
+        <NuxtLink to="/" class="tombol tombol-tersier -ml-2">
+          Kembali ke peta
+        </NuxtLink>
+        <MerekLandai class="ml-auto" :ukuran="22" tulisan="text-sm" />
+      </div>
     </header>
 
     <article class="px-4 pb-16 pt-6">

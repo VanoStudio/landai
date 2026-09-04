@@ -36,16 +36,19 @@ const TINGKAT = [
 <template>
   <div
     v-if="terlihat"
-    class="flex items-center gap-3 rounded-lg border border-gray-200 bg-white px-3 py-2 shadow-sm"
+    class="flex items-center gap-3 rounded-lg border border-gray-200 bg-white px-3 py-2 shadow-lg"
   >
-    <ul class="flex items-center gap-3">
+    <!-- Keempat keterangan duduk dalam satu baris di layar lebar. Yang membuatnya
+         dulu turun tidak sejajar adalah panjang teks keterangan terakhir, bukan
+         ruang yang kurang, jadi teksnya yang dipendekkan. -->
+    <ul class="flex flex-wrap items-center gap-x-3 gap-y-1 sm:flex-nowrap">
       <li v-for="t in TINGKAT" :key="t.label" class="flex items-center gap-1.5">
         <span
           class="h-3.5 w-3.5 shrink-0 rounded-full"
           :style="{ background: t.warna }"
           aria-hidden="true"
         />
-        <span class="text-xs text-gray-700">{{ t.label }}</span>
+        <span class="whitespace-nowrap text-xs text-gray-700">{{ t.label }}</span>
       </li>
       <li class="flex items-center gap-1.5">
         <span
@@ -53,7 +56,7 @@ const TINGKAT = [
           style="box-shadow: inset 0 0 0 2px #6B7280"
           aria-hidden="true"
         />
-        <span class="text-xs text-gray-700">Belum dikonfirmasi</span>
+        <span class="whitespace-nowrap text-xs text-gray-700">Belum verifikasi</span>
       </li>
     </ul>
 

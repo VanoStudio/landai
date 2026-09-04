@@ -36,6 +36,8 @@ useHead({ title: 'Mengaktifkan akun — landai' })
 
 <template>
   <main class="mx-auto max-w-sm p-6">
+    <MerekLandai class="mb-6" :ukuran="26" ke="/" />
+
     <template v-if="pesanError">
       <h1 class="text-xl font-bold text-brand">Masuk tidak berhasil</h1>
       <p role="alert" class="mt-3 text-sm text-skor-kurang">{{ pesanError }}</p>

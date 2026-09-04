@@ -51,7 +51,8 @@ async function daftar() {
 
 <template>
   <main class="mx-auto max-w-sm p-6">
-    <h1 class="text-xl font-bold text-brand">Daftar akun</h1>
+    <MerekLandai :ukuran="26" ke="/" />
+    <h1 class="mt-6 text-xl font-bold text-brand">Daftar akun</h1>
     <p class="mt-1 text-sm text-gray-600">Akun dipakai untuk menambah lokasi.</p>
 
     <div v-if="perluCekEmail" class="mt-6 rounded border border-gray-300 p-4 text-sm">

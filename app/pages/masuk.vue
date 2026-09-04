@@ -31,7 +31,8 @@ async function masuk() {
 
 <template>
   <main class="mx-auto max-w-sm p-6">
-    <h1 class="text-xl font-bold text-brand">Masuk</h1>
+    <MerekLandai :ukuran="26" ke="/" />
+    <h1 class="mt-6 text-xl font-bold text-brand">Masuk</h1>
 
     <form class="mt-6 space-y-4" @submit.prevent="masuk">
       <div>

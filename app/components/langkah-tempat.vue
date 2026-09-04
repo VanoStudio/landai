@@ -19,7 +19,7 @@ const kategori = defineModel<string>('kategori', { required: true })
       <div class="mt-2 grid grid-cols-2 gap-2">
         <label
           v-for="k in KATEGORI_PILIHAN" :key="k"
-          class="cursor-pointer rounded border px-3 py-2.5 text-sm"
+          class="flex min-h-11 cursor-pointer items-center rounded border px-3 py-2 text-sm"
           :class="kategori === k
             ? 'border-brand bg-brand text-white font-medium'
             : 'border-gray-300 hover:border-gray-500'"

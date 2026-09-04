@@ -47,6 +47,11 @@ typography:
     fontSize: "15px"
     fontWeight: 700
     lineHeight: 1
+  keterangan:
+    fontFamily: "Public Sans, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "11px"
+    fontWeight: 400
+    lineHeight: 1
 rounded:
   sm: "4px"
   md: "6px"
@@ -234,6 +239,62 @@ Tidak ada bilah navigasi global. Peta adalah rumah. Setiap halaman lain menyedia
 
 ### Penanda skor (komponen tanda tangan)
 Tombol lingkaran 44px berisi angka skor 15px bobot 700 dengan angka sejajar. Dirender MapLibre di luar pohon Vue, jadi gayanya global di `main.css`. Nama aksesibelnya menyebut nama tempat, skor, dan label tingkatnya, misalnya "Blok M Plaza, skor 50 dari 100, Sebagian ramah". Hover menaikkan skala 1.09, terpilih 1.18, keduanya dengan easing keluar eksponensial 140ms dan dimatikan saat `prefers-reduced-motion`.
+
+### Keterangan, 11px
+
+Satu tingkat di bawah label. Dipakai hanya untuk teks yang harus jelas berada di bawah
+sesuatu yang lain dalam hierarki, bukan sekadar untuk memuat lebih banyak kata di ruang
+sempit. Sejauh ini pemakainya satu: tagline di samping nama merek pada header.
+
+## Tanda merek
+
+Tiga anak tangga kecil di sisi kiri, yang secara bertahap melebur menjadi satu garis
+diagonal halus di sisi kanan, di dalam persegi membulat berwarna hijau utama.
+
+**Filosofinya.** Tangga melambangkan hambatan. Garis landai melambangkan akses.
+Peralihan dari satu ke yang lain melambangkan misi aplikasi ini: mengubah kondisi yang
+menghambat menjadi mudah diakses. Peralihannya digambar bertahap, bukan patah di satu
+titik, karena perubahan itu memang terjadi sedikit demi sedikit, satu lokasi yang
+disurvei warga pada satu waktu.
+
+**Keputusan bentuk.**
+
+- Anak tangganya tiga, bukan lima atau tujuh. Di 24 piksel, anak tangga setinggi kurang
+  dari dua piksel melebur jadi bubur, dan yang tersisa cuma segitiga tanpa cerita.
+- Digambar sebagai satu jalur terisi, bukan garis bergaris tepi. Bidang pejal bertahan
+  saat dikecilkan; garis setipis anak tangga akan saling menempel di ukuran favicon.
+- Sudut anak tangganya membulat makin ke kanan, 0.4 lalu 0.5 lalu 0.6, sebelum lengkung
+  besar menyatukannya dengan garis lurus ke sudut kanan atas. Pembulatan yang bertingkat
+  itulah yang membuat peleburannya terbaca, bukan sekadar tangga lalu garis.
+- Warnanya hijau utama yang sudah ada, tanpa warna kedua. Tanda ini tidak pernah boleh
+  memakai warna skor: hijau, amber, dan merah punya arti yang sudah dipatenkan di produk
+  ini, dan merek tidak boleh ikut memakainya.
+
+**Aturan pemakaian.**
+
+- Tanda tidak pernah tampil sendirian. Ia selalu berdampingan dengan tulisan `landai`,
+  dan keduanya dibungkus komponen `MerekLandai` supaya tidak ada halaman yang bisa
+  melanggar aturan ini tanpa sengaja.
+- Bagi pembaca layar, tandanya dekoratif. Nama merek dibawa oleh tulisannya.
+- Tagline `Peta aksesibilitas difabel` adalah keterangan, bukan nama kedua: ukurannya
+  11px terhadap 18px nama merek, warnanya abu sekunder, dan letaknya di bawah nama.
+- Berkas `public/tanda.svg` adalah sumber tunggal. Favicon PNG, ikon Apple, dan gambar
+  pratinjau tautan semuanya dirender lokal dari berkas itu lewat `docs/buat-aset.mjs`,
+  jadi tidak ada aset yang digambar dua kali dan tidak ada yang bisa menyimpang.
+  Gambar pratinjau harus PNG karena WhatsApp dan Telegram tidak merender `og:image`
+  berformat SVG.
+
+## Kartu pengenalan pengunjung pertama
+
+Kartu kecil di sudut, bukan jendela modal dan bukan tur berpandu. Peta di belakangnya
+tetap bisa digeser dan diketuk selama kartu itu tampil. Isinya dua kalimat: melihat peta
+tidak perlu akun, menambah lokasi perlu akun. Satu ketukan menutupnya.
+
+Ambangnya penyimpanan lokal peramban (`landai:pengenalan-ditutup`), bukan status masuk.
+Orang yang sudah paham aturan mainnya tidak pantas diberi tahu lagi hanya karena belum
+mendaftar. Kartu ini ditumpuk satu kolom dengan legenda skor di sudut kiri atas, bukan
+disebar ke sudut berbeda, karena keduanya menjawab pertanyaan yang sama: ini sebenarnya
+apa.
 
 ## Do's and Don'ts
 

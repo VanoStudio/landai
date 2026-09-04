@@ -105,9 +105,10 @@ useHead({ title: 'Tambah lokasi — landai' })
 <template>
   <div class="mx-auto flex min-h-[100dvh] max-w-lg flex-col">
     <header class="border-b border-gray-200 px-4 py-3">
-      <div class="flex items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
         <NuxtLink to="/" class="tombol tombol-tersier -ml-2">Batal</NuxtLink>
-        <p class="text-sm text-gray-600 tabular-nums">Langkah {{ langkah + 1 }} dari {{ LANGKAH.length }}</p>
+        <MerekLandai class="mx-auto" :ukuran="20" tulisan="text-sm" />
+        <p class="shrink-0 text-sm text-gray-600 tabular-nums">Langkah {{ langkah + 1 }} dari {{ LANGKAH.length }}</p>
       </div>
 
       <ol class="mt-3 flex gap-1.5" aria-hidden="true">
@@ -131,7 +132,7 @@ useHead({ title: 'Tambah lokasi — landai' })
       <LangkahChecklist v-else-if="langkah === 2" v-model="checklist" />
       <LangkahFoto v-else v-model:foto="foto" v-model:catatan="catatan" />
 
-      <p v-if="pesanError" role="alert" class="mt-4 rounded border border-skor-kurang px-3 py-2 text-sm text-skor-kurang">
+      <p v-if="pesanError" role="alert" class="mt-4 rounded-lg border border-skor-kurang px-3 py-2 text-sm text-skor-kurang">
         {{ pesanError }}
       </p>
     </main>

@@ -17,250 +17,260 @@
   --color-posisi: #1D6FE0;
 }
 
-html {
-  -webkit-text-size-adjust: 100%;
-}
-
-body {
-  font-family: var(--font-sans);
-  color: var(--color-gray-900);
-  background: var(--color-white);
-}
-
-/* Permukaan bawaan browser ikut memakai palet, bukan default sistem. */
-::selection {
-  background: color-mix(in srgb, var(--color-brand) 22%, transparent);
-  color: var(--color-gray-900);
-}
-
-:where(input, textarea) {
-  caret-color: var(--color-brand);
-}
-
-:where(a, button, input, textarea, select, [tabindex]):focus-visible {
-  outline: 2px solid var(--color-brand);
-  outline-offset: 2px;
-  border-radius: 4px;
-}
-
-@supports (scrollbar-color: auto) {
+/* Aturan dasar dan komponen dibungkus lapisan.
+   Tailwind 4 mendaftarkan @layer theme, base, components, utilities. CSS yang ditulis
+   tanpa lapisan berada DI ATAS seluruh lapisan itu, apa pun urutan berkasnya, jadi
+   .tombol yang tadinya tanpa lapisan mengalahkan utilitas seperti hidden dan sm:hidden:
+   tombol tambah lokasi yang seharusnya hilang di layar lebar tetap tampil, dan tidak ada
+   pesan galat apa pun yang memberi tahu. Dengan dibungkus, utilitas kembali menang. */
+@layer base {
   html {
-    scrollbar-color: var(--color-gray-400) transparent;
-    scrollbar-width: thin;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    color: var(--color-gray-900);
+    background: var(--color-white);
+  }
+
+  /* Permukaan bawaan browser ikut memakai palet, bukan default sistem. */
+  ::selection {
+    background: color-mix(in srgb, var(--color-brand) 22%, transparent);
+    color: var(--color-gray-900);
+  }
+
+  :where(input, textarea) {
+    caret-color: var(--color-brand);
+  }
+
+  :where(a, button, input, textarea, select, [tabindex]):focus-visible {
+    outline: 2px solid var(--color-brand);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  @supports (scrollbar-color: auto) {
+    html {
+      scrollbar-color: var(--color-gray-400) transparent;
+      scrollbar-width: thin;
+    }
   }
 }
 
-/* Penanda peta dirender MapLibre di luar pohon Vue, jadi gayanya global.
-   Angka skor ada di dalam penanda: elemen tipografi utama produk ini. */
-.penanda-skor {
-  display: grid;
-  place-items: center;
-  width: 44px;
-  height: 44px;
-  padding: 0;
-  border: 0;
-  border-radius: 9999px;
-  background: var(--warna-skor);
-  color: #fff;
-  font-family: var(--font-sans);
-  font-size: 15px;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  line-height: 1;
-  cursor: pointer;
-  box-shadow: 0 0 0 2px #fff, 0 1px 5px rgb(0 0 0 / 0.35);
-  transition: transform 140ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 140ms ease;
-}
+@layer components {
+  /* Penanda peta dirender MapLibre di luar pohon Vue, jadi gayanya global.
+     Angka skor ada di dalam penanda: elemen tipografi utama produk ini. */
+  .penanda-skor {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 0;
+    border-radius: 9999px;
+    background: var(--warna-skor);
+    color: #fff;
+    font-family: var(--font-sans);
+    font-size: 15px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: 0 0 0 2px #fff, 0 1px 5px rgb(0 0 0 / 0.35);
+    transition: transform 140ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 140ms ease;
+  }
 
-.penanda-skor:hover {
-  transform: scale(1.09);
-}
+  .penanda-skor:hover {
+    transform: scale(1.09);
+  }
 
-.penanda-skor:focus-visible {
-  outline: 2px solid var(--color-gray-900);
-  outline-offset: 3px;
-}
+  .penanda-skor:focus-visible {
+    outline: 2px solid var(--color-gray-900);
+    outline-offset: 3px;
+  }
 
-/* Belum terverifikasi: penanda berongga, bukan terisi. Bentuknya yang membedakan,
-   bukan warnanya, jadi statusnya tetap terbaca tanpa bergantung pada penglihatan
-   warna (PRD bagian 8). Angka tetap gelap supaya kontrasnya lolos AA. */
-.penanda-skor[data-status='belum_terverifikasi'] {
-  background: #fff;
-  color: var(--color-gray-900);
-  box-shadow: inset 0 0 0 3px var(--warna-skor), 0 0 0 1px rgb(0 0 0 / 0.08), 0 1px 5px rgb(0 0 0 / 0.3);
-}
+  /* Belum terverifikasi: penanda berongga, bukan terisi. Bentuknya yang membedakan,
+     bukan warnanya, jadi statusnya tetap terbaca tanpa bergantung pada penglihatan
+     warna (PRD bagian 8). Angka tetap gelap supaya kontrasnya lolos AA. */
+  .penanda-skor[data-status='belum_terverifikasi'] {
+    background: #fff;
+    color: var(--color-gray-900);
+    box-shadow: inset 0 0 0 3px var(--warna-skor), 0 0 0 1px rgb(0 0 0 / 0.08), 0 1px 5px rgb(0 0 0 / 0.3);
+  }
 
-.penanda-skor[data-terpilih='true'] {
-  transform: scale(1.18);
-  box-shadow: 0 0 0 3px #fff, 0 0 0 6px var(--warna-skor), 0 3px 10px rgb(0 0 0 / 0.4);
-  z-index: 2;
-}
+  .penanda-skor[data-terpilih='true'] {
+    transform: scale(1.18);
+    box-shadow: 0 0 0 3px #fff, 0 0 0 6px var(--warna-skor), 0 3px 10px rgb(0 0 0 / 0.4);
+    z-index: 2;
+  }
 
-.penanda-skor[data-status='belum_terverifikasi'][data-terpilih='true'] {
-  box-shadow: inset 0 0 0 3px var(--warna-skor), 0 0 0 3px #fff, 0 0 0 6px var(--warna-skor), 0 3px 10px rgb(0 0 0 / 0.4);
-}
+  .penanda-skor[data-status='belum_terverifikasi'][data-terpilih='true'] {
+    box-shadow: inset 0 0 0 3px var(--warna-skor), 0 0 0 3px #fff, 0 0 0 6px var(--warna-skor), 0 3px 10px rgb(0 0 0 / 0.4);
+  }
 
-/* ---------------------------------------------------------------------------
-   Hierarki tombol. Sebelumnya gaya aksi utama ditulis ulang di sepuluh berkas
-   dengan enam varian tinggi dan bantalan yang berbeda-beda, begitu pula aksi
-   sekunder. Didefinisikan sekali di sini, dipakai ulang lewat nama kelas.
+  /* ---------------------------------------------------------------------------
+     Hierarki tombol. Sebelumnya gaya aksi utama ditulis ulang di sepuluh berkas
+     dengan enam varian tinggi dan bantalan yang berbeda-beda, begitu pula aksi
+     sekunder. Didefinisikan sekali di sini, dipakai ulang lewat nama kelas.
 
-   Aturannya satu: aksi utama terisi penuh warna merek, aksi sekunder bergaris,
-   aksi tersier tanpa isian maupun garis. Satu layar tidak boleh punya dua aksi
-   utama yang bersaing.
-   --------------------------------------------------------------------------- */
-.tombol {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  min-height: 44px;
-  padding-inline: 1rem;
-  border: 1px solid transparent;
-  border-radius: 4px;
-  font-family: var(--font-sans);
-  font-size: 0.875rem;
-  font-weight: 500;
-  line-height: 1;
-  text-align: center;
-  cursor: pointer;
-  transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease;
-}
-
-.tombol:disabled,
-.tombol[aria-disabled='true'] {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.tombol-utama {
-  background: var(--color-brand);
-  color: #fff;
-}
-
-.tombol-utama:hover:not(:disabled) {
-  background: var(--color-brand-gelap);
-}
-
-.tombol-sekunder {
-  background: #fff;
-  border-color: var(--color-gray-400);
-  color: var(--color-gray-800);
-}
-
-.tombol-sekunder:hover:not(:disabled) {
-  border-color: var(--color-gray-600);
-}
-
-.tombol-tersier {
-  background: transparent;
-  color: var(--color-gray-700);
-  padding-inline: 0.5rem;
-}
-
-.tombol-tersier:hover:not(:disabled) {
-  color: var(--color-gray-900);
-}
-
-/* Keadaan terpilih untuk pilihan yang bukan aksi utama. Dipakai pada tombol
-   "sudah berubah" di halaman detail: pilihan itu perlu terlihat aktif, tetapi
-   tidak boleh memakai warna merek yang berarti aksi utama. */
-.tombol-dipilih-gelap {
-  background: var(--color-gray-900);
-  border-color: var(--color-gray-900);
-  color: #fff;
-}
-
-/* Bentuk pil hanya untuk tombol mengambang di atas peta, yang harus terbaca
-   sebagai benda terpisah dari bidang petanya. */
-.tombol-pil {
-  border-radius: 9999px;
-  padding-inline: 1.25rem;
-  font-weight: 600;
-}
-
-@media (prefers-reduced-motion: reduce) {
+     Aturannya satu: aksi utama terisi penuh warna merek, aksi sekunder bergaris,
+     aksi tersier tanpa isian maupun garis. Satu layar tidak boleh punya dua aksi
+     utama yang bersaing.
+     --------------------------------------------------------------------------- */
   .tombol {
-    transition: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 44px;
+    padding-inline: 1rem;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+    font-weight: 500;
+    line-height: 1;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease;
   }
-}
 
-/* Penanda kelompok. Netral gelap, bukan warna skor: satu kelompok memuat beberapa
-   skor sekaligus, jadi memberinya satu warna akan menyampaikan hal yang keliru.
-   Bentuknya tetap lingkaran berangka supaya sekeluarga dengan penanda tunggal. */
-.penanda-kluster {
-  display: grid;
-  place-items: center;
-  width: 44px;
-  height: 44px;
-  padding: 0;
-  border: 0;
-  border-radius: 9999px;
-  background: var(--color-gray-800);
-  color: #fff;
-  font-family: var(--font-sans);
-  font-size: 15px;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  line-height: 1;
-  cursor: pointer;
-  box-shadow: 0 0 0 2px #fff, 0 1px 5px rgb(0 0 0 / 0.35);
-  transition: transform 140ms cubic-bezier(0.16, 1, 0.3, 1);
-}
+  .tombol:disabled,
+  .tombol[aria-disabled='true'] {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
 
-.penanda-kluster:hover {
-  transform: scale(1.09);
-}
+  .tombol-utama {
+    background: var(--color-brand);
+    color: #fff;
+  }
 
-.penanda-kluster:focus-visible {
-  outline: 2px solid var(--color-gray-900);
-  outline-offset: 3px;
-}
+  .tombol-utama:hover:not(:disabled) {
+    background: var(--color-brand-gelap);
+  }
 
-@media (prefers-reduced-motion: reduce) {
+  .tombol-sekunder {
+    background: #fff;
+    border-color: var(--color-gray-400);
+    color: var(--color-gray-800);
+  }
+
+  .tombol-sekunder:hover:not(:disabled) {
+    border-color: var(--color-gray-600);
+  }
+
+  .tombol-tersier {
+    background: transparent;
+    color: var(--color-gray-700);
+    padding-inline: 0.5rem;
+  }
+
+  .tombol-tersier:hover:not(:disabled) {
+    color: var(--color-gray-900);
+  }
+
+  /* Keadaan terpilih untuk pilihan yang bukan aksi utama. Dipakai pada tombol
+     "sudah berubah" di halaman detail: pilihan itu perlu terlihat aktif, tetapi
+     tidak boleh memakai warna merek yang berarti aksi utama. */
+  .tombol-dipilih-gelap {
+    background: var(--color-gray-900);
+    border-color: var(--color-gray-900);
+    color: #fff;
+  }
+
+  /* Bentuk pil hanya untuk tombol mengambang di atas peta, yang harus terbaca
+     sebagai benda terpisah dari bidang petanya. */
+  .tombol-pil {
+    border-radius: 9999px;
+    padding-inline: 1.25rem;
+    font-weight: 600;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tombol {
+      transition: none;
+    }
+  }
+
+  /* Penanda kelompok. Netral gelap, bukan warna skor: satu kelompok memuat beberapa
+     skor sekaligus, jadi memberinya satu warna akan menyampaikan hal yang keliru.
+     Bentuknya tetap lingkaran berangka supaya sekeluarga dengan penanda tunggal. */
   .penanda-kluster {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 0;
+    border-radius: 9999px;
+    background: var(--color-gray-800);
+    color: #fff;
+    font-family: var(--font-sans);
+    font-size: 15px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: 0 0 0 2px #fff, 0 1px 5px rgb(0 0 0 / 0.35);
+    transition: transform 140ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .penanda-kluster:hover {
+    transform: scale(1.09);
+  }
+
+  .penanda-kluster:focus-visible {
+    outline: 2px solid var(--color-gray-900);
+    outline-offset: 3px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .penanda-kluster {
+      transition: none;
+    }
+  }
+
+  /* Varian penanda untuk panel daftar: bentuk dan kode statusnya sama persis dengan
+     penanda peta, hanya lebih kecil dan tanpa perilaku interaktif, supaya pembaca
+     mengenali keduanya sebagai benda yang sama. */
+  .penanda-daftar {
+    width: 38px;
+    height: 38px;
+    font-size: 13px;
+    cursor: inherit;
     transition: none;
   }
-}
 
-/* Varian penanda untuk panel daftar: bentuk dan kode statusnya sama persis dengan
-   penanda peta, hanya lebih kecil dan tanpa perilaku interaktif, supaya pembaca
-   mengenali keduanya sebagai benda yang sama. */
-.penanda-daftar {
-  width: 38px;
-  height: 38px;
-  font-size: 13px;
-  cursor: inherit;
-  transition: none;
-}
+  .penanda-daftar:hover {
+    transform: none;
+  }
 
-.penanda-daftar:hover {
-  transform: none;
-}
+  /* Titik posisi pengguna. Biru dipakai sebagai konvensi peta yang sudah dikenal,
+     bukan sebagai warna kode skor, dan tidak pernah muncul di elemen lain. */
+  .titik-saya {
+    width: 18px;
+    height: 18px;
+    border-radius: 9999px;
+    background: var(--color-posisi);
+    box-shadow: 0 0 0 3px #fff, 0 1px 4px rgb(0 0 0 / 0.35);
+    position: relative;
+  }
 
-/* Titik posisi pengguna. Biru dipakai sebagai konvensi peta yang sudah dikenal,
-   bukan sebagai warna kode skor, dan tidak pernah muncul di elemen lain. */
-.titik-saya {
-  width: 18px;
-  height: 18px;
-  border-radius: 9999px;
-  background: var(--color-posisi);
-  box-shadow: 0 0 0 3px #fff, 0 1px 4px rgb(0 0 0 / 0.35);
-  position: relative;
-}
+  .titik-saya::after {
+    content: '';
+    position: absolute;
+    inset: -11px;
+    border-radius: 9999px;
+    background: color-mix(in srgb, var(--color-posisi) 18%, transparent);
+    animation: denyut-posisi 2.2s ease-out infinite;
+  }
 
-.titik-saya::after {
-  content: '';
-  position: absolute;
-  inset: -11px;
-  border-radius: 9999px;
-  background: color-mix(in srgb, var(--color-posisi) 18%, transparent);
-  animation: denyut-posisi 2.2s ease-out infinite;
-}
-
-@keyframes denyut-posisi {
-  0%   { transform: scale(0.6); opacity: 0.85; }
-  100% { transform: scale(1.35); opacity: 0; }
+  @keyframes denyut-posisi {
+    0%   { transform: scale(0.6); opacity: 0.85; }
+    100% { transform: scale(1.35); opacity: 0; }
+  }
 }
 
 /* Basemap streets-v2 membawa warnanya sendiri: jalan kuning, taman hijau, dan ikon
@@ -277,106 +287,141 @@ body {
   border-radius: 6px;
 }
 
-/* Rangka pemuatan peta. Denyutnya pelan dan kontrasnya rendah: ini penanda tunggu,
-   bukan sesuatu yang perlu ditonton. */
-.rangka-peta span {
-  position: absolute;
-  display: block;
-  background: var(--color-gray-200);
-  animation: rangka-denyut 1.6s ease-in-out infinite;
-}
-
-.rangka-jalan {
-  height: 10px;
-  border-radius: 9999px;
-}
-
-.rangka-jalan-tegak {
-  width: 12px;
-}
-
-.rangka-blok {
-  border-radius: 6px;
-  opacity: 0.7;
-}
-
-.rangka-peta span:nth-child(even) {
-  animation-delay: 0.4s;
-}
-
-@keyframes rangka-denyut {
-  0%, 100% { opacity: 0.45; }
-  50%      { opacity: 0.9; }
-}
-
-.rangka-leave-active {
-  transition: opacity 320ms ease-out;
-}
-
-.rangka-leave-to {
-  opacity: 0;
-}
-
-/* Kartu ringkas naik dari bawah sambil memudar masuk. Easing keluar eksponensial
-   supaya berhenti dengan lembut, bukan mengerem mendadak. */
-.kartu-enter-active {
-  transition: opacity 220ms ease-out, transform 260ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.kartu-leave-active {
-  transition: opacity 140ms ease-in, transform 160ms ease-in;
-}
-
-.kartu-enter-from,
-.kartu-leave-to {
-  opacity: 0;
-  transform: translateY(12px);
-}
-
-/* Umpan balik saat penanda diketuk: satu denyut singkat lalu berhenti di ukuran
-   terpilih. Hanya sekali, tidak berdenyut terus, supaya tidak menarik perhatian
-   dari angka skornya sendiri. */
-@keyframes denyut-penanda {
-  0%   { transform: scale(1); }
-  45%  { transform: scale(1.32); }
-  100% { transform: scale(1.18); }
-}
-
-.penanda-skor[data-terpilih='true'] {
-  animation: denyut-penanda 260ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.penanda-skor:active {
-  transform: scale(0.94);
-  transition-duration: 80ms;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .penanda-skor {
-    transition: none;
+@layer components {
+  /* Rangka pemuatan peta. Denyutnya pelan dan kontrasnya rendah: ini penanda tunggu,
+     bukan sesuatu yang perlu ditonton. */
+  .rangka-peta span {
+    position: absolute;
+    display: block;
+    background: var(--color-gray-200);
+    animation: rangka-denyut 1.6s ease-in-out infinite;
   }
 
-  .penanda-skor[data-terpilih='true'] {
-    animation: none;
+  .rangka-jalan {
+    height: 10px;
+    border-radius: 9999px;
   }
 
-  .kartu-enter-active,
+  .rangka-jalan-tegak {
+    width: 12px;
+  }
+
+  .rangka-blok {
+    border-radius: 6px;
+    opacity: 0.7;
+  }
+
+  .rangka-peta span:nth-child(even) {
+    animation-delay: 0.4s;
+  }
+
+  @keyframes rangka-denyut {
+    0%, 100% { opacity: 0.45; }
+    50%      { opacity: 0.9; }
+  }
+
+  .rangka-leave-active {
+    transition: opacity 320ms ease-out;
+  }
+
+  .rangka-leave-to {
+    opacity: 0;
+  }
+
+  /* Kartu ringkas naik dari bawah sambil memudar masuk. Easing keluar eksponensial
+     supaya berhenti dengan lembut, bukan mengerem mendadak. */
+  .kartu-enter-active {
+    transition: opacity 220ms ease-out, transform 260ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
   .kartu-leave-active {
-    transition: opacity 100ms linear;
+    transition: opacity 140ms ease-in, transform 160ms ease-in;
   }
 
   .kartu-enter-from,
   .kartu-leave-to {
-    transform: none;
+    opacity: 0;
+    transform: translateY(12px);
   }
 
-  .rangka-peta span {
-    animation: none;
-    opacity: 0.6;
+  /* Umpan balik saat penanda diketuk: satu denyut singkat lalu berhenti di ukuran
+     terpilih. Hanya sekali, tidak berdenyut terus, supaya tidak menarik perhatian
+     dari angka skornya sendiri. */
+  @keyframes denyut-penanda {
+    0%   { transform: scale(1); }
+    45%  { transform: scale(1.32); }
+    100% { transform: scale(1.18); }
   }
 
-  .titik-saya::after {
-    animation: none;
-    opacity: 0.25;
+  .penanda-skor[data-terpilih='true'] {
+    animation: denyut-penanda 260ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .penanda-skor:active {
+    transform: scale(0.94);
+    transition-duration: 80ms;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .penanda-skor {
+      transition: none;
+    }
+
+    .penanda-skor[data-terpilih='true'] {
+      animation: none;
+    }
+
+    .kartu-enter-active,
+    .kartu-leave-active {
+      transition: opacity 100ms linear;
+    }
+
+    .kartu-enter-from,
+    .kartu-leave-to {
+      transform: none;
+    }
+
+    .rangka-peta span {
+      animation: none;
+      opacity: 0.6;
+    }
+
+    .titik-saya::after {
+      animation: none;
+      opacity: 0.25;
+    }
+  }
+
+  /* Panel daftar lokasi. Di ponsel ia menggantikan pandangan, jadi naik dari bawah
+     seperti lembar; di layar lebar ia menempel di tepi kanan peta, jadi masuk dari
+     kanan. Arahnya mengikuti dari mana benda itu datang, bukan satu animasi seragam. */
+  .panel-enter-active,
+  .panel-leave-active {
+    transition: opacity 200ms ease, transform 260ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .panel-enter-from,
+  .panel-leave-to {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  @media (min-width: 1024px) {
+    .panel-enter-from,
+    .panel-leave-to {
+      transform: translateX(24px);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .panel-enter-active,
+    .panel-leave-active {
+      transition: opacity 120ms linear;
+    }
+
+    .panel-enter-from,
+    .panel-leave-to {
+      transform: none;
+    }
   }
 }
