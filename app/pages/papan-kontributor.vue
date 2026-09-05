@@ -10,6 +10,7 @@
 
 const supabase = useSupabaseClient()
 const user = useSupabaseUser()
+const idPengguna = useIdPengguna()
 
 // Ambang tingkat ditulis sebagai konstanta di sini, bukan disimpan di basis data,
 // supaya bisa diubah tanpa migrasi dan supaya jelas ini keputusan tampilan.
@@ -129,11 +130,21 @@ useHead({ title: 'Papan kontributor — landai' })
       </div>
 
       <ol v-else class="mt-8 divide-y divide-gray-200">
-        <li v-for="(k, i) in kontributor" :key="k.id" class="py-4">
+        <!-- Baris milik sendiri ditandai. Tanpa ini, papan ini hanya daftar nama orang
+             lain, padahal justru di sinilah seseorang memeriksa kemajuannya sendiri. -->
+        <li
+          v-for="(k, i) in kontributor" :key="k.id"
+          class="-mx-3 rounded-lg px-3 py-4"
+          :class="k.id === idPengguna ? 'bg-gray-50 ring-1 ring-inset ring-brand/25' : ''"
+        >
           <div class="flex items-baseline justify-between gap-3">
             <p class="min-w-0 truncate font-semibold">
               <span class="mr-1.5 text-sm text-gray-500 tabular-nums">{{ i + 1 }}</span>
               {{ k.nama }}
+              <span
+                v-if="k.id === idPengguna"
+                class="ml-1.5 rounded-full bg-brand px-2 py-0.5 align-middle text-[11px] font-medium text-white"
+              >Anda</span>
             </p>
             <p class="shrink-0 text-sm text-gray-700 tabular-nums">
               {{ k.jumlah }} lokasi

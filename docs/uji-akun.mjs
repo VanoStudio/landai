@@ -96,9 +96,19 @@ try {
   await page.waitForTimeout(1500)
 
   // ---------- tautan menuju halaman akun ----------
-  const tautanHeader = await page.evaluate(() =>
-    !!document.querySelector('header a[aria-label="Akun saya"]'))
-  catat('Tautan akun ada di header peta pada layar lebar', tautanHeader)
+  // Jalan ke halaman akun sekarang lewat menu akun, bukan ikon yang berdiri sendiri.
+  const lewatMenu = await page.evaluate(async () => {
+    const pemicu = document.querySelector('button.menu-akun-pemicu')
+    if (!pemicu) return { adaPemicu: false }
+    pemicu.click()
+    await new Promise(r => setTimeout(r, 400))
+    const a = [...document.querySelectorAll('[role=menu] [role=menuitem]')]
+      .find(e => /Ubah nama tampilan/.test(e.textContent))
+    return { adaPemicu: true, adaTautan: !!a, href: a?.getAttribute('href') ?? '' }
+  })
+  catat('Halaman akun dijangkau lewat menu akun di header peta',
+    lewatMenu.adaPemicu && lewatMenu.adaTautan && lewatMenu.href === '/akun',
+    lewatMenu.href || 'tidak ada')
 
   await page.goto(`${BASIS}/tentang`, { waitUntil: 'domcontentloaded' })
   await page.waitForTimeout(1800)

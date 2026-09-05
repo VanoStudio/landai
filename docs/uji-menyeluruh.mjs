@@ -89,9 +89,31 @@ await page.waitForSelector('.maplibregl-canvas')
 await page.waitForTimeout(9000)
 await sembunyikanDevtools(page)
 await page.screenshot({ path: join(KELUARAN, 'peta-masuk-mobile.png') })
-const adaKeluar = await page.evaluate(() =>
-  [...document.querySelectorAll('button')].some(b => b.textContent.trim() === 'Keluar'))
-catat('Header berubah saat sudah masuk', adaKeluar, adaKeluar ? 'tombol Keluar muncul' : '')
+
+// Jumlah penanda SEBELUM menambah lokasi, dipakai sebagai pembanding di langkah 11.
+const hitungPenanda = () => page.evaluate(() => {
+  const tunggal = document.querySelectorAll('.penanda-skor.maplibregl-marker').length
+  const dalamKluster = [...document.querySelectorAll('.penanda-kluster.maplibregl-marker')]
+    .reduce((s, e) => s + Number(e.textContent), 0)
+  return tunggal + dalamKluster
+})
+const jumlahPenandaAwal = await hitungPenanda()
+// Aksi akun kini berkumpul di satu menu, bukan tersebar sebagai tombol terpisah di
+// header. Yang menandai keadaan sudah masuk adalah tombol menu itu, dan keluar ada di
+// dalamnya.
+const menuAkun = await page.evaluate(async () => {
+  const pemicu = document.querySelector('button.menu-akun-pemicu')
+  if (!pemicu) return { ada: false }
+  pemicu.click()
+  await new Promise(r => setTimeout(r, 400))
+  const butir = [...document.querySelectorAll('[role=menu] [role=menuitem]')]
+    .map(b => b.textContent.trim())
+  pemicu.click()
+  return { ada: true, butir }
+})
+catat('Header berubah saat sudah masuk',
+  menuAkun.ada && (menuAkun.butir || []).some(b => /Keluar/.test(b)),
+  menuAkun.ada ? `menu akun muncul, berisi ${menuAkun.butir.length} aksi` : 'menu akun tidak ada')
 
 // --- 3. buka form tanpa dialihkan ---
 await page.goto(`${BASIS}/tambah-lokasi`, { waitUntil: 'networkidle' })
@@ -188,11 +210,24 @@ const jumlahPenanda = await page.evaluate(() => (() => {
         .reduce((s, e) => s + Number(e.textContent), 0)
       return tunggal + dalamKluster
     })())
-catat('Lokasi baru langsung muncul di peta', jumlahPenanda === 4, `${jumlahPenanda} lokasi terwakili di peta, 3 seed ditambah 1 baru`)
+// Dulu diperiksa totalnya harus pas empat, yaitu tiga seed ditambah satu yang baru
+// dibuat. Itu berhenti benar begitu ada kiriman warga sungguhan di basis data. Yang
+// sebenarnya diuji adalah lokasi yang baru saja dibuat ikut terwakili, jadi jumlah
+// sebelum dan sesudah yang dibandingkan, bukan angka tetap.
+catat('Lokasi baru langsung muncul di peta',
+  jumlahPenanda >= jumlahPenandaAwal + 1,
+  `${jumlahPenandaAwal} penanda sebelum menambah, ${jumlahPenanda} sesudah`)
 
 // --- 12. keluar ---
-await klik(page, 'Keluar')
-await page.waitForTimeout(2500)
+// Keluar sekarang berada di dalam menu akun, jadi menunya dibuka lebih dulu.
+await page.evaluate(async () => {
+  document.querySelector('button.menu-akun-pemicu')?.click()
+  await new Promise(r => setTimeout(r, 400))
+  const b = [...document.querySelectorAll('[role=menu] [role=menuitem]')]
+    .find(e => /Keluar/.test(e.textContent))
+  b && b.click()
+})
+await page.waitForTimeout(3000)
 const adaMasuk = await page.evaluate(() =>
   [...document.querySelectorAll('a')].some(a => a.textContent.trim() === 'Masuk'))
 catat('Keluar mengembalikan ke mode lihat', adaMasuk)

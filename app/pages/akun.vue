@@ -15,20 +15,7 @@ const user = useSupabaseUser()
 const idPengguna = useIdPengguna()
 const { tampilkan } = useNotifikasi()
 
-const { data: profil, refresh } = await useAsyncData(
-  () => `profil-${idPengguna.value ?? 'tamu'}`,
-  async () => {
-    if (!idPengguna.value) return null
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('id, nama')
-      .eq('id', idPengguna.value)
-      .maybeSingle()
-    if (error) throw error
-    return data as any
-  },
-  { watch: [idPengguna] },
-)
+const { data: profil, refresh } = await useProfilSaya()
 
 const nama = ref('')
 const menyimpan = ref(false)

@@ -5,7 +5,6 @@
 // memangkas lebar peta selamanya, padahal peta yang dilihat, bukan daftarnya.
 const { data: semua, pending, error, refresh } = useDaftarLokasi()
 const user = useSupabaseUser()
-const keluar = useKeluar()
 
 // Rangka pemuatan hidup di sini, bukan di dalam komponen peta, karena komponen itu
 // khusus sisi klien dan tidak dirender server sama sekali. Ditaruh di halaman berarti
@@ -205,29 +204,12 @@ useHead({ title: 'landai — peta aksesibilitas' })
           class="tombol tombol-utama hidden md:inline-flex"
         >Tambah lokasi</NuxtLink>
 
-        <!-- Tautan akun. Sengaja hanya tampil dari layar sedang ke atas: di 375px
-             baris header sudah terisi penuh, dan menambah satu tombol lagi membuatnya
-             melimpah. Di layar tersempit halaman akun dijangkau lewat halaman tentang. -->
-        <NuxtLink
-          v-if="user"
-          to="/akun"
-          aria-label="Akun saya"
-          class="tombol tombol-tersier hidden w-11 sm:inline-flex"
-        >
-          <svg
-            viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor"
-            stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
-          >
-            <circle cx="12" cy="8.5" r="3.5" />
-            <path d="M5 20c0-3.6 3.1-5.5 7-5.5s7 1.9 7 5.5" />
-          </svg>
-        </NuxtLink>
+        <!-- Satu tombol untuk seluruh urusan akun, menggantikan ikon akun dan tombol
+             keluar yang dulu berdiri sendiri-sendiri. Aksi akun berikutnya masuk ke
+             dalam menunya, bukan ke dalam baris header, jadi baris ini berhenti tumbuh
+             dan tidak ada lagi yang hilang diam-diam di layar sempit. -->
+        <MenuAkun v-if="user" />
 
-        <button
-          v-if="user"
-          class="tombol tombol-sekunder"
-          @click="keluar()"
-        >Keluar</button>
         <NuxtLink
           v-else
           to="/masuk"
