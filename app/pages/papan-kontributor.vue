@@ -9,6 +9,7 @@
 // di peramban tidak menimbulkan beban yang berarti.
 
 const supabase = useSupabaseClient()
+const user = useSupabaseUser()
 
 // Ambang tingkat ditulis sebagai konstanta di sini, bukan disimpan di basis data,
 // supaya bisa diubah tanpa migrasi dan supaya jelas ini keputusan tampilan.
@@ -102,6 +103,13 @@ useHead({ title: 'Papan kontributor — landai' })
       <p class="mt-2 text-sm text-gray-600">
         Ini bentuk pengakuan komunitas, bukan program hadiah. Tidak ada yang bisa diklaim
         atau ditukar dari halaman ini.
+      </p>
+
+      <!-- Di sinilah orang paling mungkin menyadari namanya perlu dirapikan, jadi di
+           sini pula jalan keluarnya ditawarkan. -->
+      <p v-if="user" class="mt-2 text-sm text-gray-600">
+        Nama di daftar ini diambil dari profil Anda.
+        <NuxtLink to="/akun" class="font-medium text-brand underline">Ubah nama tampilan</NuxtLink>.
       </p>
 
       <p v-if="pending" class="mt-8 text-sm text-gray-600" role="status">Memuat papan</p>

@@ -1,4 +1,8 @@
 <script setup lang="ts">
+// Halaman ini juga jadi jalan masuk ke halaman akun di layar tersempit, karena di
+// sana baris header peta sudah terisi penuh dan tidak muat satu tombol lagi.
+const user = useSupabaseUser()
+
 useHead({ title: 'Tentang landai' })
 </script>
 
@@ -86,9 +90,14 @@ useHead({ title: 'Tentang landai' })
         warga yang sudah mengisi peta ini beserta jumlahnya. Ini bentuk pengakuan komunitas,
         bukan program hadiah: tidak ada yang bisa diklaim atau ditukar dari sana.
       </p>
-      <NuxtLink to="/papan-kontributor" class="tombol tombol-sekunder mt-3">
-        Lihat papan kontributor
-      </NuxtLink>
+      <div class="mt-3 flex flex-wrap gap-2">
+        <NuxtLink to="/papan-kontributor" class="tombol tombol-sekunder">
+          Lihat papan kontributor
+        </NuxtLink>
+        <NuxtLink v-if="user" to="/akun" class="tombol tombol-sekunder">
+          Ubah nama tampilan
+        </NuxtLink>
+      </div>
 
       <h2 class="mt-8 text-base font-semibold">Rencana pengembangan</h2>
       <p class="mt-2 text-gray-700">

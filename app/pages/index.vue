@@ -205,6 +205,24 @@ useHead({ title: 'landai — peta aksesibilitas' })
           class="tombol tombol-utama hidden md:inline-flex"
         >Tambah lokasi</NuxtLink>
 
+        <!-- Tautan akun. Sengaja hanya tampil dari layar sedang ke atas: di 375px
+             baris header sudah terisi penuh, dan menambah satu tombol lagi membuatnya
+             melimpah. Di layar tersempit halaman akun dijangkau lewat halaman tentang. -->
+        <NuxtLink
+          v-if="user"
+          to="/akun"
+          aria-label="Akun saya"
+          class="tombol tombol-tersier hidden w-11 sm:inline-flex"
+        >
+          <svg
+            viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor"
+            stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
+          >
+            <circle cx="12" cy="8.5" r="3.5" />
+            <path d="M5 20c0-3.6 3.1-5.5 7-5.5s7 1.9 7 5.5" />
+          </svg>
+        </NuxtLink>
+
         <button
           v-if="user"
           class="tombol tombol-sekunder"

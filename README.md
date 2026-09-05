@@ -1,137 +1,361 @@
-# landai — Peta Aksesibilitas Difabel Kota
+<div align="center">
 
-Web crowdmap yang memberi tahu orang apakah sebuah tempat umum bisa mereka akses, sebelum mereka pergi ke sana.
+  # landai
+  ### Peta aksesibilitas difabel berbasis kontribusi warga
 
-**ITechno Cup 2026 — Web Development**
-Subtema: Smart Sustainable Digital Solution for Inclusive Society
-Mendukung SDG 11: Kota dan Komunitas Berkelanjutan
+  [![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-Visit_Site-success?style=for-the-badge)](https://landai-zeta.vercel.app)
+  [![GitHub](https://img.shields.io/badge/GitHub-Repository-181717?style=for-the-badge&logo=github)](https://github.com/VanoStudio/landai)
+  [![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
 
-> **Link demo:** _belum di-deploy, isi di sini setelah deploy ke Vercel._
+  **Submission for ITECHNO CUP 2026 - Web Development**
+
+  **By [ISI: nama tim resmi kalau ada, kalau tidak pakai nama tiga anggota]**
+
+</div>
 
 ---
 
-## Tim
+## 📋 Daftar Isi
 
-| Nama | Peran |
-|---|---|
-| Vano | Pengembang |
-| Husein | Survei lapangan |
-| Dakara | Riset kriteria dan konten dampak |
+- [Tentang Proyek](#-tentang-proyek)
+- [Fitur Unggulan](#-fitur-unggulan)
+- [Demo & Screenshot](#-demo--screenshot)
+- [Teknologi](#-teknologi)
+- [Arsitektur Sistem](#-arsitektur-sistem)
+- [Instalasi & Setup](#-instalasi--setup)
+- [Penggunaan](#-penggunaan)
+- [API Documentation](#-api-documentation)
+- [Testing](#-testing)
+- [Tim Pengembang](#-tim-pengembang)
+- [Lisensi](#-lisensi)
 
-## Masalah
+---
 
-Belum ada sumber informasi terpercaya soal kondisi aksesibilitas tempat umum di Indonesia. Penyandang disabilitas, lansia, dan orang tua dengan stroller sering baru tahu sebuah tempat tidak ramah akses setelah tiba di sana, saat pulang bukan lagi pilihan yang murah.
+## 👥 Tim Pengembang
 
-Google Maps dan aplikasi peta sejenis menyimpan lokasi dan jam buka. Keduanya tidak menyimpan apakah rampnya ada, apakah guiding block-nya tersambung, apakah liftnya benar-benar menyala.
+| Nama | Peran | Kontribusi |
+|------|-------|------------|
+| **Vano** | Project Lead & Full Stack Developer | Merancang dan membangun seluruh aplikasi, basis data, dan alur pengujian |
+| **Husein** | Riset Lapangan | Turun langsung mensurvei lokasi, mengambil foto dan mengisi data aksesibilitas sungguhan |
+| **Dakara** | Peneliti Kriteria Aksesibilitas | Menyusun kriteria penilaian dan bahan rujukan regulasi tentang aksesibilitas |
 
-## Solusi
+---
 
-Warga menandai lokasi di peta, mengisi checklist delapan fasilitas aksesibilitas, dan mengambil foto langsung di tempat. Hasilnya jadi peta interaktif dengan skor aksesibilitas per lokasi yang bisa disaring menurut kebutuhan: kursi roda, tunanetra, atau lansia dan stroller.
+## 🎯 Tentang Proyek
 
-Data yang belum dikonfirmasi warga lain tetap tampil, tapi menandai dirinya berbeda. Kejujuran soal tingkat keyakinan data adalah bagian dari produknya.
+### Latar Belakang
 
-## Fitur
+Berdasarkan data Badan Pusat Statistik tahun 2024, lebih dari 17,8 juta jiwa penduduk Indonesia adalah penyandang disabilitas. Undang-Undang Nomor 8 Tahun 2016 tentang Penyandang Disabilitas menjamin hak aksesibilitas bagi mereka, dan Peraturan Menteri PUPR Nomor 14/PRT/M/2017 secara khusus mewajibkan bangunan gedung umum menyediakan sarana kemudahan seperti ramp, jalur pemandu, dan toilet yang dapat diakses. Meski aturan sudah ada, tidak ada sumber informasi terbuka yang bisa diandalkan warga untuk mengetahui apakah sebuah tempat umum benar-benar mematuhi standar tersebut sebelum mereka datang ke sana. Penyandang disabilitas, lansia, dan orang tua dengan stroller sering kali baru mengetahui sebuah tempat tidak ramah akses setelah tiba di lokasi.
 
-- **Peta penuh layar** dengan penanda berwarna sesuai skor. Hijau ramah akses, amber sebagian, merah belum ramah.
-- **Filter tiga kategori kebutuhan.** Beberapa filter aktif berarti lokasi harus memenuhi semuanya.
-- **Mode lihat tanpa akun.** Mencari informasi tidak butuh mendaftar.
-- **Tambah lokasi empat langkah:** cari nama tempat lewat geocoding, ambil koordinat GPS perangkat, koreksi manual dengan menggeser pin, isi checklist, ambil foto lewat kamera.
-- **Skor otomatis.** Dihitung trigger database dari checklist, bukan diisi manusia, jadi tidak bisa dimanipulasi lewat form.
-- **Halaman detail** berisi foto, skor, rincian delapan fasilitas, catatan kontributor, dan jejak siapa yang menambahkan kapan.
-- **Konfirmasi akurasi warga.** Tiga konfirmasi akurat menaikkan status lokasi jadi terverifikasi.
+### Solusi yang Ditawarkan
 
-## Menjaga kualitas data
+landai adalah peta interaktif berbasis kontribusi warga. Siapa saja bisa menandai sebuah lokasi, mengisi daftar periksa delapan fasilitas aksesibilitas, dan mengunggah foto langsung dari kamera. Sistem menghitung skor aksesibilitas secara otomatis dari data yang diisi, menampilkannya sebagai penanda berwarna di peta, dan menjaga kepercayaan data lewat konfirmasi berulang dari warga lain, bukan lewat tim verifikasi tertutup.
 
-Ini bukan sistem anti-fraud berat, tapi cukup untuk menjawab pertanyaan soal validitas:
+### Tujuan Proyek
 
-- Foto diambil langsung lewat kamera perangkat (`capture="environment"`), bukan dipilih dari galeri.
-- Setiap lokasi mencatat kontributor dan waktunya.
-- Warga lain yang pernah ke lokasi yang sama bisa menyatakan datanya masih akurat atau sudah berubah.
-- Row Level Security di Postgres membatasi checklist sebuah lokasi hanya bisa diubah oleh pembuatnya, sehingga skor lokasi orang lain tidak bisa disetir.
-- Skor tidak pernah dikirim dari browser. Trigger database yang menghitungnya dari checklist.
+- 🎯 **Tujuan Utama**: Menyediakan sumber informasi aksesibilitas tempat umum yang terbuka, terus diperbarui, dan bisa dipercaya, dikumpulkan bersama oleh warga.
+- 📊 **Target Pengguna**: Penyandang disabilitas, lansia, dan orang tua dengan stroller sebagai pencari informasi; warga umum sebagai kontributor data.
+- 💡 **Value Proposition**: Belum ada crowdmap aksesibilitas serupa di Indonesia. landai tidak menunggu satu pihak memetakan seluruh kota, tapi membiarkan warga yang sudah berada di suatu tempat langsung melaporkan kondisinya.
 
-## Teknologi
+---
 
-| Lapisan | Pilihan | Alasan |
-|---|---|---|
-| Framework | Nuxt 4 (Vue 3, `<script setup>`) | SSR untuk waktu muat pertama peta, satu bahasa untuk klien dan server route |
-| Database dan auth | Supabase (Postgres, Auth, Storage) | Row Level Security dan trigger memindahkan aturan kualitas data ke lapisan yang tidak bisa dilewati klien |
-| Peta | MapLibre GL JS | Sumber terbuka, tanpa kunci vendor pada pustakanya |
-| Basemap | MapTiler `dataviz-light`, cadangan raster OpenStreetMap | Basemap sengaja netral supaya warna skor jadi satu-satunya warna kuat di layar |
-| Geocoding | Nominatim, lewat server route Nuxt | Proxy dipakai supaya header `User-Agent` bisa dipasang sesuai kebijakan pemakaian Nominatim |
-| Styling | Tailwind CSS 4 | Token warna dan tipografi didefinisikan sekali lewat `@theme` |
-| Deploy | Vercel | Nuxt terdeteksi otomatis |
+## ✨ Fitur Unggulan
 
-## Struktur project
+### Fitur Utama
+
+| Fitur | Deskripsi | Keunggulan |
+|----------|--------------|---------------|
+| **Peta interaktif dengan skor aksesibilitas** | Setiap lokasi ditandai warna hijau, amber, atau merah sesuai skor, dan bentuk terisi atau berongga sesuai status verifikasi | Warna dan bentuk dipakai bersamaan, sehingga tetap terbaca oleh mata yang tidak membedakan warna |
+| **Formulir kontribusi empat langkah** | Menandai titik lewat GPS perangkat atau geser manual, mengisi identitas tempat, delapan daftar periksa fasilitas, dan foto wajib dari kamera langsung | Foto tidak bisa diambil dari galeri, mencegah data yang tidak diverifikasi di lapangan |
+| **Verifikasi komunitas otomatis** | Status lokasi naik menjadi terverifikasi setelah tiga warga berbeda mengonfirmasi, dan turun kembali kalau ada laporan sudah berubah | Kepercayaan data ditentukan komunitas, bukan satu admin, dan tetap bisa diperbarui seiring waktu |
+| **Penyaringan berdasarkan kebutuhan** | Filter terpisah untuk kebutuhan kursi roda, tunanetra, dan lansia atau stroller, bisa digabung sekaligus | Setiap filter dihitung dari kombinasi fasilitas yang relevan, bukan sekadar kategori umum |
+
+### Fitur Tambahan
+
+- **Papan kontributor** - Menampilkan warga paling aktif menambahkan lokasi, sebagai bentuk pengakuan komunitas.
+- **Pembaruan terbuka** - Siapa pun yang masuk bisa membantu memperbarui daftar periksa dan foto sebuah lokasi, tercatat siapa pengubahnya, sementara nama, kategori, dan koordinat tetap hanya bisa diubah pemilik asli.
+- **Deteksi kemungkinan duplikat** - Memperingatkan kontributor kalau lokasi serupa sudah ada di dekatnya sebelum menyimpan data baru.
+- **Buka rute ke Google Maps** - Menyerahkan navigasi ke Google Maps lewat satu tautan, karena landai fokus pada data aksesibilitas, bukan membangun ulang sistem navigasi.
+- **Masuk dengan Google** - Alternatif pendaftaran cepat selain email dan kata sandi.
+
+---
+
+## 📸 Demo & Screenshot
+
+### Live Demo
+
+🔗 **[Kunjungi Website](https://landai-zeta.vercel.app)**
+
+### Screenshot Aplikasi
+
+<div align="center">
+  <img src="docs/screenshots/peta-utama.png" alt="Peta utama" width="800"/>
+  <p><em>Peta utama - penanda berwarna sesuai skor aksesibilitas</em></p>
+
+  <img src="docs/screenshots/detail-lokasi.png" alt="Detail lokasi" width="800"/>
+  <p><em>Halaman detail lokasi dengan rincian delapan fasilitas</em></p>
+
+  <img src="docs/screenshots/tambah-lokasi.png" alt="Formulir tambah lokasi" width="800"/>
+  <p><em>Formulir tambah lokasi empat langkah</em></p>
+</div>
+
+> **Catatan tangkapan layar.** Ketiganya diambil dari tautan hosting yang sedang
+> berjalan, bukan dari mockup, tetapi memakai data yang ada saat ini: tiga lokasi
+> contoh beserta beberapa lokasi kiriman awal. **Tangkapan ini belum final dan harus
+> diambil ulang setelah data survei lapangan sungguhan masuk**, supaya yang terlihat
+> adalah kondisi aksesibilitas yang benar-benar disurvei di tempat.
+
+### Video Demo
+
+📹 **[ISI: opsional, link video demo kalau sempat dibuat]**
+
+---
+
+## 🛠️ Teknologi
+
+### Tech Stack
+
+#### Frontend
+```
+Framework    : Nuxt 4 (Vue 3, Composition API)
+Peta         : MapLibre GL JS dengan basemap MapTiler
+Gaya         : Tailwind CSS 4
+Sistem desain: Impeccable, menghasilkan PRODUCT.md dan DESIGN.md
+```
+
+#### Layanan data dan akun
+```
+Basis data   : Supabase (PostgreSQL)
+Autentikasi  : Supabase Auth (email dan kata sandi, serta Google OAuth)
+Penyimpanan  : Supabase Storage untuk foto lokasi
+Keamanan     : Row Level Security pada seluruh tabel, ditegakkan di level basis data
+Pencarian    : Nominatim OpenStreetMap, diakses lewat satu rute server Nuxt
+```
+
+Catatan: landai tidak membangun server backend terpisah. Sebagian besar operasi baca dan tulis data dilakukan langsung dari klien ke Supabase lewat pustaka resminya, diamankan oleh kebijakan Row Level Security, bukan oleh lapisan API kustom.
+
+#### DevOps & Tools
+```
+Deployment   : Vercel
+Pengujian    : Skrip end to end kustom berbasis Playwright, dijalankan lewat browser sungguhan
+```
+
+### Alasan Pemilihan Teknologi
+
+| Teknologi | Alasan Pemilihan |
+|-----------|------------------|
+| **Nuxt 4** | Perenderan sisi server mempercepat tampilan pertama peta, dan menyediakan rute server bawaan tanpa perlu backend terpisah |
+| **Supabase** | Autentikasi, basis data, dan penyimpanan foto tersedia dalam satu layanan, dengan Row Level Security dan trigger basis data memindahkan aturan kualitas data ke lapisan yang tidak bisa dilewati dari sisi peramban |
+| **MapLibre GL JS** | Pustaka peta sumber terbuka tanpa keterikatan vendor, mendukung kontrol penuh atas gaya visual peta |
+| **Impeccable** | Membantu memastikan sistem desain terarah dan tidak generik, sesuai filosofi visual yang dipilih untuk proyek ini |
+
+### Dependencies Utama
+
+```json
+{
+  "dependencies": {
+    "@nuxtjs/supabase": "^2.0.10",
+    "maplibre-gl": "^6.7.0",
+    "nuxt": "^4.5.2",
+    "vue": "^3.5.42",
+    "vue-router": "^5.3.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^7.0.2"
+  }
+}
+```
+
+Tailwind dipasang lewat `@tailwindcss/vite`, bukan lewat modul `@nuxtjs/tailwindcss`,
+karena modul itu masih terikat Tailwind v3 sedangkan proyek ini memakai v4 beserta
+token `@theme`-nya.
+
+---
+
+## 🏗️ Arsitektur Sistem
+
+### System Architecture
 
 ```
-app/
-  assets/css/main.css      token desain dan gaya penanda peta
-  components/              komponen UI, komponen peta berakhiran .client.vue
-  composables/             skor, data lokasi, checklist, GPS, kompresi foto
-  pages/                   peta, auth, tambah lokasi, detail lokasi, tentang
-  types/database.types.ts  tipe database, ditulis mengikuti schema.sql
-server/api/geocode.get.ts  proxy pencarian nama tempat ke Nominatim
-scripts/                   penyalin worker MapLibre ke public/, jalan otomatis
-schema.sql                 skema database, dijalankan sekali
-schema-patch.sql           perbaikan trigger, RLS, dan bucket Storage
-seed-demo.sql              data contoh untuk uji tampilan, hapus di langkah paling akhir
-bersihkan-data-uji.sql     pembersih data contoh dan data uji, jalankan terakhir
-PRD.md DESIGN-BRIEF.md     requirement produk dan arah visual
-PRODUCT.md DESIGN.md       konteks produk dan sistem desain
+Peramban pengguna
+   │
+   ├─▶ Nuxt 4 (sisi server, perenderan awal halaman)
+   │        │
+   │        └─▶ server/api/geocode.get.ts ──▶ Nominatim OpenStreetMap
+   │
+   └─▶ Nuxt 4 (sisi klien, setelah hidrasi)
+            │
+            └─▶ Supabase (Auth, PostgreSQL, Storage)
+                     │
+                     └─▶ Row Level Security + trigger basis data
+                              (hitung skor, buat profil, ubah status verifikasi)
 ```
 
-## Menjalankan di lokal
+### Database Schema
 
-Butuh Node.js 20 atau lebih baru, akun Supabase, dan kunci MapTiler gratis.
+Lima tabel utama, didefinisikan lengkap pada schema.sql dan tambalannya:
 
-**1. Pasang dependency**
+- `profiles` - data akun, dibuat otomatis lewat trigger saat pendaftaran
+- `locations` - lokasi, skor, status verifikasi, dan jejak pembaru
+- `accessibility_checklist` - delapan fasilitas per lokasi, sumber perhitungan skor
+- `location_photos` - foto lokasi, maksimal tiga per lokasi
+- `confirmations` - konfirmasi akurasi dari warga, penentu naik turunnya status verifikasi
+
+### Folder Structure
+
+```
+landai/
+├── app/
+│   ├── components/     # Komponen antarmuka, peta berakhiran .client.vue
+│   ├── composables/     # Aturan skor, pengambilan data, pembacaan GPS, pengecilan foto
+│   └── pages/           # Peta, tentang, masuk, daftar, tambah lokasi, detail, papan kontributor
+├── server/
+│   └── api/             # Rute server, satu di antaranya perantara pencarian tempat
+├── docs/
+│   ├── qa/               # Skrip pengujian end to end
+│   └── screenshots/       # Tangkapan layar untuk dokumentasi
+├── schema.sql             # Skema basis data awal
+├── schema-patch-*.sql      # Tambalan basis data berurutan
+├── PRODUCT.md              # Konteks produk untuk sistem desain
+└── DESIGN.md               # Token desain dan filosofi visual
+```
+
+---
+
+## ⚙️ Instalasi & Setup
+
+### Prerequisites
+
+- **Node.js** versi 20 atau lebih tinggi
+- **npm**
+- **Git**
+- Akun **Supabase** (gratis)
+- Akun **MapTiler** (gratis, untuk basemap)
+
+### Langkah Instalasi
+
+#### 1️⃣ Clone Repository
+
+```bash
+git clone https://github.com/VanoStudio/landai.git
+cd landai
+```
+
+#### 2️⃣ Install Dependencies
 
 ```bash
 npm install
 ```
 
-Repo ini menyertakan `.npmrc` berisi `legacy-peer-deps=true`. npm 10.9.3 punya bug resolver peer dependency yang membuat install Nuxt gagal; flag itu melewatinya.
+#### 3️⃣ Setup Environment Variables
 
-**2. Siapkan database**
+Buat file `.env` di root direktori:
 
-Di Supabase SQL Editor, jalankan `schema.sql` lalu `schema-patch.sql`. Keduanya sekali saja.
-
-Lalu di Dashboard, buka **Authentication → Sign In / Providers** dan atur dua hal di bagian yang berbeda:
-
-- Di **Auth Providers**, buka baris **Email** dan pastikan provider-nya aktif. Kalau `Disabled`, semua pendaftaran dan login gagal.
-- Di **User Signups** di bagian atas halaman yang sama, matikan **Confirm email**. SMTP bawaan Supabase dibatasi sekitar dua sampai tiga email per jam, yang tidak cukup untuk pendaftaran beruntun saat survei lapangan.
-
-Tombol Save di dua bagian itu terpisah.
-
-**3. Isi environment variable**
-
-Salin `.env.example` jadi `.env`:
-
-```
-SUPABASE_URL=https://xxxx.supabase.co
-SUPABASE_KEY=sb_publishable_xxxx
-NUXT_PUBLIC_MAPTILER_KEY=xxxx
+```env
+SUPABASE_URL="[isi Project URL dari dashboard Supabase]"
+SUPABASE_KEY="[isi publishable key dari dashboard Supabase]"
+NUXT_PUBLIC_MAPTILER_KEY="[isi key dari dashboard MapTiler]"
 ```
 
-**4. Jalankan**
+#### 4️⃣ Setup Basis Data
+
+Jalankan seluruh isi `schema.sql`, lalu setiap `schema-patch-*.sql` secara berurutan, di SQL Editor pada dashboard Supabase.
+
+#### 5️⃣ Run Development Server
 
 ```bash
 npm run dev
 ```
 
-Buka `http://localhost:3000`.
+Aplikasi berjalan di `http://localhost:3000`
 
-## Catatan pemakaian di lapangan
+---
 
-Kamera dan GPS hanya berfungsi di konteks aman, yaitu HTTPS atau `localhost`. Membuka dev server lewat alamat IP jaringan lokal seperti `http://192.168.1.5:3000` akan membuat browser memblokir keduanya tanpa penjelasan yang jelas. Untuk survei lapangan, selalu pakai URL hosting.
+## 🚀 Penggunaan
 
-## Deploy
+### Menjalankan Aplikasi
 
-1. Import repo di Vercel, Nuxt terdeteksi otomatis.
-2. Tambahkan tiga environment variable yang sama seperti `.env`.
-3. Deploy, lalu buka URL hasilnya dari perangkat lain untuk memastikan tidak ada yang bergantung ke `localhost`.
+```bash
+npm run dev      # mode pengembangan
+npm run build     # build produksi
+npm run preview   # menjalankan hasil build secara lokal
+```
 
-## Lingkup yang sengaja tidak dibangun
+### Panduan Pengguna
 
-Routing atau navigasi rute, chat atau notifikasi, dashboard admin terpisah, gamifikasi, aplikasi mobile native, dan sistem pembayaran. Semuanya dibekukan supaya alur inti berjalan tanpa cacat, bukan supaya daftar fiturnya panjang.
+#### Mode Melihat (tanpa akun)
+
+1. Buka aplikasi, peta langsung tampil penuh berisi lokasi yang sudah disurvei.
+2. Pilih penyaring kebutuhan (kursi roda, tunanetra, atau lansia dan stroller) untuk menyaring lokasi yang relevan.
+3. Ketuk sebuah penanda untuk melihat skor dan ringkasan fasilitas, atau lanjut ke halaman detail untuk rincian penuh.
+
+#### Mode Kontribusi (perlu akun)
+
+1. Daftar atau masuk, bisa lewat email atau akun Google.
+2. Tekan tombol tambah lokasi, tentukan titik lewat GPS atau geser manual di peta.
+3. Isi nama, jenis tempat, delapan daftar periksa fasilitas, dan ambil foto langsung dari kamera.
+4. Simpan, lokasi langsung tampil di peta dengan status belum terverifikasi sampai dikonfirmasi warga lain.
+5. Kontributor lain yang pernah ke lokasi yang sama bisa membantu memperbarui daftar periksa atau menambahkan foto, dan menekan tombol konfirmasi akurasi.
+
+---
+
+## 📚 API Documentation
+
+landai tidak membangun REST API kustom penuh. Autentikasi dan seluruh operasi baca-tulis data lokasi dilakukan langsung dari klien ke Supabase lewat pustaka resminya, diamankan oleh kebijakan Row Level Security pada tiap tabel, bukan oleh lapisan endpoint kustom.
+
+### Rute Server Kustom
+
+Satu-satunya rute server yang dibuat khusus untuk proyek ini:
+
+```http
+GET /api/geocode?q=[nama tempat]
+```
+
+Rute ini meneruskan pencarian nama tempat ke Nominatim OpenStreetMap dari sisi server, karena tajuk pengenal aplikasi yang disyaratkan Nominatim tidak bisa disetel dari peramban, dan agar tidak terhalang kebijakan lintas asal.
+
+### Contoh Permintaan
+
+```javascript
+const hasil = await fetch('/api/geocode?q=Blok M Plaza')
+```
+
+---
+
+## 🧪 Testing
+
+landai diuji lewat skenario end to end memakai browser sungguhan dan akun uji nyata, bukan lewat cakupan unit test otomatis semata. Skrip pengujian tersimpan di `docs/qa/` dan dijalankan dengan Playwright.
+
+### Menjalankan Pengujian
+
+```bash
+node docs/qa/01-inti.mjs
+node docs/qa/03-peta-filter.mjs
+# skrip lain pada folder yang sama menguji bagian berbeda
+```
+
+### Cakupan Pengujian
+
+Lebih dari tiga puluh skenario diuji sepanjang pengembangan, mencakup antara lain:
+
+- Alur pendaftaran, masuk, dan keluar
+- Penyimpanan lokasi, unggahan foto, dan perhitungan skor lewat trigger basis data
+- Ambang tiga konfirmasi untuk status terverifikasi, naik dan turun
+- Aturan Row Level Security, termasuk percobaan langsung ke layanan memakai akun yang bukan pemiliknya
+- Penyaringan tiga kategori kebutuhan, satu per satu dan gabungan
+- Tampilan responsif pada beberapa ukuran layar
+
+---
+
+## 📄 Lisensi
+
+Proyek ini dilisensikan di bawah [MIT License](LICENSE) - lihat file LICENSE untuk detail lebih lanjut.
+
+---
+
+<div align="center">
+
+  **Dibuat oleh Vano, Husein, dan Dakara untuk ITECHNO CUP 2026**
+
+</div>

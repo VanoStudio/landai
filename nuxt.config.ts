@@ -40,7 +40,7 @@ export default defineNuxtConfig({
     redirectOptions: {
       login: '/masuk',
       callback: '/konfirmasi',
-      include: ['/tambah-lokasi'],
+      include: ['/tambah-lokasi', '/akun'],
       exclude: [],
     },
   },
