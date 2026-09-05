@@ -15,14 +15,7 @@ Sumber laporan progres. PDF hasilnya ada di `../laporan-progres-landai.pdf`.
   tautan 1200x630 dan dua ukuran favicon. Perlu raster karena WhatsApp dan Telegram
   tidak merender og:image berformat SVG. Jalankan `node buat-aset.mjs ..` dari folder
   ini setiap kali tandanya berubah.
-- `uji-polish.mjs` — pemeriksaan visual: limpahan mendatar, tindih antar elemen
-  header, teks terpotong, tinggi tombol, dan keberadaan tanda merek.
-- `uji-menyeluruh.mjs` — uji 14 langkah lewat peramban, dari mendaftar sampai keluar,
-  memakai akun sungguhan. Menghasilkan juga tangkapan keadaan sudah masuk.
-- `uji-filter.mjs` — menguji tiap penyaring kebutuhan terpisah, mencocokkan jumlah
-  penanda di peta dengan isi basis data.
-- `uji-batas-foto-ketat.mjs` — menembakkan empat pemilihan berkas serentak untuk
-  memastikan batas tiga foto ditegakkan di logika, bukan cuma disembunyikan.
+- `qa/` — seluruh skrip pengujian ujung ke ujung, lihat bagian di bawah.
 
 Urutan membuat ulang laporan lengkap:
 
@@ -39,7 +32,39 @@ npm install playwright && npx playwright install chromium
 
 ## Menjalankan skrip pengujian
 
-Dua skrip perlu masuk sebagai kontributor, jadi kredensial akun ujinya dibaca dari
+Semua skrip pengujian ada di `qa/`. Berkas `qa/uji-*.mjs` adalah pengujian ujung ke
+ujung yang menjalankan peramban sungguhan terhadap dev server, sementara `qa/01-*`
+sampai `qa/11-*` adalah pemeriksaan bertahap yang ditulis lebih dulu.
+
+**Jalankan dari akar repo, bukan dari dalam folder ini.** Setiap skrip menyusun
+jalurnya dari `process.cwd()`, jadi tangkapan layar hasilnya jatuh ke `gambar/` di
+akar repo:
+
+```bash
+node docs/qa/uji-menyeluruh.mjs
+```
+
+Beberapa contoh yang mencakup area terpenting:
+
+- `qa/uji-menyeluruh.mjs` — 14 langkah, dari mendaftar sampai keluar.
+- `qa/uji-tulis-bersama.mjs` — batas hak tulis antar pengguna, 35 pemeriksaan.
+- `qa/uji-responsif.mjs` — tata letak di lebar 320px sampai desktop, 50 pemeriksaan.
+- `qa/uji-filter.mjs` — jumlah penanda di peta dicocokkan dengan isi basis data.
+- `qa/uji-batas-foto-ketat.mjs` — empat pemilihan berkas serentak, memastikan batas
+  tiga foto ditegakkan di logika, bukan sekadar disembunyikan.
+
+Satu skrip berbeda dari yang lain: `qa/uji-schema-gabungan.mjs` tidak membuka peramban
+dan tidak menyentuh Supabase sama sekali. Ia menjalankan `schema-gabungan.sql` di atas
+Postgres sungguhan lewat PGlite, Postgres yang dikompilasi ke WebAssembly, jadi tidak
+perlu Docker maupun server. Gunanya membuktikan berkas gabungan itu benar-benar bisa
+dipasang sekali jalan pada basis data kosong, dan skema hasilnya berperilaku benar:
+
+```bash
+npm install @electric-sql/pglite
+node docs/qa/uji-schema-gabungan.mjs
+```
+
+Sebagian skrip perlu masuk sebagai kontributor, jadi kredensial akun ujinya dibaca dari
 environment dan tidak pernah ditulis di dalam berkas. Tambahkan ke `.env` di akar repo:
 
 ```

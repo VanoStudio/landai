@@ -1,4 +1,4 @@
-// Pesan error Supabase datang dalam bahasa Inggris teknis. DESIGN-BRIEF minta
+// Pesan error Supabase datang dalam bahasa Inggris teknis. DESIGN.md minta
 // bahasa Indonesia sederhana tanpa istilah teknis di UI pengguna umum.
 const PETA_PESAN: Record<string, string> = {
   'Invalid login credentials': 'Email atau kata sandi salah.',

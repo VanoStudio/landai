@@ -4,8 +4,8 @@
 // Ada karena nama itu bukan urusan kosmetik di aplikasi ini. Nama inilah yang tertulis
 // pada "Ditambahkan ... " di halaman detail dan pada papan kontributor, jadi ia
 // dibaca siapa pun yang membuka peta. Sebelum halaman ini ada, nama hanya bisa diubah
-// lewat SQL, dan nama yang datang dari akun Google sekolah terbawa apa adanya, lengkap
-// dengan awalan seperti "8C_" atau "[AKUN BELAJAR]".
+// lewat SQL, dan nama yang ikut terbawa dari penyedia masuk seperti Google dipakai apa
+// adanya, termasuk kalau bentuknya bukan nama yang ingin ditampilkan ke publik.
 //
 // Surel sengaja hanya ditampilkan, tidak bisa diubah di sini. Mengubah surel berarti
 // mengubah identitas masuk, dan itu perlu pengiriman tautan konfirmasi ke dua alamat
@@ -62,7 +62,7 @@ async function simpan() {
   tampilkan('Nama tampilan tersimpan.')
 }
 
-useHead({ title: 'Akun — landai' })
+useHead({ title: 'Akun' })
 </script>
 
 <template>
@@ -93,9 +93,7 @@ useHead({ title: 'Akun — landai' })
             class="mt-1 min-h-11 w-full rounded border border-gray-400 px-3 py-2"
           >
           <p class="mt-1.5 text-sm text-gray-600">
-            Boleh nama panggilan. Kalau nama Anda terbawa awalan dari akun sekolah
-            seperti <span class="whitespace-nowrap">8C_</span> atau
-            <span class="whitespace-nowrap">[AKUN BELAJAR]</span>, rapikan di sini.
+            Boleh nama panggilan, tidak harus nama lengkap. Bisa diubah kapan saja.
           </p>
         </div>
 

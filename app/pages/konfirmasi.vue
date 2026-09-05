@@ -31,7 +31,7 @@ watchEffect(() => {
   if (user.value) navigateTo('/', { replace: true })
 })
 
-useHead({ title: 'Mengaktifkan akun — landai' })
+useHead({ title: 'Mengaktifkan akun' })
 </script>
 
 <template>

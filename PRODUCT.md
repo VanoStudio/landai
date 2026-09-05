@@ -61,8 +61,8 @@ Kendala teknis: Nuxt 4, Supabase, MapLibre GL, Tailwind 4, deploy Vercel. Nomina
 ## Evidence on Hand
 
 - `PRD.md`, requirement produk, data model, dan user flow.
-- `DESIGN-BRIEF.md`, arah visual yang mengikat, dipakai sebagai jawaban discovery.
-- `schema.sql` dan `schema-patch.sql`, skema database yang sudah berjalan di Supabase.
+- `DESIGN.md`, sistem desain yang mengikat: token warna, tipografi, dan komponen.
+- `schema.sql` beserta seluruh `schema-patch-*.sql`, skema database yang sudah berjalan di Supabase. Gabungannya ada di `schema-gabungan.sql`.
 - Belum ada foto lokasi, testimoni, angka pemakaian, atau data survei di database. Survei lapangan Blok M (20 sampai 30 titik) belum masuk. Jangan mengarang salah satu pun dari itu di UI atau README.
 
 ## Product Principles

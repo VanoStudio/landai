@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-/* Token dari DESIGN-BRIEF.md.
+/* Token dari DESIGN.md.
    Tiga warna skor HANYA untuk mengkodekan skor aksesibilitas, bukan dekorasi. */
 @theme {
   --font-sans: 'Public Sans', ui-sans-serif, system-ui, -apple-system, sans-serif;

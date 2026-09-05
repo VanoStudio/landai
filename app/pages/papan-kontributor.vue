@@ -84,7 +84,7 @@ const { data: kontributor, pending, error } = await useAsyncData<Kontributor[]>(
   { default: () => [] },
 )
 
-useHead({ title: 'Papan kontributor — landai' })
+useHead({ title: 'Papan kontributor' })
 </script>
 
 <template>

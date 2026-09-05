@@ -13,11 +13,21 @@ public/maplibre-gl-worker.mjs
 public/maplibre-gl-shared.mjs
 
 # Berkas perkakas pengembangan lokal. Tetap ada di disk, tidak ikut ke repo:
-# isinya konvensi mesin masing-masing, bukan bagian dari produk.
+# isinya instruksi kerja untuk sesi asisten koding, bukan bagian dari produk.
+#
+# DESIGN-BRIEF.md ikut dikeluarkan karena ia briefing untuk proses `/impeccable init`,
+# dan hasil prosesnya, DESIGN.md, sudah ada di repo dengan isi yang lebih lengkap.
+# Rujukan di kode diarahkan ke DESIGN.md, bukan ke briefing ini.
 .claude/
 CLAUDE.md
+DESIGN-BRIEF.md
+*_PROMPT.md
 
 # Hasil dokumentasi berukuran besar. Sumbernya tetap ikut: docs/laporan.html
 # beserta skrip pembangunnya, jadi tangkapan dan PDF bisa dibuat ulang kapan saja.
 docs/tangkapan/
 *.pdf
+
+# Tangkapan layar keluaran skrip pengujian di docs/qa/. Dibuat ulang tiap kali
+# skripnya dijalankan, jadi tidak ada gunanya menyimpannya di riwayat git.
+gambar/

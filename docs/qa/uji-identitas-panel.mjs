@@ -369,8 +369,11 @@ for (const [label, vp] of [
   catat('Favicon menunjuk ke tanda SVG yang sama',
     kepala.ikonSvg === '/tanda.svg' && kepala.ikonPng === '/favicon-32.png',
     `${kepala.ikonSvg}, ${kepala.ikonPng}, ${kepala.apple}`)
+  // Judulnya kini berawalan huruf besar, "Landai: ...", jadi pencocokan wajib
+  // mengabaikan besar kecil huruf. Yang dijaga di sini bukan ejaannya, melainkan
+  // bahwa og:title, og:image, dan og:description ketiganya benar-benar terpasang.
   catat('Pratinjau tautan lengkap dengan judul dan keterangan',
-    /\/og\.png$/.test(kepala.ogGambar || '') && (kepala.ogJudul || '').includes('landai')
+    /\/og\.png$/.test(kepala.ogGambar || '') && /landai/i.test(kepala.ogJudul || '')
     && (kepala.ogKeterangan || '').length > 40,
     `${kepala.ogJudul}`)
 

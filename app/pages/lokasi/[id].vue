@@ -1,5 +1,5 @@
 <script setup lang="ts">
-// Kartu tunggal, bukan grid kartu kecil (DESIGN-BRIEF).
+// Kartu tunggal, bukan grid kartu kecil (DESIGN.md).
 const route = useRoute()
 const supabase = useSupabaseClient()
 const user = useSupabaseUser()
@@ -223,7 +223,7 @@ async function konfirmasiAkurasi(akurat: boolean) {
   await refresh()
 }
 
-useHead(() => ({ title: lokasi.value ? `${lokasi.value.nama} — landai` : 'landai' }))
+useHead(() => ({ title: lokasi.value ? lokasi.value.nama : 'Lokasi' }))
 </script>
 
 <template>

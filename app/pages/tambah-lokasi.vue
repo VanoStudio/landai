@@ -1,6 +1,6 @@
 <script setup lang="ts">
 // Alur pendek empat langkah, bukan satu form panjang: kontributor lapangan
-// mengisi ini berulang kali di lokasi berbeda (DESIGN-BRIEF).
+// mengisi ini berulang kali di lokasi berbeda (DESIGN.md).
 const supabase = useSupabaseClient()
 const idPengguna = useIdPengguna()
 const route = useRoute()
@@ -300,7 +300,7 @@ const kemungkinanDuplikat = computed(() => {
   return kandidatDekat.value.find(k => namanyaMirip(k.nama, n)) ?? null
 })
 
-useHead(() => ({ title: modeUbah.value ? 'Edit lokasi — landai' : 'Tambah lokasi — landai' }))
+useHead(() => ({ title: modeUbah.value ? 'Edit lokasi' : 'Tambah lokasi' }))
 </script>
 
 <template>

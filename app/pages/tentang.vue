@@ -3,7 +3,7 @@
 // sana baris header peta sudah terisi penuh dan tidak muat satu tombol lagi.
 const user = useSupabaseUser()
 
-useHead({ title: 'Tentang landai' })
+useHead({ title: 'Tentang' })
 </script>
 
 <template>

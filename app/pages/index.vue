@@ -1,5 +1,5 @@
 <script setup lang="ts">
-// Peta adalah hero. Tidak ada halaman pembuka sebelum peta (DESIGN-BRIEF), dan peta
+// Peta adalah hero. Tidak ada halaman pembuka sebelum peta (DESIGN.md), dan peta
 // selalu memakai lebar penuh. Daftar lokasi bukan kolom tetap di sampingnya melainkan
 // panel yang dipanggil lewat pemindah tampilan di header lalu ditutup lagi: kolom tetap
 // memangkas lebar peta selamanya, padahal peta yang dilihat, bukan daftarnya.
@@ -141,7 +141,6 @@ function pilihDariDaftar(l: LokasiPeta) {
   nextTick(() => petaRef.value?.pindahKe(l.lat, l.lng, 17))
 }
 
-useHead({ title: 'landai — peta aksesibilitas' })
 </script>
 
 <template>

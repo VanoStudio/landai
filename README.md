@@ -226,50 +226,21 @@ landai/
 
 ## ⚙️ Instalasi & Setup
 
-### Prerequisites
-
-- **Node.js** versi 20 atau lebih tinggi
-- **npm**
-- **Git**
-- Akun **Supabase** (gratis)
-- Akun **MapTiler** (gratis, untuk basemap)
-
-### Langkah Instalasi
-
-#### 1️⃣ Clone Repository
+Butuh **Node.js 20+**, akun **Supabase** gratis, dan akun **MapTiler** gratis untuk basemap.
 
 ```bash
 git clone https://github.com/VanoStudio/landai.git
 cd landai
-```
-
-#### 2️⃣ Install Dependencies
-
-```bash
 npm install
-```
-
-#### 3️⃣ Setup Environment Variables
-
-Buat file `.env` di root direktori:
-
-```env
-SUPABASE_URL="[isi Project URL dari dashboard Supabase]"
-SUPABASE_KEY="[isi publishable key dari dashboard Supabase]"
-NUXT_PUBLIC_MAPTILER_KEY="[isi key dari dashboard MapTiler]"
-```
-
-#### 4️⃣ Setup Basis Data
-
-Jalankan seluruh isi `schema.sql`, lalu setiap `schema-patch-*.sql` secara berurutan, di SQL Editor pada dashboard Supabase.
-
-#### 5️⃣ Run Development Server
-
-```bash
+cp .env.example .env      # lalu isi SUPABASE_URL, SUPABASE_KEY, NUXT_PUBLIC_MAPTILER_KEY
 npm run dev
 ```
 
-Aplikasi berjalan di `http://localhost:3000`
+Basis datanya dipasang sekali jalan: tempel seluruh isi `schema-gabungan.sql` ke SQL Editor Supabase pada proyek baru, lalu Run. Satu berkas itu membuat seluruh tabel, trigger, Row Level Security, hak akses per kolom, dan bucket Storage sekaligus.
+
+Aplikasi berjalan di `http://localhost:3000`.
+
+> **Panduan lengkap ada di [SETUP.md](SETUP.md)**, mencakup pengaturan alamat pengalihan Supabase, masuk dengan Google, data contoh, penanganan masalah yang sering muncul, dan langkah deploy ke Vercel.
 
 ---
 
@@ -325,26 +296,11 @@ const hasil = await fetch('/api/geocode?q=Blok M Plaza')
 
 ## 🧪 Testing
 
-landai diuji lewat skenario end to end memakai browser sungguhan dan akun uji nyata, bukan lewat cakupan unit test otomatis semata. Skrip pengujian tersimpan di `docs/qa/` dan dijalankan dengan Playwright.
-
-### Menjalankan Pengujian
+landai diuji lewat skenario ujung ke ujung memakai browser sungguhan dan akun uji nyata, bukan lewat cakupan unit test otomatis. Alasannya, yang paling mungkin patah di aplikasi ini justru hal yang tidak terlihat oleh unit test: aturan Row Level Security, trigger basis data, dan peta yang dirender WebGL. Area utama yang diuji mencakup alur akun, penyimpanan lokasi beserta foto dan skornya, ambang tiga konfirmasi untuk status terverifikasi, batas hak tulis antar pengguna, penyaringan kategori kebutuhan, dan tampilan responsif dari 320px sampai desktop. Skrip pengujiannya ada di [`docs/qa/`](docs/qa/) bagi yang ingin memeriksa lebih lanjut.
 
 ```bash
-node docs/qa/01-inti.mjs
-node docs/qa/03-peta-filter.mjs
-# skrip lain pada folder yang sama menguji bagian berbeda
+node docs/qa/uji-menyeluruh.mjs
 ```
-
-### Cakupan Pengujian
-
-Lebih dari tiga puluh skenario diuji sepanjang pengembangan, mencakup antara lain:
-
-- Alur pendaftaran, masuk, dan keluar
-- Penyimpanan lokasi, unggahan foto, dan perhitungan skor lewat trigger basis data
-- Ambang tiga konfirmasi untuk status terverifikasi, naik dan turun
-- Aturan Row Level Security, termasuk percobaan langsung ke layanan memakai akun yang bukan pemiliknya
-- Penyaringan tiga kategori kebutuhan, satu per satu dan gabungan
-- Tampilan responsif pada beberapa ukuran layar
 
 ---
 

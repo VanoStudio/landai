@@ -1,6 +1,6 @@
 <script setup lang="ts">
 // Simbol aksesibilitas standar internasional. Sengaja tidak didesain ulang,
-// familiaritas lebih penting daripada keunikan (DESIGN-BRIEF).
+// familiaritas lebih penting daripada keunikan (DESIGN.md).
 // Selalu netral, mewarisi currentColor. Warna hanya untuk skor.
 defineProps<{
   jenis: 'kursi_roda' | 'tunanetra' | 'lansia_stroller'

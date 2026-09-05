@@ -7,13 +7,25 @@
 // lokal dari tanda SVG yang sama, jadi tidak ada aset yang digambar dua kali.
 const { situsUrl } = useRuntimeConfig().public as { situsUrl: string }
 
-const JUDUL = 'landai — peta aksesibilitas tempat umum'
+// Satu sumber kebenaran untuk judul. Tajuk halaman, og:title, twitter:title, dan
+// teks di dalam gambar pratinjau dulu ditulis terpisah dan sempat berbeda-beda;
+// sekarang semuanya berangkat dari konstanta ini.
+const JUDUL = 'Landai: Peta Aksesibilitas Kota yang Ramah Difabel'
 const RINGKAS = 'Cari tahu apakah sebuah tempat bisa Anda akses sebelum berangkat. '
   + 'Skor aksesibilitas dari delapan fasilitas, diisi dan diverifikasi warga.'
 
+// Halaman dalam cukup menyebut namanya sendiri, misalnya `title: 'Akun'`, dan
+// akhiran mereknya ditambahkan di sini. Halaman yang tidak menyetel judul sama
+// sekali, yaitu peta, memakai judul penuh.
+useHead({
+  title: JUDUL,
+  titleTemplate: (judulHalaman?: string) =>
+    judulHalaman && judulHalaman !== JUDUL ? `${judulHalaman} — Landai` : JUDUL,
+})
+
 useSeoMeta({
   description: RINGKAS,
-  ogSiteName: 'landai',
+  ogSiteName: 'Landai',
   ogType: 'website',
   ogTitle: JUDUL,
   ogDescription: RINGKAS,
@@ -22,7 +34,7 @@ useSeoMeta({
   ogImage: `${situsUrl}/og.png`,
   ogImageWidth: 1200,
   ogImageHeight: 630,
-  ogImageAlt: 'landai, peta aksesibilitas tempat umum yang diisi warga',
+  ogImageAlt: JUDUL,
   twitterCard: 'summary_large_image',
   twitterTitle: JUDUL,
   twitterDescription: RINGKAS,
