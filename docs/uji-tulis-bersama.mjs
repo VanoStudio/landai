@@ -135,6 +135,13 @@ console.log(TAMBALAN5
   ? 'schema-patch-5.sql TERPASANG. Menuntut perilaku setelah pelonggaran.\n'
   : 'schema-patch-5.sql BELUM dipasang. Menuntut perilaku sebelum pelonggaran.\n')
 
+// ---------- apakah schema-patch-6.sql sudah dijalankan ----------
+const cekPengunggah = await A.kirim('GET', 'location_photos?select=uploaded_by&limit=1')
+const TAMBALAN6 = cekPengunggah.status < 300
+console.log(TAMBALAN6
+  ? 'schema-patch-6.sql TERPASANG. Penghapusan foto oleh pengunggah ikut diuji.\n'
+  : 'schema-patch-6.sql BELUM dipasang. Penghapusan foto oleh pengunggah dilewati.\n')
+
 // ---------- lokasi uji milik A ----------
 const buat = await A.kirim('POST', 'locations', {
   nama: 'UJI TULIS BERSAMA, hapus setelah pengujian',
@@ -322,6 +329,45 @@ try {
       { location_id: ID, photo_url: 'https://contoh.invalid/gambar-liar.jpg' })
     catat('Alamat gambar di luar penyimpanan proyek ditolak', !fotoLuar.tembus,
       `HTTP ${fotoLuar.status}, kode ${fotoLuar.kode}`)
+
+    // ---------- penghapusan foto oleh pengunggahnya ----------
+    if (TAMBALAN6) {
+      console.log(String.fromCharCode(10) + '19c. Penghapusan foto oleh pengunggahnya')
+
+      const idFotoB = JSON.parse(fotoSah.teks)[0]?.id
+      const barisB = await A.kirim('GET', `location_photos?select=id,uploaded_by&id=eq.${idFotoB}`)
+      catat('Pengunggah dicatat basis data, bukan dikirim peramban',
+        barisB.baris?.[0]?.uploaded_by === B.uid,
+        `uploaded_by ${String(barisB.baris?.[0]?.uploaded_by).slice(0, 8)} berbanding B ${B.uid.slice(0, 8)}`)
+
+      const palsu = await B.kirim('POST', 'location_photos', {
+        location_id: ID,
+        photo_url: `${URL_}/storage/v1/object/public/location-photos/${ID}/palsu.jpg`,
+        uploaded_by: A.uid,
+      })
+      catat('Klien ditolak menyetel pengunggah sendiri', !palsu.tembus,
+        `HTTP ${palsu.status}, kode ${palsu.kode}`)
+
+      const hapusOrangLain = await C.kirim('DELETE', `location_photos?id=eq.${idFotoB}`)
+      catat('Bukan pengunggah dan bukan pemilik ditolak menghapus foto',
+        !hapusOrangLain.tembus, `HTTP ${hapusOrangLain.status}, ${hapusOrangLain.baris?.length ?? 0} baris`)
+
+      const hapusSendiri = await B.kirim('DELETE', `location_photos?id=eq.${idFotoB}`)
+      catat('Pengunggah BISA menghapus fotonya sendiri', hapusSendiri.tembus,
+        `HTTP ${hapusSendiri.status}`)
+
+      const fotoKedua = await B.kirim('POST', 'location_photos',
+        { location_id: ID, photo_url: `${URL_}/storage/v1/object/public/location-photos/${ID}/kedua.jpg` })
+      const idKedua = JSON.parse(fotoKedua.teks)[0]?.id
+      const hapusPemilik = await A.kirim('DELETE', `location_photos?id=eq.${idKedua}`)
+      catat('Pemilik lokasi tetap bisa menghapus foto orang lain di lokasinya',
+        hapusPemilik.tembus, `HTTP ${hapusPemilik.status}`)
+
+      const tanpaNama = await A.kirim('GET', 'profiles?select=id,nama&nama=is.null')
+      catat('Tidak ada lagi profil tanpa nama',
+        (tanpaNama.baris?.length ?? 0) === 0,
+        `${tanpaNama.baris?.length ?? 0} profil masih kosong namanya`)
+    }
   }
 }
 finally {

@@ -18,14 +18,26 @@ const id = computed(() => String(route.params.id))
 // menangkapnya, dan halaman ini sempat mati begitu tambalannya dijalankan. Petunjuknya
 // memakai nama kolom, bukan nama batasan, karena nama batasan dibuat otomatis dan bisa
 // berbeda di basis data lain.
-async function ambilLokasi(pakaiJejak: boolean) {
+// Dua kelompok kolom di bawah ini datang dari tambalan yang berbeda: jejak pembaruan
+// dari schema-patch-5.sql, dan pengunggah foto dari schema-patch-6.sql. Kueri dicoba
+// lengkap dulu, lalu kelompoknya dilepas satu per satu kalau basis datanya belum
+// menerima tambalan itu. Tanpa ini, mendorong kode lebih dulu daripada menjalankan
+// tambalannya membuat seluruh halaman detail membalas galat, bukan sekadar kehilangan
+// satu keterangan.
+//
+// Relasi ke profiles WAJIB disebut lewat kolom kunci asingnya. Sejak updated_by ada,
+// locations punya DUA kunci asing ke profiles, dan PostgREST menolak menebak yang mana
+// yang dimaksud: "PGRST201 Could not embed because more than one relationship was
+// found". Petunjuknya memakai nama kolom, bukan nama batasan, karena nama batasan
+// dibuat otomatis dan bisa berbeda di basis data lain.
+async function ambilLokasi(pakaiJejak: boolean, pakaiPengunggah: boolean) {
   return supabase
     .from('locations')
     .select(`
       id, nama, kategori, lat, lng, skor, status, created_at, created_by,
       ${pakaiJejak ? 'updated_by, updated_at, pembaru:profiles!updated_by ( nama ),' : ''}
       accessibility_checklist (*),
-      location_photos ( id, photo_url ),
+      location_photos ( id, photo_url${pakaiPengunggah ? ', uploaded_by' : ''} ),
       confirmations ( id, user_id, is_accurate ),
       penambah:profiles!created_by ( nama )
     `)
@@ -36,12 +48,15 @@ async function ambilLokasi(pakaiJejak: boolean) {
 const { data: lokasi, error, refresh } = await useAsyncData(
   () => `lokasi-${id.value}`,
   async () => {
-    const { data, error } = await ambilLokasi(true)
-    if (!error) return data as any
+    let pertama: any = null
 
-    const ulang = await ambilLokasi(false)
-    if (ulang.error) throw error
-    return ulang.data as any
+    for (const [jejak, pengunggah] of [[true, true], [true, false], [false, false]] as const) {
+      const { data, error } = await ambilLokasi(jejak, pengunggah)
+      if (!error) return data as any
+      pertama ??= error
+    }
+
+    throw pertama
   },
 )
 
@@ -125,6 +140,63 @@ const rute = computed(() =>
 
 const mengirim = ref(false)
 const pesanError = ref('')
+
+// ---------------------------------------------------------------------------
+// Menghapus foto.
+//
+// Boleh dilakukan pengunggahnya sendiri atau pemilik lokasi. Yang benar-benar
+// menegakkannya adalah kebijakan di basis data; yang di sini hanya supaya tombolnya
+// tidak disodorkan kepada orang yang pasti ditolak.
+//
+// Baris foto lama tidak punya catatan pengunggah, jadi untuk baris itu hanya pemilik
+// lokasi yang bisa menghapus, sama seperti aturan sebelumnya.
+// ---------------------------------------------------------------------------
+const { tampilkan } = useNotifikasi()
+const mintaKonfirmasi = ref<string | null>(null)
+const menghapusFoto = ref<string | null>(null)
+
+function bolehHapusFoto(f: any): boolean {
+  if (!idPengguna.value) return false
+  return f.uploaded_by === idPengguna.value || pemilik.value
+}
+
+async function hapusFoto(f: any) {
+  // Ketukan pertama meminta kepastian, ketukan kedua menghapus. Menghapus foto tidak
+  // bisa dibatalkan, dan jendela konfirmasi bawaan peramban mudah tertekan tanpa
+  // dibaca di layar sentuh.
+  if (mintaKonfirmasi.value !== f.id) {
+    mintaKonfirmasi.value = f.id
+    return
+  }
+
+  menghapusFoto.value = f.id
+
+  // Barisnya dihapus lebih dulu, baru berkasnya. Urutan ini yang aman: kalau
+  // penghapusan berkas gagal, yang tertinggal hanya berkas yatim yang tidak tampil di
+  // mana pun. Urutan sebaliknya bisa menyisakan baris yang menunjuk gambar yang sudah
+  // tidak ada, dan itu tampil sebagai gambar rusak bagi semua orang.
+  const { error: galatBaris } = await supabase
+    .from('location_photos')
+    .delete()
+    .eq('id', f.id)
+
+  if (galatBaris) {
+    menghapusFoto.value = null
+    mintaKonfirmasi.value = null
+    tampilkan('Foto gagal dihapus. Hanya pengunggahnya atau kontributor lokasi ini yang bisa menghapusnya.', 'galat')
+    return
+  }
+
+  const jalur = String(f.photo_url).split('/location-photos/')[1]
+  if (jalur) {
+    await supabase.storage.from('location-photos').remove([decodeURIComponent(jalur)])
+  }
+
+  menghapusFoto.value = null
+  mintaKonfirmasi.value = null
+  await refresh()
+  tampilkan('Foto dihapus.')
+}
 
 async function konfirmasiAkurasi(akurat: boolean) {
   if (!idPengguna.value) {
@@ -228,11 +300,33 @@ useHead(() => ({ title: lokasi.value ? `${lokasi.value.nama} — landai` : 'land
       </div>
 
       <ul v-if="foto.length" class="mt-5 grid gap-2" :class="foto.length > 1 ? 'grid-cols-2' : 'grid-cols-1'">
-        <li v-for="f in foto" :key="f.id">
+        <li v-for="f in foto" :key="f.id" class="relative">
           <img
             :src="f.photo_url" :alt="`Kondisi ${lokasi.nama}`" loading="lazy"
             class="w-full rounded object-cover" :class="foto.length > 1 ? 'aspect-square' : 'aspect-[4/3]'"
           >
+
+          <!-- Tombol hapus hanya untuk pengunggahnya sendiri atau pemilik lokasi.
+               Ketukan pertama meminta kepastian, ketukan kedua menghapus. -->
+          <button
+            v-if="bolehHapusFoto(f)"
+            type="button"
+            :disabled="menghapusFoto === f.id"
+            :aria-label="mintaKonfirmasi === f.id ? 'Ketuk sekali lagi untuk menghapus foto ini' : 'Hapus foto ini'"
+            class="absolute right-2 top-2 inline-flex min-h-11 items-center gap-1.5 rounded-full border bg-white px-3 text-[13px] font-medium shadow-lg disabled:opacity-60"
+            :class="mintaKonfirmasi === f.id ? 'border-skor-kurang text-skor-kurang' : 'border-gray-300 text-gray-800'"
+            @click="hapusFoto(f)"
+          >
+            <svg viewBox="0 0 24 24" class="h-4 w-4 shrink-0" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M4 7h16" />
+              <path d="M9 7V5h6v2" />
+              <path d="M6.5 7l.8 12h9.4l.8-12" />
+            </svg>
+            <span v-if="menghapusFoto === f.id">Menghapus</span>
+            <span v-else-if="mintaKonfirmasi === f.id">Yakin hapus?</span>
+            <span v-else>Hapus</span>
+          </button>
         </li>
       </ul>
       <FotoKosong v-else class="mt-5" />
