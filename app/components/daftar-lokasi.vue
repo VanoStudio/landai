@@ -58,7 +58,7 @@ const terurut = computed(() =>
             :style="{ '--warna-skor': warnaSkor(l.skor) }"
             :data-status="l.status"
             aria-hidden="true"
-          >{{ l.skor }}</span>
+          ><span class="penanda-bulat">{{ l.skor }}</span></span>
 
           <span class="min-w-0 flex-1">
             <span class="block truncate text-sm font-medium">{{ l.nama }}</span>

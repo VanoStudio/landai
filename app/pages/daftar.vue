@@ -47,6 +47,8 @@ async function daftar() {
 
   await navigateTo('/')
 }
+
+useHead({ title: 'Daftar Akun' })
 </script>
 
 <template>
@@ -85,7 +87,7 @@ async function daftar() {
 
       <button type="submit" :disabled="memuat"
         class="tombol tombol-utama w-full">
-        {{ memuat ? 'Memproses' : 'Daftar' }}
+        {{ memuat ? 'Memproses' : 'Daftar akun' }}
       </button>
     </form>
 

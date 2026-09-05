@@ -75,14 +75,44 @@
 
 @layer components {
   /* Penanda peta dirender MapLibre di luar pohon Vue, jadi gayanya global.
-     Angka skor ada di dalam penanda: elemen tipografi utama produk ini. */
-  .penanda-skor {
-    display: grid;
-    place-items: center;
+     Angka skor ada di dalam penanda: elemen tipografi utama produk ini.
+
+     PEMBAGIAN TUGAS DI BAWAH INI WAJIB DIPERTAHANKAN.
+     Properti `transform` pada elemen penanda milik MapLibre seorang. CSS tidak
+     boleh menyentuhnya, sekalipun lewat :hover, :active, transisi, atau animasi.
+
+     Sebabnya begini. MapLibre menulis posisi penanda ke style inline elemen itu,
+     diperbarui tiap bingkai selama peta bergerak. Sementara itu animasi dan transisi
+     CSS menduduki lapisan kaskade DI ATAS style inline. Jadi begitu ada animasi atau
+     transisi transform yang berjalan pada elemen yang sama, nilai dari MapLibre
+     diabaikan sepanjang animasi itu, dan yang terlukis hanya nilai dari stylesheet,
+     yaitu scale tanpa translasi sama sekali. Penanda pun terjun ke titik nol wadah,
+     yakni pojok kiri atas peta, lalu kembali begitu animasinya habis.
+
+     Itu bukan dugaan. Terukur pada jalur ketuk penanda: penanda terlukis menyimpang
+     sampai 699px dari titik yang diperintahkan peta, selama 260ms, tanpa satu pun
+     elemen dibuat ulang. Lihat docs/qa/uji-penanda-jalur.mjs.
+
+     Karena itu seluruh penekanan visual, yaitu lingkaran, bayangan, dan denyut saat
+     dipilih, tinggal di elemen anak `.penanda-bulat`, yang tidak pernah disentuh
+     MapLibre. Elemen luarnya tinggal kotak 44px penangkap ketukan. */
+  .penanda-skor,
+  .penanda-kluster {
+    display: block;
     width: 44px;
     height: 44px;
     padding: 0;
     border: 0;
+    border-radius: 9999px;
+    background: none;
+    cursor: pointer;
+  }
+
+  .penanda-bulat {
+    display: grid;
+    place-items: center;
+    width: 100%;
+    height: 100%;
     border-radius: 9999px;
     background: var(--warna-skor);
     color: #fff;
@@ -91,16 +121,23 @@
     font-weight: 700;
     font-variant-numeric: tabular-nums;
     line-height: 1;
-    cursor: pointer;
     box-shadow: 0 0 0 2px #fff, 0 1px 5px rgb(0 0 0 / 0.35);
     transition: transform 140ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 140ms ease;
   }
 
-  .penanda-skor:hover {
+  .penanda-skor:hover .penanda-bulat,
+  .penanda-kluster:hover .penanda-bulat {
     transform: scale(1.09);
   }
 
-  .penanda-skor:focus-visible {
+  .penanda-skor:active .penanda-bulat,
+  .penanda-kluster:active .penanda-bulat {
+    transform: scale(0.94);
+    transition-duration: 80ms;
+  }
+
+  .penanda-skor:focus-visible,
+  .penanda-kluster:focus-visible {
     outline: 2px solid var(--color-gray-900);
     outline-offset: 3px;
   }
@@ -108,19 +145,22 @@
   /* Belum terverifikasi: penanda berongga, bukan terisi. Bentuknya yang membedakan,
      bukan warnanya, jadi statusnya tetap terbaca tanpa bergantung pada penglihatan
      warna (PRD bagian 8). Angka tetap gelap supaya kontrasnya lolos AA. */
-  .penanda-skor[data-status='belum_terverifikasi'] {
+  .penanda-skor[data-status='belum_terverifikasi'] .penanda-bulat {
     background: #fff;
     color: var(--color-gray-900);
     box-shadow: inset 0 0 0 3px var(--warna-skor), 0 0 0 1px rgb(0 0 0 / 0.08), 0 1px 5px rgb(0 0 0 / 0.3);
   }
 
   .penanda-skor[data-terpilih='true'] {
-    transform: scale(1.18);
-    box-shadow: 0 0 0 3px #fff, 0 0 0 6px var(--warna-skor), 0 3px 10px rgb(0 0 0 / 0.4);
     z-index: 2;
   }
 
-  .penanda-skor[data-status='belum_terverifikasi'][data-terpilih='true'] {
+  .penanda-skor[data-terpilih='true'] .penanda-bulat {
+    transform: scale(1.18);
+    box-shadow: 0 0 0 3px #fff, 0 0 0 6px var(--warna-skor), 0 3px 10px rgb(0 0 0 / 0.4);
+  }
+
+  .penanda-skor[data-status='belum_terverifikasi'][data-terpilih='true'] .penanda-bulat {
     box-shadow: inset 0 0 0 3px var(--warna-skor), 0 0 0 3px #fff, 0 0 0 6px var(--warna-skor), 0 3px 10px rgb(0 0 0 / 0.4);
   }
 
@@ -212,39 +252,8 @@
   /* Penanda kelompok. Netral gelap, bukan warna skor: satu kelompok memuat beberapa
      skor sekaligus, jadi memberinya satu warna akan menyampaikan hal yang keliru.
      Bentuknya tetap lingkaran berangka supaya sekeluarga dengan penanda tunggal. */
-  .penanda-kluster {
-    display: grid;
-    place-items: center;
-    width: 44px;
-    height: 44px;
-    padding: 0;
-    border: 0;
-    border-radius: 9999px;
+  .penanda-kluster .penanda-bulat {
     background: var(--color-gray-800);
-    color: #fff;
-    font-family: var(--font-sans);
-    font-size: 15px;
-    font-weight: 700;
-    font-variant-numeric: tabular-nums;
-    line-height: 1;
-    cursor: pointer;
-    box-shadow: 0 0 0 2px #fff, 0 1px 5px rgb(0 0 0 / 0.35);
-    transition: transform 140ms cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  .penanda-kluster:hover {
-    transform: scale(1.09);
-  }
-
-  .penanda-kluster:focus-visible {
-    outline: 2px solid var(--color-gray-900);
-    outline-offset: 3px;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .penanda-kluster {
-      transition: none;
-    }
   }
 
   /* Varian penanda untuk panel daftar: bentuk dan kode statusnya sama persis dengan
@@ -253,12 +262,16 @@
   .penanda-daftar {
     width: 38px;
     height: 38px;
-    font-size: 13px;
     cursor: inherit;
+  }
+
+  .penanda-daftar .penanda-bulat {
+    font-size: 13px;
     transition: none;
   }
 
-  .penanda-daftar:hover {
+  .penanda-daftar:hover .penanda-bulat,
+  .penanda-daftar:active .penanda-bulat {
     transform: none;
   }
 
@@ -404,21 +417,16 @@
     100% { transform: scale(1.18); }
   }
 
-  .penanda-skor[data-terpilih='true'] {
+  .penanda-skor[data-terpilih='true'] .penanda-bulat {
     animation: denyut-penanda 260ms cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  .penanda-skor:active {
-    transform: scale(0.94);
-    transition-duration: 80ms;
-  }
-
   @media (prefers-reduced-motion: reduce) {
-    .penanda-skor {
+    .penanda-bulat {
       transition: none;
     }
 
-    .penanda-skor[data-terpilih='true'] {
+    .penanda-skor[data-terpilih='true'] .penanda-bulat {
       animation: none;
     }
 

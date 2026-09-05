@@ -92,6 +92,15 @@ const filterAktif = ref<Kebutuhan[]>([])
 const terpilihId = ref<string | null>(null)
 const tampilan = ref<'peta' | 'daftar'>('peta')
 
+// Labelnya ditulis lengkap, tidak lagi memakai nilai keadaannya sendiri sebagai
+// tulisan. "Daftar" sendirian berarti dua hal dalam Bahasa Indonesia, senarai dan
+// mendaftar akun, dan tombol ini duduk berdampingan dengan "Masuk" dan "Tambah
+// lokasi" yang keduanya urusan akun. Kata "Lokasi" yang menyudahi keraguan itu.
+const TAMPILAN = [
+  { nilai: 'peta', label: 'Peta' },
+  { nilai: 'daftar', label: 'Daftar Lokasi' },
+] as const
+
 const DAFTAR_KEBUTUHAN: Kebutuhan[] = ['kursi_roda', 'tunanetra', 'lansia_stroller']
 
 // Beberapa filter aktif = lokasi harus memenuhi semuanya. Rombongan dengan
@@ -169,13 +178,13 @@ function pilihDariDaftar(l: LokasiPeta) {
           role="tablist" aria-label="Pindah tampilan"
         >
           <button
-            v-for="t in (['peta', 'daftar'] as const)" :key="t"
+            v-for="t in TAMPILAN" :key="t.nilai"
             type="button" role="tab"
-            :aria-selected="tampilan === t"
-            class="-my-px h-11 rounded-full px-3 text-[13px] font-medium capitalize sm:px-4"
-            :class="tampilan === t ? 'bg-brand text-white' : 'text-gray-700'"
-            @click="tampilan = t"
-          >{{ t }}</button>
+            :aria-selected="tampilan === t.nilai"
+            class="-my-px h-11 whitespace-nowrap rounded-full px-3 text-[13px] font-medium sm:px-4"
+            :class="tampilan === t.nilai ? 'bg-brand text-white' : 'text-gray-700'"
+            @click="tampilan = t.nilai"
+          >{{ t.label }}</button>
         </div>
 
         <NuxtLink

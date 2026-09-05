@@ -15,12 +15,14 @@ const RINGKAS = 'Cari tahu apakah sebuah tempat bisa Anda akses sebelum berangka
   + 'Skor aksesibilitas dari delapan fasilitas, diisi dan diverifikasi warga.'
 
 // Halaman dalam cukup menyebut namanya sendiri, misalnya `title: 'Akun'`, dan
-// akhiran mereknya ditambahkan di sini. Halaman yang tidak menyetel judul sama
-// sekali, yaitu peta, memakai judul penuh.
+// akhiran mereknya ditambahkan di sini, dipisah garis tegak: "Akun | Landai".
+// Peta adalah satu-satunya pengecualian. Ia tidak menyetel judul sama sekali, jadi
+// memakai judul penuh yang deskriptif, karena halaman itu yang paling sering
+// dibagikan tautannya dan judulnya harus berdiri sendiri tanpa konteks.
 useHead({
   title: JUDUL,
   titleTemplate: (judulHalaman?: string) =>
-    judulHalaman && judulHalaman !== JUDUL ? `${judulHalaman} — Landai` : JUDUL,
+    judulHalaman && judulHalaman !== JUDUL ? `${judulHalaman} | Landai` : JUDUL,
 })
 
 useSeoMeta({

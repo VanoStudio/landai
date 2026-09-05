@@ -3,17 +3,57 @@
 // jumlah lokasi yang benar-benar memenuhi syarat menurut isi basis data.
 
 import { chromium } from 'playwright'
-import { join } from 'node:path'
+import { existsSync, readFileSync } from 'node:fs'
+import { join, resolve } from 'node:path'
 
 const BASIS = 'http://localhost:3000'
 const KELUARAN = join(process.cwd(), 'gambar')
 
+// Jumlah yang diharapkan DIHITUNG dari basis data, tidak ditulis mati.
+//
+// Sebelumnya keempat angkanya konstanta, dan begitu satu lokasi sungguhan masuk ke
+// basis data, tiga dari delapan kasus gagal padahal aplikasinya benar. Pengujian
+// yang menuntut data tetap seperti itu justru menghalangi survei lapangan bertambah.
+const BERKAS_ENV = [process.env.BERKAS_ENV, '.env', '../.env', '../../.env']
+  .filter(Boolean).map(x => resolve(x)).find(existsSync)
+
+if (!BERKAS_ENV) {
+  console.error('Berkas .env tidak ketemu. Jalankan dari akar repo, atau isi BERKAS_ENV.')
+  process.exit(1)
+}
+
+const env = Object.fromEntries(readFileSync(BERKAS_ENV, 'utf8')
+  .split(String.fromCharCode(10)).map(b => b.trim()).filter(b => b.includes('='))
+  .map((b) => {
+    const i = b.indexOf('=')
+    return [b.slice(0, i).trim(), b.slice(i + 1).trim()]
+  }))
+
+const baris = await (await fetch(
+  `${env.SUPABASE_URL}/rest/v1/accessibility_checklist`
+  + '?select=ramp_tersedia,guiding_block_tersambung,tempat_duduk_tersedia,lift_tersedia_berfungsi',
+  { headers: { apikey: env.SUPABASE_KEY } })).json()
+
+// Aturannya disalin apa adanya dari cocokKebutuhan() di app/composables/use-lokasi.ts.
+const cocok = {
+  'Kursi roda': l => l.ramp_tersedia,
+  'Tunanetra': l => l.guiding_block_tersambung,
+  'Lansia atau stroller': l => l.tempat_duduk_tersedia || l.lift_tersedia_berfungsi,
+}
+
+const hitung = (...syarat) =>
+  baris.filter(l => syarat.every(s => cocok[s](l))).length
+
 const KASUS = [
-  { nama: 'filter-kursi-roda', pilih: ['Kursi roda'], harap: 3 },
-  { nama: 'filter-lansia', pilih: ['Lansia atau stroller'], harap: 4 },
-  { nama: 'filter-tunanetra', pilih: ['Tunanetra'], harap: 2 },
-  { nama: 'filter-gabungan', pilih: ['Kursi roda', 'Tunanetra'], harap: 2 },
-]
+  { nama: 'filter-kursi-roda', pilih: ['Kursi roda'] },
+  { nama: 'filter-lansia', pilih: ['Lansia atau stroller'] },
+  { nama: 'filter-tunanetra', pilih: ['Tunanetra'] },
+  { nama: 'filter-gabungan', pilih: ['Kursi roda', 'Tunanetra'] },
+].map(k => ({ ...k, harap: hitung(...k.pilih) }))
+
+console.log(`  ${baris.length} lokasi berchecklist di basis data`)
+for (const k of KASUS) console.log(`    ${k.pilih.join(' + ')} : ${k.harap} lokasi`)
+console.log('')
 
 async function sembunyikanDevtools(page) {
   await page.addStyleTag({

@@ -55,6 +55,12 @@ const GAYA_OSM: maplibregl.StyleSpecification = {
   layers: [{ id: 'osm', type: 'raster', source: 'osm' }],
 }
 
+// Angka dan lingkarannya tinggal di elemen anak, bukan di tombolnya sendiri.
+// Alasannya bukan kerapian markup melainkan kebenaran posisi: MapLibre menulis
+// posisi penanda ke style inline tombol ini, sedangkan animasi dan transisi CSS
+// menang atas style inline. Selama gaya penekanan masih menempel di tombol yang
+// sama, denyut saat penanda dipilih membuang posisi dari MapLibre dan penanda
+// terlukis di pojok kiri atas peta. Uraian lengkapnya ada di main.css.
 function buatElemenPenanda(l: LokasiPeta): HTMLButtonElement {
   const el = document.createElement('button')
   el.type = 'button'
@@ -63,7 +69,12 @@ function buatElemenPenanda(l: LokasiPeta): HTMLButtonElement {
   el.dataset.status = l.status
   el.dataset.id = l.id
   el.setAttribute('aria-label', `${l.nama}, skor ${l.skor} dari 100, ${labelSkor(l.skor)}`)
-  el.textContent = String(l.skor)
+
+  const bulat = document.createElement('span')
+  bulat.className = 'penanda-bulat'
+  bulat.textContent = String(l.skor)
+  el.appendChild(bulat)
+
   el.addEventListener('click', (e) => {
     e.stopPropagation()
     emit('pilih', l)
@@ -112,8 +123,12 @@ function buatElemenKluster(anggota: LokasiPeta[]): HTMLButtonElement {
   const el = document.createElement('button')
   el.type = 'button'
   el.className = 'penanda-kluster'
-  el.textContent = String(anggota.length)
   el.setAttribute('aria-label', `${anggota.length} lokasi berdekatan, perbesar untuk memisahkan`)
+
+  const bulat = document.createElement('span')
+  bulat.className = 'penanda-bulat'
+  bulat.textContent = String(anggota.length)
+  el.appendChild(bulat)
 
   // Warnanya netral, bukan warna skor. Satu kelompok memuat banyak skor sekaligus,
   // jadi memberinya satu warna skor akan menyampaikan hal yang tidak benar.
@@ -141,7 +156,8 @@ function kunciKelompok(g: Kelompok): string {
 // Isi penanda tunggal bisa berubah tanpa keanggotaannya berubah, misalnya setelah
 // skornya dihitung ulang. Diperbarui di tempat, tetap tanpa membuat elemen baru.
 function segarkanIsi(el: HTMLElement, l: LokasiPeta) {
-  if (el.textContent !== String(l.skor)) el.textContent = String(l.skor)
+  const bulat = el.querySelector<HTMLElement>('.penanda-bulat')
+  if (bulat && bulat.textContent !== String(l.skor)) bulat.textContent = String(l.skor)
   el.style.setProperty('--warna-skor', warnaSkor(l.skor))
   el.dataset.status = l.status
   el.setAttribute('aria-label', `${l.nama}, skor ${l.skor} dari 100, ${labelSkor(l.skor)}`)
@@ -284,6 +300,14 @@ function tandaiPosisiSaya(lat: number, lng: number) {
     const el = document.createElement('div')
     el.className = 'titik-saya'
     el.setAttribute('aria-hidden', 'true')
+
+    // Transform dipasang sebelum elemen masuk ke DOM, alasannya sama dengan penanda
+    // skor: MapLibre memasang posisinya lewat antrean tugas DOM yang baru berjalan
+    // pada bingkai berikutnya, jadi tanpa ini titiknya sempat terlukis satu bingkai
+    // di pojok kiri atas peta.
+    const titik = peta.project([lng, lat])
+    el.style.transform = `translate(-50%, -50%) translate(${titik.x}px, ${titik.y}px)`
+
     penandaSaya = new maplibregl.Marker({ element: el })
   }
 
@@ -343,6 +367,10 @@ function pastikanTerlihat(l: LokasiPeta) {
     center: [l.lng, l.lat],
     offset: [0, -(TINGGI_KARTU - TINGGI_LAPISAN_ATAS) / 2],
     duration: 400,
+    // Sama seperti perpindahan pandangan lain di berkas ini: tanpa penanda esensial,
+    // MapLibre melewati animasinya pada perangkat yang meminta gerak dikurangi, dan
+    // penanda yang baru dipilih justru berpindah mendadak.
+    essential: true,
   })
 }
 

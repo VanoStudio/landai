@@ -27,6 +27,8 @@ async function masuk() {
   }
   await navigateTo((route.query.redirect as string) || '/')
 }
+
+useHead({ title: 'Masuk' })
 </script>
 
 <template>
@@ -65,7 +67,7 @@ async function masuk() {
 
     <p class="mt-4 text-sm">
       Belum punya akun?
-      <NuxtLink to="/daftar" class="font-medium text-brand underline">Daftar</NuxtLink>
+      <NuxtLink to="/daftar" class="font-medium text-brand underline">Daftar akun</NuxtLink>
     </p>
 
     <p class="mt-6 border-t border-gray-200 pt-4 text-sm">

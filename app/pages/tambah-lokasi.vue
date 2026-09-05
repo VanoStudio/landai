@@ -300,7 +300,7 @@ const kemungkinanDuplikat = computed(() => {
   return kandidatDekat.value.find(k => namanyaMirip(k.nama, n)) ?? null
 })
 
-useHead(() => ({ title: modeUbah.value ? 'Edit lokasi' : 'Tambah lokasi' }))
+useHead(() => ({ title: modeUbah.value ? 'Edit Lokasi' : 'Tambah Lokasi' }))
 </script>
 
 <template>
