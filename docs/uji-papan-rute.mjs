@@ -2,7 +2,8 @@
 // Tidak ada logika penyimpanan yang berubah, jadi yang diperiksa tampilannya saja.
 
 import { chromium } from 'playwright'
-import { join } from 'node:path'
+import { existsSync, readFileSync } from 'node:fs'
+import { join, resolve } from 'node:path'
 
 const BASIS = 'http://localhost:3000'
 const KELUARAN = join(process.cwd(), 'gambar')
@@ -17,6 +18,62 @@ const catat = (nama, lolos, ket = '') => {
 const bersihkan = page => page.addStyleTag({
   content: '#nuxt-devtools-anchor,#nuxt-devtools-container,.nuxt-devtools-anchor{display:none!important}',
 }).catch(() => {})
+
+// ---------------------------------------------------------------------------
+// Papan kontributor hanya punya baris kalau ada lokasi yang punya pemilik. Dulu berkas
+// ini mengandalkan lokasi yang kebetulan tertinggal dari putaran sebelumnya, dan begitu
+// data itu dibersihkan, ujinya berhenti menguji apa pun tanpa suara. Sekarang datanya
+// disiapkan sendiri di sini lalu dihapus lagi di akhir.
+// ---------------------------------------------------------------------------
+const BERKAS_ENV = [process.env.BERKAS_ENV, '.env', '../.env', '../../.env']
+  .filter(Boolean).map(x => resolve(x)).find(existsSync)
+
+if (!BERKAS_ENV) {
+  console.error('Berkas .env tidak ketemu. Jalankan dari akar repo, atau isi BERKAS_ENV.')
+  process.exit(1)
+}
+
+// Dipecah per baris tanpa ekspresi reguler. Baris bergaya Windows berakhir dengan
+// carriage return, dan trim membuangnya sekalian.
+const env = Object.fromEntries(readFileSync(BERKAS_ENV, 'utf8')
+  .split(String.fromCharCode(10))
+  .map(baris => baris.trim())
+  .filter(baris => baris.includes('='))
+  .map((baris) => {
+    const i = baris.indexOf('=')
+    return [baris.slice(0, i).trim(), baris.slice(i + 1).trim()]
+  }))
+
+const dasar = { apikey: env.SUPABASE_KEY, 'Content-Type': 'application/json' }
+const masuk = await (await fetch(`${env.SUPABASE_URL}/auth/v1/token?grant_type=password`, {
+  method: 'POST', headers: dasar,
+  body: JSON.stringify({
+    email: process.env.AKUN_UJI_EMAIL || env.AKUN_UJI_EMAIL,
+    password: process.env.AKUN_UJI_SANDI || env.AKUN_UJI_SANDI,
+  }),
+})).json()
+
+if (!masuk.access_token) {
+  console.error('Gagal masuk dengan akun uji.')
+  process.exit(1)
+}
+
+const uid = JSON.parse(atob(masuk.access_token.split('.')[1])).sub
+const auth = { ...dasar, Authorization: `Bearer ${masuk.access_token}`, Prefer: 'return=representation' }
+
+const dibuat = await (await fetch(`${env.SUPABASE_URL}/rest/v1/locations`, {
+  method: 'POST', headers: auth,
+  body: JSON.stringify({
+    nama: 'UJI papan kontributor', kategori: 'lainnya',
+    lat: -6.2688, lng: 106.7788, created_by: uid,
+  }),
+})).json()
+
+const ID_PAPAN = Array.isArray(dibuat) ? dibuat[0]?.id : null
+if (!ID_PAPAN) {
+  console.error('Gagal membuat lokasi uji:', JSON.stringify(dibuat).slice(0, 200))
+  process.exit(1)
+}
 
 const browser = await chromium.launch({
   args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'],
@@ -148,6 +205,12 @@ for (const [label, vp] of [
 }
 
 await browser.close()
+
+await fetch(`${env.SUPABASE_URL}/rest/v1/locations?id=eq.${ID_PAPAN}`, { method: 'DELETE', headers: auth })
+const sisa = await (await fetch(
+  `${env.SUPABASE_URL}/rest/v1/locations?select=id&nama=like.UJI*`, { headers: auth })).json()
+catat('Lokasi uji papan dibersihkan', (sisa.length ?? 0) === 0, `${sisa.length ?? 0} tersisa`)
+
 const gagal = langkah.filter(l => !l.lolos)
 console.log(`\n${langkah.length - gagal.length} dari ${langkah.length} pemeriksaan lolos`)
 if (gagal.length) process.exitCode = 1

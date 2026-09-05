@@ -56,13 +56,33 @@ const sesi = await (await fetch(`${URL_SUPABASE}/auth/v1/token?grant_type=passwo
 const uid = JSON.parse(atob(sesi.access_token.split('.')[1])).sub
 const auth = { ...h, Authorization: `Bearer ${sesi.access_token}`, Prefer: 'return=representation' }
 
-const milikSendiri = (await (await fetch(
-  `${URL_SUPABASE}/rest/v1/locations?select=id,nama&created_by=eq.${uid}&limit=1`, { headers: auth })).json())[0]
+// Lokasi uji dibuat sendiri di sini, bukan mengandalkan sisa data putaran sebelumnya,
+// lalu dihapus lagi di akhir. Berkas uji yang bergantung pada data yang kebetulan ada
+// akan diam-diam berhenti menguji apa pun begitu data itu dibersihkan.
+const dibuat = await (await fetch(`${URL_SUPABASE}/rest/v1/locations`, {
+  method: 'POST', headers: auth,
+  body: JSON.stringify({
+    nama: 'UJI sunting dan splash', kategori: 'lainnya',
+    lat: -6.2655, lng: 106.7755, created_by: uid,
+  }),
+})).json()
 
+const milikSendiri = Array.isArray(dibuat) ? dibuat[0] : null
 if (!milikSendiri) {
-  console.error('Akun uji belum punya lokasi. Tambahkan satu lokasi lebih dulu.')
+  console.error('Gagal membuat lokasi uji:', JSON.stringify(dibuat).slice(0, 200))
   process.exit(1)
 }
+
+await fetch(`${URL_SUPABASE}/rest/v1/accessibility_checklist`, {
+  method: 'POST', headers: auth,
+  body: JSON.stringify({
+    location_id: milikSendiri.id,
+    ramp_tersedia: true, lebar_pintu_cukup: false, toilet_difabel: false,
+    parkir_difabel: false, lift_tersedia_berfungsi: false,
+    guiding_block_tersambung: false, tempat_duduk_tersedia: false,
+    permukaan_jalan_rata: false, catatan: 'Baris pengujian otomatis.',
+  }),
+})
 
 const browser = await chromium.launch({
   args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'],
@@ -176,12 +196,19 @@ const browser = await chromium.launch({
     !!tombolSendiri && tombolSendiri.href.includes(`ubah=${milikSendiri.id}`) && tombolSendiri.sekunder,
     tombolSendiri ? tombolSendiri.href : 'tidak ada')
 
-  // b. Tombol edit TIDAK muncul di lokasi orang lain.
+  // b. Pada lokasi orang lain, tombolnya berubah menjadi ajakan memperbarui kondisi.
+  //    Ini perubahan yang DISENGAJA pada schema-patch-5.sql: memperbarui kondisi
+  //    fasilitas dibuka untuk siapa pun yang sudah masuk, sedangkan nama, kategori,
+  //    dan koordinat tetap milik kontributor yang menambahkannya.
   await page.goto(`${BASIS}/lokasi/${LOKASI_ORANG_LAIN}`, { waitUntil: 'domcontentloaded' })
   await page.waitForTimeout(2200)
-  const tombolOrangLain = await page.evaluate(() =>
-    [...document.querySelectorAll('a')].some(e => e.textContent.trim() === 'Edit lokasi'))
-  catat('Tombol edit tidak tampil pada lokasi orang lain', tombolOrangLain === false)
+  const tombolOrangLain = await page.evaluate(() => {
+    const a = [...document.querySelectorAll('a')]
+      .find(e => /Perbarui kondisi|Edit lokasi/.test(e.textContent.trim()))
+    return a ? a.textContent.trim() : null
+  })
+  catat('Pada lokasi orang lain tombolnya berbunyi perbarui kondisi',
+    tombolOrangLain === 'Perbarui kondisi', `terbaca "${tombolOrangLain}"`)
 
   // c. Formulir edit terisi data yang ada.
   await page.goto(`${BASIS}/tambah-lokasi?ubah=${milikSendiri.id}`, { waitUntil: 'domcontentloaded' })
@@ -190,7 +217,7 @@ const browser = await chromium.launch({
   const isiForm = await page.evaluate(() => {
     const teks = document.body.innerText
     return {
-      berjudulEdit: /Mengubah data lokasi ini/.test(teks),
+      berjudulEdit: /Mengubah lokasi kamu/.test(teks),
       menyebutTurunStatus: /kembali menjadi belum\s+terverifikasi/i.test(teks),
     }
   })
@@ -225,18 +252,21 @@ const browser = await chromium.launch({
 
   await page.screenshot({ path: join(KELUARAN, 'sunting-form.png') })
 
-  // d. Lokasi orang lain ditolak walau alamatnya dibuka langsung.
-  const balasan = await page.goto(`${BASIS}/tambah-lokasi?ubah=${LOKASI_ORANG_LAIN}`,
+  // d. Rute pembaruan lokasi orang lain terbuka, tetapi hanya untuk dua langkah
+  //    terakhir. Nama dan titiknya tidak pernah disodorkan.
+  await page.goto(`${BASIS}/tambah-lokasi?ubah=${LOKASI_ORANG_LAIN}`,
     { waitUntil: 'domcontentloaded' })
-  await page.waitForTimeout(1800)
-  const ditolak = await page.evaluate(() => ({
-    teks: document.body.innerText.slice(0, 200),
-    adaForm: !!document.querySelector('#nama-tempat')
-      || /Langkah 1 dari 4/.test(document.body.innerText),
+  await page.waitForTimeout(2400)
+  const terbatas = await page.evaluate(() => ({
+    teks: document.body.innerText,
+    adaNamaTempat: !!document.querySelector('#nama-tempat'),
+    hitungan: (document.body.innerText.match(/Langkah \d+ dari \d+/) || [''])[0],
   }))
-  catat('Rute edit lokasi orang lain ditolak walau dibuka langsung',
-    !ditolak.adaForm && /kontributor lokasi ini|403|Forbidden/i.test(ditolak.teks),
-    `HTTP ${balasan?.status()}, ${ditolak.teks.replace(/\s+/g, ' ').slice(0, 70)}`)
+  catat('Rute pembaruan lokasi orang lain terbuka, tapi hanya dua langkah',
+    terbatas.hitungan === 'Langkah 1 dari 2'
+    && !terbatas.adaNamaTempat
+    && /Membantu memperbarui data lokasi ini/.test(terbatas.teks),
+    terbatas.hitungan)
 
   await page.screenshot({ path: join(KELUARAN, 'sunting-ditolak.png') })
   await page.close()
@@ -326,6 +356,12 @@ const browser = await chromium.launch({
 }
 
 await browser.close()
+
+await fetch(`${URL_SUPABASE}/rest/v1/locations?id=eq.${milikSendiri.id}`, { method: 'DELETE', headers: auth })
+const sisaLokasi = await (await fetch(
+  `${URL_SUPABASE}/rest/v1/locations?select=id&nama=like.UJI*`, { headers: auth })).json()
+catat('Lokasi uji dibersihkan', (sisaLokasi.length ?? 0) === 0, `${sisaLokasi.length ?? 0} tersisa`)
+
 const gagal = langkah.filter(l => !l.lolos)
 console.log(`\n${langkah.length - gagal.length} dari ${langkah.length} pemeriksaan lolos`)
 if (gagal.length) process.exitCode = 1

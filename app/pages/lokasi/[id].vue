@@ -6,23 +6,52 @@ const user = useSupabaseUser()
 const idPengguna = useIdPengguna()
 const id = computed(() => String(route.params.id))
 
+// Kolom jejak pembaruan datang dari schema-patch-5.sql. Kueri dicoba lengkap dulu,
+// dan kalau kolomnya belum ada di basis data, diulang tanpa keduanya. Tanpa ini,
+// mendorong kode lebih dulu daripada menjalankan tambalannya membuat seluruh halaman
+// detail membalas galat, bukan sekadar kehilangan satu baris keterangan.
+const KOLOM_JEJAK = 'updated_by, updated_at,'
+
+async function ambilLokasi(pakaiJejak: boolean) {
+  return supabase
+    .from('locations')
+    .select(`
+      id, nama, kategori, lat, lng, skor, status, created_at, created_by,
+      ${pakaiJejak ? KOLOM_JEJAK : ''}
+      accessibility_checklist (*),
+      location_photos ( id, photo_url ),
+      confirmations ( id, user_id, is_accurate ),
+      profiles ( nama )
+    `)
+    .eq('id', id.value)
+    .maybeSingle()
+}
+
 const { data: lokasi, error, refresh } = await useAsyncData(
   () => `lokasi-${id.value}`,
   async () => {
-    const { data, error } = await supabase
-      .from('locations')
-      .select(`
-        id, nama, kategori, lat, lng, skor, status, created_at, created_by,
-        accessibility_checklist (*),
-        location_photos ( id, photo_url ),
-        confirmations ( id, user_id, is_accurate ),
-        profiles ( nama )
-      `)
-      .eq('id', id.value)
+    let { data, error } = await ambilLokasi(true)
+
+    if (error) {
+      const ulang = await ambilLokasi(false)
+      if (ulang.error) throw error
+      data = ulang.data
+    }
+
+    const baris = data as any
+    if (!baris?.updated_by) return baris
+
+    // Nama pembarunya diambil terpisah, bukan lewat relasi kedua pada kueri di atas.
+    // Relasi kedua ke tabel yang sama harus disebut lewat nama batasan kunci asing,
+    // dan menggantungkan halaman ini pada nama batasan yang dibuat otomatis berarti
+    // halaman rusak begitu nama itu berbeda sedikit saja.
+    const { data: pembaru } = await supabase
+      .from('profiles')
+      .select('nama')
+      .eq('id', baris.updated_by)
       .maybeSingle()
 
-    if (error) throw error
-    return data as any
+    return { ...baris, nama_pembaru: (pembaru as any)?.nama ?? null }
   },
 )
 
@@ -75,6 +104,19 @@ const namaKontributor = computed(() => {
 // sempat melihat tanggal yang meleset satu hari sebelum hidrasi mengoreksinya.
 // Aplikasinya memetakan kota di Indonesia, jadi WIB adalah zona yang benar untuk
 // dibaca semua orang, termasuk juri yang membukanya dari zona lain.
+// Jejak pembaruan. Hanya tampil kalau lokasi ini memang pernah diperbarui sesudah
+// dibuat; pemicu di basis data sengaja tidak mengisinya saat baris pertama dibuat.
+const pembaru = computed(() => {
+  const l = lokasi.value
+  if (!l?.updated_by || !l?.updated_at) return null
+  return {
+    nama: l.nama_pembaru || 'Warga',
+    tanggal: new Date(l.updated_at).toLocaleDateString('id-ID', {
+      day: 'numeric', month: 'long', year: 'numeric',
+    }),
+  }
+})
+
 const tanggal = computed(() =>
   lokasi.value?.created_at
     ? new Date(lokasi.value.created_at).toLocaleDateString('id-ID', {
@@ -166,12 +208,15 @@ useHead(() => ({ title: lokasi.value ? `${lokasi.value.nama} — landai` : 'land
       </p>
 
       <div class="mt-5 flex flex-wrap gap-3">
+        <!-- Sejak schema-patch-5.sql, memperbarui kondisi fasilitas terbuka untuk siapa
+             pun yang sudah masuk. Labelnya dibedakan supaya jelas apa yang bisa diubah:
+             pemilik mengubah seluruh datanya, yang lain memperbarui kondisinya. -->
         <NuxtLink
-          v-if="pemilik"
+          v-if="user"
           :to="`/tambah-lokasi?ubah=${lokasi.id}`"
           class="tombol tombol-sekunder"
         >
-          Edit lokasi
+          {{ pemilik ? 'Edit lokasi' : 'Perbarui kondisi' }}
         </NuxtLink>
 
         <a
@@ -235,6 +280,10 @@ useHead(() => ({ title: lokasi.value ? `${lokasi.value.nama} — landai` : 'land
         <template v-if="namaKontributor">Ditambahkan {{ namaKontributor }} pada {{ tanggal }}.</template>
         <template v-else>Ditambahkan pada {{ tanggal }}. Kontributor tidak tercatat.</template>
       </p>
+      <p v-if="pembaru" class="mt-1 text-sm text-gray-700">
+        Terakhir diperbarui {{ pembaru.nama }} pada {{ pembaru.tanggal }}.
+      </p>
+
       <p class="mt-1 text-sm text-gray-700 tabular-nums">
         {{ jumlahAkurat }} warga menyatakan masih akurat<template v-if="jumlahBerubah">, {{ jumlahBerubah }} menyatakan sudah berubah</template>.
       </p>

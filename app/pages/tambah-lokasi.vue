@@ -6,9 +6,12 @@ const idPengguna = useIdPengguna()
 const route = useRoute()
 const { tampilkan } = useNotifikasi()
 
-const LANGKAH = ['Titik', 'Tempat', 'Fasilitas', 'Foto'] as const
+// Kunci halaman diikat ke alamat penuh, termasuk kuerinya. Tanpa ini, berpindah dari
+// alur tambah ke alur ubah lewat peringatan duplikat hanya mengubah kueri tanpa
+// memasang ulang komponennya, jadi isian awalnya tidak pernah terambil.
+definePageMeta({ key: route => route.fullPath })
+
 const MAKS_FOTO_UNGGAH = 3
-const langkah = ref(0)
 
 // Menyunting memakai halaman yang sama persis dengan menambah: empat langkah yang
 // sama, komponen yang sama, hanya isian awalnya diambil dari baris yang sudah ada.
@@ -31,10 +34,13 @@ const mengirim = ref(false)
 const pesanError = ref('')
 const idLokasiTersimpan = ref<string | null>(null)
 
-// Kepemilikan diperiksa saat rute dibuka, bukan hanya dengan menyembunyikan tombol
-// di halaman detail. Tanpa ini, siapa pun yang menebak alamatnya bisa membuka
-// formulir berisi data orang lain, dan walaupun aturan keamanan tingkat baris akan
-// menolak penyimpanannya, memperlihatkan formulirnya saja sudah salah.
+// Siapa pemilik lokasi yang sedang dibuka. Bukan lagi penjaga pintu, melainkan penentu
+// langkah mana yang boleh disentuh: sejak schema-patch-5.sql siapa pun yang sudah masuk
+// boleh memperbarui KONDISI fasilitas, tetapi nama, kategori, dan koordinat tetap milik
+// pembuatnya. Batas itu ditegakkan aturan keamanan tingkat baris dan hak akses kolom di
+// basis data; yang di sini hanya supaya orang tidak disodori isian yang pasti ditolak.
+const pemilikLokasi = ref(true)
+
 if (idUbah.value) {
   const { data: asal, error: galatAsal } = await useAsyncData(
     () => `ubah-${idUbah.value}`,
@@ -53,13 +59,7 @@ if (idUbah.value) {
     throw createError({ statusCode: 404, statusMessage: 'Lokasi tidak ditemukan', fatal: true })
   }
 
-  if (asal.value.created_by !== idPengguna.value) {
-    throw createError({
-      statusCode: 403,
-      statusMessage: 'Hanya kontributor lokasi ini yang bisa mengubahnya',
-      fatal: true,
-    })
-  }
+  pemilikLokasi.value = asal.value.created_by === idPengguna.value
 
   const c = Array.isArray(asal.value.accessibility_checklist)
     ? asal.value.accessibility_checklist[0]
@@ -84,17 +84,33 @@ if (idUbah.value) {
   idLokasiTersimpan.value = asal.value.id
 }
 
+// Langkah mana yang tampil. Bukan pemilik hanya melihat dua langkah terakhir, yaitu
+// daftar periksa dan bukti foto, karena hanya itu yang boleh ia ubah. Menyembunyikan
+// dua langkah pertama lebih jujur daripada menampilkannya lalu menolak simpanannya.
+const langkahTersedia = computed<number[]>(() =>
+  modeUbah.value && !pemilikLokasi.value ? [2, 3] : [0, 1, 2, 3],
+)
+
+// Posisi di dalam daftar langkah yang tampil, bukan nomor langkah aslinya. Keduanya
+// dipisah supaya isi tiap langkah tidak perlu tahu langkah mana saja yang disembunyikan.
+const posisi = ref(0)
+const langkah = computed(() => langkahTersedia.value[posisi.value] ?? 0)
+const terakhir = computed(() => posisi.value >= langkahTersedia.value.length - 1)
+
 const bolehLanjut = computed(() => {
   if (langkah.value === 1) return nama.value.trim().length >= 3
   return true
 })
 
-function maju() {
-  if (langkah.value < LANGKAH.length - 1) langkah.value++
+async function maju() {
+  // Pemeriksaan duplikat dijalankan saat meninggalkan langkah titik, karena di situlah
+  // koordinatnya baru pasti. Namanya sendiri baru dibandingkan di langkah berikutnya.
+  if (langkah.value === 0) await periksaDuplikat()
+  if (!terakhir.value) posisi.value++
 }
 
 function mundur() {
-  if (langkah.value > 0) langkah.value--
+  if (posisi.value > 0) posisi.value--
 }
 
 async function kirim() {
@@ -110,7 +126,10 @@ async function kirim() {
     //    Kolom skor dan status sengaja tidak ikut dikirim: hak tulis kedua kolom itu
     //    dicabut dari peran klien di schema-patch-3.sql, dan hanya pemicu basis data
     //    yang boleh mengisinya.
-    if (modeUbah.value) {
+    // Bukan pemilik tidak menyentuh baris locations sama sekali. Kalaupun dicoba,
+    // aturan keamanan tingkat baris akan menolaknya, tapi mengirim permintaan yang
+    // sudah pasti ditolak hanya menghasilkan pesan galat yang membingungkan.
+    if (modeUbah.value && pemilikLokasi.value) {
       const { error } = await supabase
         .from('locations')
         .update({
@@ -146,15 +165,40 @@ async function kirim() {
     //    penyuntingan pemicu kedua menghapus konfirmasi lama lalu menurunkan status
     //    kembali ke belum terverifikasi. Keduanya di basis data, bukan di sini, jadi
     //    tidak ada jalan menyunting data tanpa ikut menurunkan statusnya.
-    const { error: errChecklist } = await supabase
-      .from('accessibility_checklist')
-      .upsert({
-        location_id: idLokasi,
-        ...checklist.value,
-        catatan: catatan.value.trim() || null,
-      })
+    //    Bukan pemilik memakai update murni, bukan upsert. Upsert diterjemahkan menjadi
+    //    insert on conflict do update, dan Postgres tetap memeriksa kebijakan INSERT
+    //    untuk baris yang diusulkan walaupun jalan yang akhirnya ditempuh adalah update.
+    //    Kebijakan insert daftar periksa masih pemilik saja, jadi upsert oleh orang lain
+    //    akan ditolak 42501 padahal barisnya sudah ada dan hanya perlu diperbarui.
+    const isi = {
+      ...checklist.value,
+      catatan: catatan.value.trim() || null,
+    }
 
-    if (errChecklist) throw new Error(`Checklist gagal disimpan. ${errChecklist.message}`)
+    if (modeUbah.value && !pemilikLokasi.value) {
+      const { data: terubah, error: errChecklist } = await supabase
+        .from('accessibility_checklist')
+        .update(isi)
+        .eq('location_id', idLokasi)
+        .select('location_id')
+
+      if (errChecklist) throw new Error(`Daftar periksa gagal disimpan. ${errChecklist.message}`)
+
+      // Nol baris tersentuh bisa berarti dua hal, dan keduanya tidak bisa dibedakan
+      // dari sisi peramban: daftar periksanya memang belum pernah dibuat, atau izin
+      // memperbarui data orang lain belum aktif karena schema-patch-5.sql belum
+      // dijalankan. Kalimatnya karena itu tidak menyebut sebab yang belum tentu benar.
+      if (!terubah || terubah.length === 0) {
+        throw new Error('Pembaruan tidak tersimpan. Untuk saat ini lokasi ini hanya bisa diperbarui oleh kontributor yang menambahkannya.')
+      }
+    }
+    else {
+      const { error: errChecklist } = await supabase
+        .from('accessibility_checklist')
+        .upsert({ location_id: idLokasi, ...isi })
+
+      if (errChecklist) throw new Error(`Daftar periksa gagal disimpan. ${errChecklist.message}`)
+    }
 
     // 3. Foto. Kegagalan satu foto tidak membatalkan lokasi yang sudah tersimpan.
     //    Dipotong di sini juga, supaya batasnya tetap berlaku walau daftar di
@@ -172,7 +216,9 @@ async function kirim() {
     }
 
     if (modeUbah.value) {
-      tampilkan('Perubahan tersimpan. Lokasi ini kembali berstatus belum terverifikasi.')
+      tampilkan(pemilikLokasi.value
+        ? 'Perubahan tersimpan. Lokasi ini kembali berstatus belum terverifikasi.'
+        : 'Terima kasih. Pembaruanmu tersimpan dan tercatat atas namamu, dan lokasi ini kembali berstatus belum terverifikasi.')
     }
     await navigateTo(`/lokasi/${idLokasi}`)
   }
@@ -183,6 +229,49 @@ async function kirim() {
     mengirim.value = false
   }
 }
+
+// ---------------------------------------------------------------------------
+// Peringatan lokasi kemungkinan duplikat.
+//
+// Dua syarat harus terpenuhi bersamaan: titiknya dalam radius empat puluh meter DAN
+// namanya mirip. Satu syarat saja terlalu sering salah tuduh. Dua kios berbeda di
+// gedung yang sama memang berjarak beberapa meter, dan dua cabang toko yang sama
+// memang bernama persis sama walau berjauhan.
+//
+// Peringatannya tidak pernah memblokir. Bisa saja itu memang tempat berbeda yang
+// kebetulan berdekatan dan bernama mirip, dan orang yang sedang berdiri di sana lebih
+// tahu daripada rumus jarak.
+// ---------------------------------------------------------------------------
+const kandidatDekat = ref<{ id: string, nama: string, jarak: number }[]>([])
+const duplikatDiabaikan = ref(false)
+
+async function periksaDuplikat() {
+  if (modeUbah.value) return
+
+  // Kotak pembatas kasar dulu, supaya yang diambil dari basis data sedikit, baru
+  // jaraknya dihitung tepat. Satu derajat lintang sekitar 111.320 meter; untuk bujur
+  // angkanya menyusut mengikuti kosinus lintang.
+  const d = RADIUS_DUPLIKAT / 111320
+  const dLng = d / Math.max(0.2, Math.cos((titik.value.lat * Math.PI) / 180))
+
+  const { data } = await supabase
+    .from('locations')
+    .select('id, nama, lat, lng')
+    .gte('lat', titik.value.lat - d).lte('lat', titik.value.lat + d)
+    .gte('lng', titik.value.lng - dLng).lte('lng', titik.value.lng + dLng)
+
+  kandidatDekat.value = ((data ?? []) as any[])
+    .map(l => ({ id: l.id, nama: l.nama, jarak: jarakMeter(titik.value, l) }))
+    .filter(l => l.jarak <= RADIUS_DUPLIKAT)
+    .sort((a, b) => a.jarak - b.jarak)
+}
+
+const kemungkinanDuplikat = computed(() => {
+  if (duplikatDiabaikan.value || modeUbah.value) return null
+  const n = nama.value.trim()
+  if (n.length < 3) return null
+  return kandidatDekat.value.find(k => namanyaMirip(k.nama, n)) ?? null
+})
 
 useHead(() => ({ title: modeUbah.value ? 'Edit lokasi — landai' : 'Tambah lokasi — landai' }))
 </script>
@@ -196,19 +285,31 @@ useHead(() => ({ title: modeUbah.value ? 'Edit lokasi — landai' : 'Tambah loka
           class="tombol tombol-tersier -ml-2"
         >Batal</NuxtLink>
         <MerekLandai class="mx-auto" :ukuran="20" tulisan="text-sm" />
-        <p class="shrink-0 text-sm text-gray-600 tabular-nums">Langkah {{ langkah + 1 }} dari {{ LANGKAH.length }}</p>
+        <p class="shrink-0 text-sm text-gray-600 tabular-nums">Langkah {{ posisi + 1 }} dari {{ langkahTersedia.length }}</p>
       </div>
 
+      <!-- Bilah kemajuan mengikuti langkah yang benar-benar tampil, bukan keempatnya,
+           supaya bukan pemilik tidak melihat dua ruas yang tidak pernah bisa ia isi. -->
       <ol class="mt-3 flex gap-1.5" aria-hidden="true">
         <li
-          v-for="(l, i) in LANGKAH" :key="l"
+          v-for="(l, i) in langkahTersedia" :key="l"
           class="h-1 flex-1 rounded-full"
-          :class="i <= langkah ? 'bg-brand' : 'bg-gray-200'"
+          :class="i <= posisi ? 'bg-brand' : 'bg-gray-200'"
         />
       </ol>
-      <p v-if="modeUbah" class="mt-3 text-sm text-gray-600">
-        Mengubah data lokasi ini. Setelah disimpan, statusnya kembali menjadi belum
-        terverifikasi, karena konfirmasi warga sebelumnya berlaku untuk data versi lama.
+
+      <p v-if="modeUbah && pemilikLokasi" class="mt-3 text-sm text-gray-600">
+        <span class="font-medium text-gray-800">Mengubah lokasi kamu.</span>
+        Setelah disimpan, statusnya kembali menjadi belum terverifikasi, karena
+        konfirmasi warga sebelumnya berlaku untuk data versi lama.
+      </p>
+
+      <p v-else-if="modeUbah" class="mt-3 text-sm text-gray-600">
+        <span class="font-medium text-gray-800">Membantu memperbarui data lokasi ini.</span>
+        Nama, jenis, dan titiknya hanya bisa diubah kontributor yang menambahkannya, jadi
+        di sini kamu memperbarui kondisi fasilitas dan fotonya. Pembaruanmu tercatat atas
+        namamu, dan lokasi ini kembali berstatus belum terverifikasi supaya warga lain
+        memeriksanya lagi.
       </p>
 
       <h1 class="mt-3 text-xl font-bold">
@@ -221,7 +322,40 @@ useHead(() => ({ title: modeUbah.value ? 'Edit lokasi — landai' : 'Tambah loka
 
     <main class="flex-1 px-4 py-5">
       <LangkahTitik v-if="langkah === 0" :lat="titik.lat" :lng="titik.lng" @geser="titik = $event" />
-      <LangkahTempat v-else-if="langkah === 1" v-model:nama="nama" v-model:kategori="kategori" />
+      <template v-else-if="langkah === 1">
+        <LangkahTempat v-model:nama="nama" v-model:kategori="kategori" />
+
+        <!-- Peringatan kemungkinan duplikat. Tidak pernah memblokir: bisa saja ini
+             memang tempat berbeda yang kebetulan berdekatan dan bernama mirip, dan
+             orang yang sedang berdiri di sana lebih tahu daripada rumus jarak. -->
+        <section
+          v-if="kemungkinanDuplikat" role="status"
+          class="mt-4 rounded-lg border border-skor-sedang bg-white px-4 py-3"
+        >
+          <h2 class="text-sm font-semibold">Mungkin tempat ini sudah ada di peta</h2>
+          <p class="mt-1 text-sm text-gray-700">
+            Ada <span class="font-medium">{{ kemungkinanDuplikat.nama }}</span> sekitar
+            {{ Math.round(kemungkinanDuplikat.jarak) }} meter dari titik yang kamu pilih,
+            dan namanya mirip. Kalau memang tempat yang sama, memperbarui yang sudah ada
+            lebih berguna daripada menambah baris kedua.
+          </p>
+
+          <div class="mt-3 flex flex-wrap gap-2">
+            <NuxtLink
+              :to="`/tambah-lokasi?ubah=${kemungkinanDuplikat.id}`"
+              class="tombol tombol-sekunder"
+            >
+              Perbarui yang sudah ada
+            </NuxtLink>
+            <button
+              type="button" class="tombol tombol-tersier"
+              @click="duplikatDiabaikan = true"
+            >
+              Ini tempat lain, lanjutkan
+            </button>
+          </div>
+        </section>
+      </template>
       <LangkahChecklist v-else-if="langkah === 2" v-model="checklist" />
       <LangkahFoto v-else v-model:foto="foto" v-model:catatan="catatan" />
 
@@ -241,7 +375,7 @@ useHead(() => ({ title: modeUbah.value ? 'Edit lokasi — landai' : 'Tambah loka
         </button>
 
         <button
-          v-if="langkah < LANGKAH.length - 1" type="button" :disabled="!bolehLanjut"
+          v-if="!terakhir" type="button" :disabled="!bolehLanjut"
           class="tombol tombol-utama flex-1"
           @click="maju"
         >
