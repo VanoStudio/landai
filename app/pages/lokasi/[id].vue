@@ -68,10 +68,17 @@ const namaKontributor = computed(() => {
   return lokasi.value?.created_by ? 'Warga' : null
 })
 
+// Zona waktu ditulis eksplisit, bukan diserahkan ke zona mesin. Server render
+// berjalan di UTC sedangkan peramban kontributor di WIB, jadi tanpa ini satu baris
+// yang sama menghasilkan dua tanggal berbeda: server "4 September", peramban
+// "5 September". Selisihnya membuat Vue menandai hidrasi tidak cocok, dan pembaca
+// sempat melihat tanggal yang meleset satu hari sebelum hidrasi mengoreksinya.
+// Aplikasinya memetakan kota di Indonesia, jadi WIB adalah zona yang benar untuk
+// dibaca semua orang, termasuk juri yang membukanya dari zona lain.
 const tanggal = computed(() =>
   lokasi.value?.created_at
     ? new Date(lokasi.value.created_at).toLocaleDateString('id-ID', {
-        day: 'numeric', month: 'long', year: 'numeric',
+        day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Jakarta',
       })
     : '',
 )
