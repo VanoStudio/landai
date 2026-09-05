@@ -10,18 +10,24 @@ const id = computed(() => String(route.params.id))
 // dan kalau kolomnya belum ada di basis data, diulang tanpa keduanya. Tanpa ini,
 // mendorong kode lebih dulu daripada menjalankan tambalannya membuat seluruh halaman
 // detail membalas galat, bukan sekadar kehilangan satu baris keterangan.
-const KOLOM_JEJAK = 'updated_by, updated_at,'
-
+//
+// Relasi ke profiles WAJIB disebut lewat kolom kunci asingnya. Sejak updated_by ada,
+// locations punya DUA kunci asing ke profiles, dan PostgREST menolak menebak yang mana
+// yang dimaksud: "PGRST201 Could not embed because more than one relationship was
+// found". Galatnya bukan soal kolom yang hilang, jadi jaring pengaman di bawah tidak
+// menangkapnya, dan halaman ini sempat mati begitu tambalannya dijalankan. Petunjuknya
+// memakai nama kolom, bukan nama batasan, karena nama batasan dibuat otomatis dan bisa
+// berbeda di basis data lain.
 async function ambilLokasi(pakaiJejak: boolean) {
   return supabase
     .from('locations')
     .select(`
       id, nama, kategori, lat, lng, skor, status, created_at, created_by,
-      ${pakaiJejak ? KOLOM_JEJAK : ''}
+      ${pakaiJejak ? 'updated_by, updated_at, pembaru:profiles!updated_by ( nama ),' : ''}
       accessibility_checklist (*),
       location_photos ( id, photo_url ),
       confirmations ( id, user_id, is_accurate ),
-      profiles ( nama )
+      penambah:profiles!created_by ( nama )
     `)
     .eq('id', id.value)
     .maybeSingle()
@@ -30,28 +36,12 @@ async function ambilLokasi(pakaiJejak: boolean) {
 const { data: lokasi, error, refresh } = await useAsyncData(
   () => `lokasi-${id.value}`,
   async () => {
-    let { data, error } = await ambilLokasi(true)
+    const { data, error } = await ambilLokasi(true)
+    if (!error) return data as any
 
-    if (error) {
-      const ulang = await ambilLokasi(false)
-      if (ulang.error) throw error
-      data = ulang.data
-    }
-
-    const baris = data as any
-    if (!baris?.updated_by) return baris
-
-    // Nama pembarunya diambil terpisah, bukan lewat relasi kedua pada kueri di atas.
-    // Relasi kedua ke tabel yang sama harus disebut lewat nama batasan kunci asing,
-    // dan menggantungkan halaman ini pada nama batasan yang dibuat otomatis berarti
-    // halaman rusak begitu nama itu berbeda sedikit saja.
-    const { data: pembaru } = await supabase
-      .from('profiles')
-      .select('nama')
-      .eq('id', baris.updated_by)
-      .maybeSingle()
-
-    return { ...baris, nama_pembaru: (pembaru as any)?.nama ?? null }
+    const ulang = await ambilLokasi(false)
+    if (ulang.error) throw error
+    return ulang.data as any
   },
 )
 
@@ -91,7 +81,7 @@ const butuhPembaruan = computed(() =>
 // Baris tanpa created_by berarti data contoh yang dimasukkan lewat SQL, bukan
 // kiriman warga. Jangan menyebut kontributor yang tidak pernah ada.
 const namaKontributor = computed(() => {
-  const p = lokasi.value?.profiles
+  const p = lokasi.value?.penambah
   const satu = Array.isArray(p) ? p[0] : p
   if (satu?.nama) return satu.nama
   return lokasi.value?.created_by ? 'Warga' : null
@@ -109,8 +99,9 @@ const namaKontributor = computed(() => {
 const pembaru = computed(() => {
   const l = lokasi.value
   if (!l?.updated_by || !l?.updated_at) return null
+  const p = Array.isArray(l.pembaru) ? l.pembaru[0] : l.pembaru
   return {
-    nama: l.nama_pembaru || 'Warga',
+    nama: p?.nama || 'Warga',
     tanggal: new Date(l.updated_at).toLocaleDateString('id-ID', {
       day: 'numeric', month: 'long', year: 'numeric',
     }),

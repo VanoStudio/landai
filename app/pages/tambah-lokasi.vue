@@ -165,39 +165,66 @@ async function kirim() {
     //    penyuntingan pemicu kedua menghapus konfirmasi lama lalu menurunkan status
     //    kembali ke belum terverifikasi. Keduanya di basis data, bukan di sini, jadi
     //    tidak ada jalan menyunting data tanpa ikut menurunkan statusnya.
-    //    Bukan pemilik memakai update murni, bukan upsert. Upsert diterjemahkan menjadi
-    //    insert on conflict do update, dan Postgres tetap memeriksa kebijakan INSERT
-    //    untuk baris yang diusulkan walaupun jalan yang akhirnya ditempuh adalah update.
-    //    Kebijakan insert daftar periksa masih pemilik saja, jadi upsert oleh orang lain
-    //    akan ditolak 42501 padahal barisnya sudah ada dan hanya perlu diperbarui.
+    //    TIDAK memakai upsert, dan ini bukan pilihan gaya.
+    //
+    //    Upsert milik PostgREST diterjemahkan menjadi insert on conflict do update yang
+    //    menyetel SELURUH kolom yang dikirim, termasuk location_id. Postgres memeriksa
+    //    hak UPDATE saat menyusun rencana, bukan saat konflik benar-benar terjadi, jadi
+    //    perintah itu menuntut hak update atas location_id walaupun barisnya baru dan
+    //    tidak akan pernah bentrok. Hak itu sengaja dicabut di schema-patch-5.sql untuk
+    //    menutup serangan pemindahan baris daftar periksa ke lokasi orang lain, jadi
+    //    setiap upsert dijawab:
+    //
+    //      42501 permission denied for table accessibility_checklist
+    //
+    //    Terukur: seluruh alur tambah lokasi mati karenanya. Pertahanan kolomnya benar
+    //    dan tetap dipertahankan; yang diganti cara menyimpannya.
     const isi = {
       ...checklist.value,
       catatan: catatan.value.trim() || null,
     }
 
-    if (modeUbah.value && !pemilikLokasi.value) {
-      const { data: terubah, error: errChecklist } = await supabase
+    async function simpanChecklist() {
+      const { data: terubah, error } = await supabase
         .from('accessibility_checklist')
         .update(isi)
         .eq('location_id', idLokasi)
         .select('location_id')
 
-      if (errChecklist) throw new Error(`Daftar periksa gagal disimpan. ${errChecklist.message}`)
+      if (error) throw new Error(`Daftar periksa gagal disimpan. ${error.message}`)
+      if (terubah && terubah.length > 0) return
 
-      // Nol baris tersentuh bisa berarti dua hal, dan keduanya tidak bisa dibedakan
-      // dari sisi peramban: daftar periksanya memang belum pernah dibuat, atau izin
-      // memperbarui data orang lain belum aktif karena schema-patch-5.sql belum
-      // dijalankan. Kalimatnya karena itu tidak menyebut sebab yang belum tentu benar.
-      if (!terubah || terubah.length === 0) {
+      // Nol baris tersentuh. Bisa berarti barisnya memang belum ada, bisa juga berarti
+      // izin memperbarui data orang lain belum aktif. Keduanya tidak bisa dibedakan dari
+      // sisi peramban, jadi bagi bukan pemilik kalimatnya tidak menyebut sebab yang
+      // belum tentu benar.
+      if (modeUbah.value && !pemilikLokasi.value) {
         throw new Error('Pembaruan tidak tersimpan. Untuk saat ini lokasi ini hanya bisa diperbarui oleh kontributor yang menambahkannya.')
       }
+
+      const { error: errIsi } = await supabase
+        .from('accessibility_checklist')
+        .insert({ location_id: idLokasi, ...isi })
+
+      if (errIsi) throw new Error(`Daftar periksa gagal disimpan. ${errIsi.message}`)
+    }
+
+    if (modeUbah.value) {
+      // Barisnya hampir pasti sudah ada, jadi diperbarui lebih dulu.
+      await simpanChecklist()
     }
     else {
-      const { error: errChecklist } = await supabase
+      // Lokasi baru: barisnya pasti belum ada. Kalau simpan diulang setelah kegagalan
+      // sebagian, id lokasinya dipakai ulang dan barisnya sudah ada, jadi bentrokan
+      // kunci ganda dijatuhkan ke jalur perbarui.
+      const { error: errIsi } = await supabase
         .from('accessibility_checklist')
-        .upsert({ location_id: idLokasi, ...isi })
+        .insert({ location_id: idLokasi, ...isi })
 
-      if (errChecklist) throw new Error(`Daftar periksa gagal disimpan. ${errChecklist.message}`)
+      if (errIsi) {
+        if (errIsi.code !== '23505') throw new Error(`Daftar periksa gagal disimpan. ${errIsi.message}`)
+        await simpanChecklist()
+      }
     }
 
     // 3. Foto. Kegagalan satu foto tidak membatalkan lokasi yang sudah tersimpan.

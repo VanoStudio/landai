@@ -46,7 +46,9 @@ const { data: kontributor, pending, error } = await useAsyncData<Kontributor[]>(
   async () => {
     const { data, error } = await supabase
       .from('locations')
-      .select('created_by, profiles ( nama )')
+      // Relasi disebut lewat kolom kunci asingnya. Sejak updated_by ada, locations punya
+      // dua kunci asing ke profiles dan PostgREST menolak menebak yang mana yang dimaksud.
+      .select('created_by, profiles!created_by ( nama )')
       .not('created_by', 'is', null)
 
     if (error) throw error

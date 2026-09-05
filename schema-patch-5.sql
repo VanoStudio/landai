@@ -142,8 +142,18 @@ create policy "siapa pun yang masuk bisa perbarui checklist"
 -- kolom. Hak tingkat tabel dicabut lebih dulu, karena hak tingkat tabel tidak bisa
 -- dipersempit oleh pencabutan tingkat kolom.
 --
--- Catatan pemeliharaan: kolom baru pada accessibility_checklist tidak akan bisa
--- diperbarui klien sampai ditambahkan ke daftar grant di bawah ini.
+-- Catatan pemeliharaan, dua hal.
+--
+-- Pertama, kolom baru pada accessibility_checklist tidak akan bisa diperbarui klien
+-- sampai ditambahkan ke daftar grant di bawah ini.
+--
+-- Kedua, dan ini menggigit: UPSERT tidak lagi bisa dipakai pada tabel ini. Upsert
+-- PostgREST menjadi insert on conflict do update yang menyetel seluruh kolom yang
+-- dikirim, termasuk location_id, dan Postgres memeriksa hak update saat menyusun
+-- rencana, bukan saat konflik benar-benar terjadi. Jadi upsert menuntut hak update atas
+-- location_id walaupun barisnya baru dan tidak akan pernah bentrok, lalu dijawab
+-- "42501 permission denied for table accessibility_checklist". Aplikasi karena itu
+-- memakai insert dan update terpisah, bukan upsert.
 -- ---------------------------------------------------------------------------
 revoke update on public.accessibility_checklist from authenticated, anon;
 
