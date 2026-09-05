@@ -15,6 +15,21 @@
      elemen lain. Biru dipilih karena "kamu di sini" adalah konvensi peta yang
      sudah dikenal universal, dan hijau akan tertukar dengan arti skor. */
   --color-posisi: #1D6FE0;
+
+  /* Jarak kendali peta ke tepi, dan celah antar kendali. Dipakai bersama oleh kendali
+     bawaan MapLibre dan tombol lokasi saya yang dirender Vue, supaya keduanya tidak
+     bisa lagi bergeser sendiri-sendiri. */
+  --sisi-kendali-peta: 16px;
+  --celah-kendali-peta: 12px;
+
+  /* Jarak dari tepi bawah peta ke sisi bawah grup perbesar. Nilainya ditentukan
+     MapLibre sendiri: tinggi atribusi ringkas ditambah margin bawahnya. Diukur, bukan
+     dikarang, dan dijaga uji docs/uji-kendali-peta.mjs supaya tidak diam-diam meleset
+     kalau MapLibre berganti versi. */
+  --dasar-kendali-peta: 48px;
+
+  /* Tinggi grup perbesar: dua tombol 44px yang ditumpuk. */
+  --tinggi-grup-zoom: 88px;
 }
 
 /* Aturan dasar dan komponen dibungkus lapisan.
@@ -294,9 +309,29 @@
    dengan kekhususan yang sama persis dan dimuat sesudah berkas ini, jadi pada
    kekhususan seri ia yang menang. Pengulangan menaikkan kekhususan satu tingkat
    tanpa perlu !important. */
+/* Kendali peta disusun sebagai satu kolom di sudut kanan bawah: tombol lokasi saya,
+   grup perbesar, lalu atribusi. Ketiganya harus segaris dan berjarak sama.
+   Terukur sebelum perbaikan, sama di 375, 390, 768, dan 1440: tombol lokasi saya
+   berjarak 16px dari tepi sedangkan grup perbesar 10px, jadi kolomnya goyang, dan
+   celah antar keduanya MINUS 14px, artinya keduanya saling menindih. */
+/* Nama kelasnya ditulis dua kali. CSS milik MapLibre memakai pemilih dengan
+   kekhususan yang sama persis dan dimuat sesudah berkas ini, jadi pada kekhususan
+   seri ia yang menang. Pengulangan menaikkannya satu tingkat tanpa !important. */
+.maplibregl-ctrl-bottom-right.maplibregl-ctrl-bottom-right .maplibregl-ctrl {
+  margin: 0 var(--sisi-kendali-peta) var(--celah-kendali-peta) 0;
+}
+
 .maplibregl-ctrl-group.maplibregl-ctrl-group button {
   width: 44px;
   height: 44px;
+}
+
+/* Tombol lokasi saya duduk di kolom yang sama dengan kendali MapLibre, tepat di
+   atas grup perbesar. Letaknya dihitung dari token yang sama, bukan dari angka lepas,
+   supaya kolomnya tidak bisa lagi bergeser sendiri-sendiri. */
+.kendali-lokasi-saya {
+  right: var(--sisi-kendali-peta);
+  bottom: calc(var(--dasar-kendali-peta) + var(--tinggi-grup-zoom) + var(--celah-kendali-peta));
 }
 
 .maplibregl-ctrl-group.maplibregl-ctrl-group button .maplibregl-ctrl-icon {

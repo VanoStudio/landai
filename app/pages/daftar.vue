@@ -56,7 +56,7 @@ async function daftar() {
     <p class="mt-1 text-sm text-gray-600">Akun dipakai untuk menambah lokasi.</p>
 
     <div v-if="perluCekEmail" class="mt-6 rounded border border-gray-300 p-4 text-sm">
-      <p class="font-medium">Cek email kamu</p>
+      <p class="font-medium">Cek email Anda</p>
       <p class="mt-1 text-gray-600">
         Kami kirim tautan konfirmasi ke {{ email }}. Buka tautan itu untuk mengaktifkan akun.
       </p>

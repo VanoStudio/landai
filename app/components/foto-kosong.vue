@@ -36,7 +36,7 @@ withDefaults(defineProps<{ ringkas?: boolean }>(), { ringkas: false })
     </svg>
     <p class="text-sm font-medium text-gray-700">Belum ada foto di sini</p>
     <p class="max-w-xs text-sm text-gray-600">
-      Kalau kamu lewat tempat ini, satu foto kondisinya sangat membantu warga lain.
+      Kalau Anda lewat tempat ini, satu foto kondisinya sangat membantu warga lain.
     </p>
   </div>
 </template>

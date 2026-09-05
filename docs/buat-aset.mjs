@@ -37,7 +37,7 @@ await og.setContent(`
 <div class="garis"></div>
 <div class="merek">${TANDA}<div class="nama">landai</div></div>
 <div class="judul">Peta aksesibilitas tempat umum, diisi warga</div>
-<div class="sub">Cari tahu apakah sebuah tempat bisa kamu akses, sebelum berangkat ke sana.</div>
+<div class="sub">Cari tahu apakah sebuah tempat bisa Anda akses, sebelum berangkat ke sana.</div>
 <div class="kaki">
   <span class="titik" style="background:#639922"></span>
   <span class="titik" style="background:#BA7517"></span>

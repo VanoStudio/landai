@@ -42,7 +42,7 @@ function tutup() {
     <h2 id="judul-pengenalan" class="text-sm font-semibold">Baru pertama ke sini?</h2>
     <p class="mt-1 text-[13px] leading-relaxed text-gray-700">
       Melihat peta dan membuka detail lokasi tidak perlu akun.
-      Kamu baru perlu masuk untuk menambah lokasi atau mengonfirmasi data warga lain.
+      Anda baru perlu masuk untuk menambah lokasi atau mengonfirmasi data warga lain.
     </p>
 
     <button

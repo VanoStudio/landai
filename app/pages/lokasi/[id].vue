@@ -267,7 +267,7 @@ useHead(() => ({ title: lokasi.value ? `${lokasi.value.nama} — landai` : 'land
       >
         <span class="font-medium">Mungkin sudah berubah.</span>
         {{ jumlahBerubah }} warga melaporkan kondisi di sini tidak lagi sesuai catatan ini.
-        Kalau kamu baru dari sana, foto dan daftar periksa yang baru sangat membantu.
+        Kalau Anda baru dari sana, foto dan daftar periksa yang baru sangat membantu.
       </p>
 
       <div class="mt-5 flex flex-wrap gap-3">
@@ -376,7 +376,7 @@ useHead(() => ({ title: lokasi.value ? `${lokasi.value.nama} — landai` : 'land
         Butuh 3 konfirmasi akurat untuk berstatus terverifikasi.
       </p>
 
-      <h2 class="mt-8 text-base font-semibold">Kamu pernah ke sini?</h2>
+      <h2 class="mt-8 text-base font-semibold">Anda pernah ke sini?</h2>
       <p class="mt-1 text-sm text-gray-600">Bantu warga lain dengan memastikan datanya masih benar.</p>
 
       <div class="mt-3 flex flex-wrap gap-3">

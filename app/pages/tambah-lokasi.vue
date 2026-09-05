@@ -245,7 +245,7 @@ async function kirim() {
     if (modeUbah.value) {
       tampilkan(pemilikLokasi.value
         ? 'Perubahan tersimpan. Lokasi ini kembali berstatus belum terverifikasi.'
-        : 'Terima kasih. Pembaruanmu tersimpan dan tercatat atas namamu, dan lokasi ini kembali berstatus belum terverifikasi.')
+        : 'Terima kasih. Pembaruan Anda tersimpan dan tercatat atas nama Anda, dan lokasi ini kembali berstatus belum terverifikasi.')
     }
     await navigateTo(`/lokasi/${idLokasi}`)
   }
@@ -326,7 +326,7 @@ useHead(() => ({ title: modeUbah.value ? 'Edit lokasi — landai' : 'Tambah loka
       </ol>
 
       <p v-if="modeUbah && pemilikLokasi" class="mt-3 text-sm text-gray-600">
-        <span class="font-medium text-gray-800">Mengubah lokasi kamu.</span>
+        <span class="font-medium text-gray-800">Mengubah lokasi Anda.</span>
         Setelah disimpan, statusnya kembali menjadi belum terverifikasi, karena
         konfirmasi warga sebelumnya berlaku untuk data versi lama.
       </p>
@@ -334,8 +334,8 @@ useHead(() => ({ title: modeUbah.value ? 'Edit lokasi — landai' : 'Tambah loka
       <p v-else-if="modeUbah" class="mt-3 text-sm text-gray-600">
         <span class="font-medium text-gray-800">Membantu memperbarui data lokasi ini.</span>
         Nama, jenis, dan titiknya hanya bisa diubah kontributor yang menambahkannya, jadi
-        di sini kamu memperbarui kondisi fasilitas dan fotonya. Pembaruanmu tercatat atas
-        namamu, dan lokasi ini kembali berstatus belum terverifikasi supaya warga lain
+        di sini Anda memperbarui kondisi fasilitas dan fotonya. Pembaruan Anda tercatat
+        atas nama Anda, dan lokasi ini kembali berstatus belum terverifikasi supaya warga lain
         memeriksanya lagi.
       </p>
 
@@ -362,7 +362,7 @@ useHead(() => ({ title: modeUbah.value ? 'Edit lokasi — landai' : 'Tambah loka
           <h2 class="text-sm font-semibold">Mungkin tempat ini sudah ada di peta</h2>
           <p class="mt-1 text-sm text-gray-700">
             Ada <span class="font-medium">{{ kemungkinanDuplikat.nama }}</span> sekitar
-            {{ Math.round(kemungkinanDuplikat.jarak) }} meter dari titik yang kamu pilih,
+            {{ Math.round(kemungkinanDuplikat.jarak) }} meter dari titik yang Anda pilih,
             dan namanya mirip. Kalau memang tempat yang sama, memperbarui yang sudah ada
             lebih berguna daripada menambah baris kedua.
           </p>

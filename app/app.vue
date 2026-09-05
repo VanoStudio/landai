@@ -8,7 +8,7 @@
 const { situsUrl } = useRuntimeConfig().public as { situsUrl: string }
 
 const JUDUL = 'landai — peta aksesibilitas tempat umum'
-const RINGKAS = 'Cari tahu apakah sebuah tempat bisa kamu akses sebelum berangkat. '
+const RINGKAS = 'Cari tahu apakah sebuah tempat bisa Anda akses sebelum berangkat. '
   + 'Skor aksesibilitas dari delapan fasilitas, diisi dan diverifikasi warga.'
 
 useSeoMeta({

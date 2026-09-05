@@ -150,7 +150,7 @@ try {
       hitungan: (teks.match(/Langkah \d+ dari \d+/) || [''])[0],
       ruasBilah: document.querySelectorAll('header ol li').length,
       judulMembantu: /Membantu memperbarui data lokasi ini/.test(teks),
-      judulPemilik: /Mengubah lokasi kamu/.test(teks),
+      judulPemilik: /Mengubah lokasi Anda/.test(teks),
       // Langkah pertama yang tampil harus daftar periksa, bukan titik atau identitas.
       adaPetaTitik: !!document.querySelector('.maplibregl-canvas'),
       adaNamaTempat: !!document.querySelector('#nama-tempat'),
@@ -164,7 +164,7 @@ try {
   catat('Langkah titik dan identitas tempat tidak ditampilkan',
     !bukanPemilik.adaPetaTitik && !bukanPemilik.adaNamaTempat,
     `judul langkah "${bukanPemilik.judulLangkah}"`)
-  catat('Judulnya berbunyi membantu memperbarui, bukan mengubah lokasi kamu',
+  catat('Judulnya berbunyi membantu memperbarui, bukan mengubah lokasi Anda',
     bukanPemilik.judulMembantu && !bukanPemilik.judulPemilik)
   await page.screenshot({ path: join(KELUARAN, 'langkah-bukan-pemilik.png') })
 
@@ -178,14 +178,14 @@ try {
     return {
       hitungan: (teks.match(/Langkah \d+ dari \d+/) || [''])[0],
       ruasBilah: document.querySelectorAll('header ol li').length,
-      judulPemilik: /Mengubah lokasi kamu/.test(teks),
+      judulPemilik: /Mengubah lokasi Anda/.test(teks),
       judulMembantu: /Membantu memperbarui data lokasi ini/.test(teks),
     }
   })
   catat('Pemilik tetap melihat keempat langkah',
     pemilik.hitungan === 'Langkah 1 dari 4' && pemilik.ruasBilah === 4,
     `${pemilik.hitungan}, ${pemilik.ruasBilah} ruas`)
-  catat('Judul untuk pemilik berbunyi mengubah lokasi kamu',
+  catat('Judul untuk pemilik berbunyi mengubah lokasi Anda',
     pemilik.judulPemilik && !pemilik.judulMembantu)
   await page.screenshot({ path: join(KELUARAN, 'langkah-pemilik.png') })
 
@@ -269,7 +269,7 @@ try {
   }))
   catat('Pilihan perbarui membawa ke formulir pembaruan lokasi itu',
     sesudahPindah.alamat.includes(`ubah=${ID_KEMBAR}`)
-    && /Mengubah lokasi kamu/.test(sesudahPindah.teks),
+    && /Mengubah lokasi Anda/.test(sesudahPindah.teks),
     `${sesudahPindah.alamat}, ${sesudahPindah.hitungan}`)
 
   if (galat.length) console.log('    galat konsol:', galat.join(' | '))

@@ -116,7 +116,7 @@ useHead({ title: 'Papan kontributor — landai' })
       >
         <p class="text-sm font-medium text-gray-700">Belum ada kontributor</p>
         <p class="mt-1 text-sm text-gray-600">
-          Lokasi pertama yang kamu tambahkan akan muncul di sini.
+          Lokasi pertama yang Anda tambahkan akan muncul di sini.
         </p>
       </div>
 

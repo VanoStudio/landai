@@ -327,8 +327,8 @@ useHead({ title: 'landai — peta aksesibilitas' })
         <button
           type="button"
           :disabled="memuatGps"
-          :aria-label="memuatGps ? 'Sedang membaca lokasi kamu' : 'Ke lokasi saya'"
-          class="absolute bottom-32 right-4 z-20 h-11 w-11 place-items-center rounded-full border border-gray-300 bg-white shadow-lg hover:border-gray-500 disabled:opacity-60"
+          :aria-label="memuatGps ? 'Sedang membaca lokasi Anda' : 'Ke lokasi saya'"
+          class="kendali-lokasi-saya absolute z-20 h-11 w-11 place-items-center rounded-full border border-gray-300 bg-white shadow-lg hover:border-gray-500 disabled:opacity-60"
           :class="lokasiTerpilih ? 'hidden sm:grid' : 'grid'"
           @click="keLokasiSaya"
         >

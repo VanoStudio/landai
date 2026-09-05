@@ -119,7 +119,7 @@ function geserManual(t: { lat: number, lng: number }) {
       class="rounded-lg border border-skor-sedang bg-white px-3 py-2 text-sm text-gray-800"
     >
       Titik ini datang dari pencarian nama, bukan dari GPS. Pencarian bisa meleset
-      ratusan meter ke gedung lain yang namanya mirip. Kalau kamu sedang berdiri di
+      ratusan meter ke gedung lain yang namanya mirip. Kalau Anda sedang berdiri di
       tempatnya, pakai lokasi saya lebih tepat, atau geser pin ke pintu masuknya.
     </p>
     <p v-else-if="akurasi !== null" class="text-sm text-gray-600">

@@ -124,7 +124,7 @@ const fasilitas = computed(() => ([
       <span class="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-skor-sedang" aria-hidden="true" />
       <span>
         {{ props.lokasi.jumlah_berubah }} warga bilang kondisinya sudah berubah.
-        Kalau kamu baru dari sana, datanya perlu diperbarui.
+        Kalau Anda baru dari sana, datanya perlu diperbarui.
       </span>
     </p>
     <p v-else-if="props.lokasi.status === 'belum_terverifikasi'" class="mt-2 text-xs text-gray-600">

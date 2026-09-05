@@ -217,7 +217,7 @@ const browser = await chromium.launch({
   const isiForm = await page.evaluate(() => {
     const teks = document.body.innerText
     return {
-      berjudulEdit: /Mengubah lokasi kamu/.test(teks),
+      berjudulEdit: /Mengubah lokasi Anda/.test(teks),
       menyebutTurunStatus: /kembali menjadi belum\s+terverifikasi/i.test(teks),
     }
   })
