@@ -66,7 +66,7 @@ Buka `http://localhost:3000`.
 ```
 npx impeccable install
 ```
-Reload sesi Claude Code, lalu jalankan `/impeccable init` di dalam Claude Code. Isi jawabannya mengikuti `DESIGN-BRIEF.md`, jangan menjawab dari nol.
+Muat ulang sesi editor, lalu jalankan `/impeccable init`. Isi jawabannya mengikuti `DESIGN-BRIEF.md`, jangan menjawab dari nol.
 
 ## 8. Setup Graphify, opsional
 
@@ -74,7 +74,7 @@ Reload sesi Claude Code, lalu jalankan `/impeccable init` di dalam Claude Code. 
 uv tool install graphifyy
 graphify install
 ```
-Ini membantu Claude Code menavigasi codebase seiring project bertambah besar, tidak wajib untuk MVP.
+Ini membantu menavigasi codebase seiring project bertambah besar, tidak wajib untuk MVP.
 
 ## 9. Deploy ke Vercel
 

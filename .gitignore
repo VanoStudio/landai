@@ -12,8 +12,10 @@ dist
 public/maplibre-gl-worker.mjs
 public/maplibre-gl-shared.mjs
 
-# Konfigurasi hook khusus mesin, konvensinya tidak dibagikan.
-.claude/settings.local.json
+# Berkas perkakas pengembangan lokal. Tetap ada di disk, tidak ikut ke repo:
+# isinya konvensi mesin masing-masing, bukan bagian dari produk.
+.claude/
+CLAUDE.md
 
 # Hasil dokumentasi berukuran besar. Sumbernya tetap ikut: docs/laporan.html
 # beserta skrip pembangunnya, jadi tangkapan dan PDF bisa dibuat ulang kapan saja.
