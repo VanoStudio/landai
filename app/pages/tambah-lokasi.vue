@@ -118,6 +118,11 @@ async function kirim() {
     pesanError.value = 'Sesi tidak terbaca. Coba muat ulang halaman lalu masuk lagi.'
     return
   }
+
+  // Isi kasar menahan pengiriman satu kali supaya peringatannya terbaca. Sesudah
+  // penulisnya menekan "Tetap kirim", isi yang sama persis tidak ditanya lagi.
+  if (!periksaKataKasar(true)) return
+
   pesanError.value = ''
   mengirim.value = true
 
@@ -300,6 +305,115 @@ const kemungkinanDuplikat = computed(() => {
   return kandidatDekat.value.find(k => namanyaMirip(k.nama, n)) ?? null
 })
 
+// ---------------------------------------------------------------------------
+// Peringatan isi kasar. Menegur, bukan memblokir.
+//
+// Isi formulir ini terbaca warga lain yang membuka peta, termasuk orang yang
+// memakainya untuk memutuskan apakah sebuah tempat bisa mereka datangi. Karena itu
+// nama tempat dan catatan lapangan ditegur kalau mengandung kata kasar.
+//
+// Tetapi keputusannya tetap di tangan penulisnya. Penyaring kata mana pun akan
+// salah menuduh cepat atau lambat, dan nama tempat sungguhan di Indonesia terlalu
+// beragam untuk dipercayakan pada sebuah daftar. Jadi peringatannya menahan
+// pengiriman SEKALI, lalu mempersilakan.
+//
+// Ditahan sekali, bukan nol kali, supaya peringatannya benar-benar terbaca. Dan
+// bukan lebih dari sekali, supaya orang yang memang menulis "Rumah Makan Babi
+// Panggang" tidak dipaksa berdebat dengan mesin.
+// ---------------------------------------------------------------------------
+type KolomTeks = 'nama' | 'catatan'
+
+const kataTerpicu = ref<string[]>([])
+const kolomTerpicu = ref<KolomTeks[]>([])
+const menungguKirim = ref(false)
+
+// Isi persis yang sudah pernah disetujui penggunanya. Begitu ia mengubah salah satu
+// kolom, tandanya tidak lagi cocok dan peringatannya berhak muncul lagi.
+const isiDisetujui = ref<string | null>(null)
+// Ditulis sebagai JSON, bukan gabungan berpemisah. Pemisah apa pun bisa muncul
+// di dalam isi kolomnya sendiri, dan dua isi berbeda akan menghasilkan tanda yang
+// sama persis, sehingga persetujuan untuk isi lama ikut berlaku untuk isi baru.
+const tandaIsi = computed(() => JSON.stringify([nama.value.trim(), catatan.value.trim()]))
+
+// Bukan pemilik hanya menyunting kondisi fasilitas dan catatannya; nama tempat tidak
+// pernah ikut terkirim, jadi tidak ada gunanya menegur soal nama.
+const kolomDiperiksa = computed<KolomTeks[]>(() =>
+  modeUbah.value && !pemilikLokasi.value ? ['catatan'] : ['nama', 'catatan'],
+)
+
+// Kedua kolom diperiksa sampai habis, bukan berhenti di temuan pertama. Kalau nama
+// dan catatan sama-sama bermasalah, menyebut salah satunya saja membuat orang
+// memperbaiki satu lalu tertahan lagi oleh yang satunya tanpa tahu sebabnya.
+function periksaKataKasar(dariKirim: boolean): boolean {
+  const kata = new Set<string>()
+  const kolom: KolomTeks[] = []
+
+  for (const k of kolomDiperiksa.value) {
+    const hasil = detectToxicWords(k === 'nama' ? nama.value : catatan.value)
+    if (!hasil.isToxic) continue
+    hasil.matchedWords.forEach(w => kata.add(w))
+    kolom.push(k)
+  }
+
+  if (kolom.length === 0) {
+    kataTerpicu.value = []
+    kolomTerpicu.value = []
+    return true
+  }
+
+  // Sudah pernah disetujui untuk isi yang persis sama: jangan tanya dua kali.
+  if (isiDisetujui.value === tandaIsi.value) return true
+
+  kataTerpicu.value = [...kata]
+  kolomTerpicu.value = kolom
+  menungguKirim.value = dariKirim
+  return false
+}
+
+// Diperiksa saat fokus meninggalkan kolomnya, bukan pada setiap ketikan. Menegur
+// orang di tengah mengetik hanya mengganggu, karena kata belum tentu selesai.
+// Dipasang di wadah lewat focusout, satu-satunya peristiwa fokus yang menggelembung,
+// supaya komponen langkahnya tidak perlu diubah sama sekali.
+function saatKeluarKolom(e: FocusEvent) {
+  const id = (e.target as HTMLElement | null)?.id
+  if (id === 'nama-tempat' || id === 'catatan') periksaKataKasar(false)
+}
+
+// Diantar ke kolom bermasalah yang pertama. Kalau keduanya bermasalah, yang kedua
+// akan menahan pengiriman berikutnya, dan bannernya menyebut kedua kolom sejak awal
+// jadi tidak ada kejutan.
+function keKolomTerpicu() {
+  const pertama = kolomTerpicu.value[0] ?? 'catatan'
+  const i = langkahTersedia.value.indexOf(pertama === 'nama' ? 1 : 3)
+  if (i >= 0) posisi.value = i
+
+  const idKolom = pertama === 'nama' ? 'nama-tempat' : 'catatan'
+  kataTerpicu.value = []
+  menungguKirim.value = false
+
+  nextTick(() => {
+    const el = document.getElementById(idKolom)
+    el?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    el?.focus()
+  })
+}
+
+function tetapKirim() {
+  isiDisetujui.value = tandaIsi.value
+  kataTerpicu.value = []
+  kolomTerpicu.value = []
+  if (menungguKirim.value) {
+    menungguKirim.value = false
+    kirim()
+  }
+}
+
+// Isi berubah setelah disetujui: peringatan lama tidak lagi berlaku, dan
+// persetujuannya pun tidak. Keduanya dilepas supaya isi baru diperiksa dari awal.
+watch(tandaIsi, () => {
+  if (kataTerpicu.value.length) kataTerpicu.value = []
+})
+
 useHead(() => ({ title: modeUbah.value ? 'Edit Lokasi' : 'Tambah Lokasi' }))
 </script>
 
@@ -347,7 +461,10 @@ useHead(() => ({ title: modeUbah.value ? 'Edit Lokasi' : 'Tambah Lokasi' }))
       </h1>
     </header>
 
-    <main class="flex-1 px-4 py-5">
+    <!-- focusout, bukan blur, karena hanya focusout yang menggelembung ke wadah.
+         Dengan begitu kolom nama dan catatan bisa diperiksa saat ditinggalkan tanpa
+         mengubah komponen langkahnya sama sekali. -->
+    <main class="flex-1 px-4 py-5" @focusout="saatKeluarKolom">
       <LangkahTitik v-if="langkah === 0" :lat="titik.lat" :lng="titik.lng" @geser="titik = $event" />
       <template v-else-if="langkah === 1">
         <LangkahTempat v-model:nama="nama" v-model:kategori="kategori" />
@@ -385,6 +502,14 @@ useHead(() => ({ title: modeUbah.value ? 'Edit Lokasi' : 'Tambah Lokasi' }))
       </template>
       <LangkahChecklist v-else-if="langkah === 2" v-model="checklist" />
       <LangkahFoto v-else v-model:foto="foto" v-model:catatan="catatan" />
+
+      <PeringatanKata
+        v-if="kataTerpicu.length"
+        :matched-words="kataTerpicu"
+        :kolom="kolomTerpicu"
+        @edit="keKolomTerpicu"
+        @lanjut="tetapKirim"
+      />
 
       <p v-if="pesanError" role="alert" class="mt-4 rounded-lg border border-skor-kurang px-3 py-2 text-sm text-skor-kurang">
         {{ pesanError }}

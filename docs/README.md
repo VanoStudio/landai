@@ -53,6 +53,17 @@ Beberapa contoh yang mencakup area terpenting:
 - `qa/uji-batas-foto-ketat.mjs` — empat pemilihan berkas serentak, memastikan batas
   tiga foto ditegakkan di logika, bukan sekadar disembunyikan.
 
+Dua skrip lain tidak membuka peramban sama sekali karena yang diujinya logika murni:
+
+- `qa/uji-saring-kata.mjs` — matriks penyaring isi kasar, 44 pemeriksaan. Separuhnya
+  justru menguji hal sebaliknya, yaitu nama tempat sah seperti "Anjungan Tunai
+  Mandiri" dan "Klinik Hewan Anjing dan Kucing" yang TIDAK boleh dituduh. Berkas yang
+  diujinya TypeScript, jadi dikemas dulu dengan esbuild yang memang sudah ikut sebagai
+  dependensi Vite. Tidak ada dependensi baru.
+- `qa/uji-peringatan-kata.mjs` — alur peringatannya di peramban sungguhan: menahan
+  pengiriman satu kali, melanjutkan setelah disetujui, dan muncul lagi kalau isinya
+  diubah.
+
 Satu skrip berbeda dari yang lain: `qa/uji-schema-gabungan.mjs` tidak membuka peramban
 dan tidak menyentuh Supabase sama sekali. Ia menjalankan `schema-gabungan.sql` di atas
 Postgres sungguhan lewat PGlite, Postgres yang dikompilasi ke WebAssembly, jadi tidak

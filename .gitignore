@@ -31,3 +31,7 @@ docs/tangkapan/
 # Tangkapan layar keluaran skrip pengujian di docs/qa/. Dibuat ulang tiap kali
 # skripnya dijalankan, jadi tidak ada gunanya menyimpannya di riwayat git.
 gambar/
+
+# Berkas kerja yang ditinggalkan skrip pengujian di akar repo.
+foto-uji.jpg
+hasil-uji.json
