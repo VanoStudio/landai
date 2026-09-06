@@ -115,13 +115,15 @@ useHead({ title: 'Tentang' })
 
       <h2 class="mt-8 text-base font-semibold">Tim</h2>
       <p class="mt-2 text-gray-700">
-        Vano mengerjakan pengembangan, Husein melakukan survei lapangan, Dakara meneliti kriteria
-        aksesibilitas dan dampaknya.
+        Stevano Sunuprakoso Sosroraharjo mengerjakan pengembangan, Muhammad Husein Bal Afif
+        melakukan survei lapangan, Daiva Dakara Dhana meneliti kriteria aksesibilitas dan
+        dampaknya.
       </p>
       <p class="mt-3 text-gray-700">
-        Survei pertama mengambil koridor Blok M: Stasiun MRT Blok M, Blok M Plaza, dan Kantor
-        Kecamatan Kebayoran Baru. Ketiganya sejarak jalan kaki, dan sengaja mencampur tempat yang
-        biasanya sudah ramah akses dengan yang sering luput dari perhatian.
+        Survei pertama mengambil koridor Pejaten sampai Warung Jati di Jakarta Selatan: satu
+        rantai halte yang dipakai orang setiap hari, ditambah satu pusat perbelanjaan di
+        ujungnya. Campuran itu disengaja, supaya terlihat bedanya antara tempat yang sudah
+        ramah akses dan yang belum.
       </p>
 
       <p class="mt-8 border-t border-gray-200 pt-4 text-sm text-gray-600">

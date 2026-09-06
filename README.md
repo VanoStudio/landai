@@ -33,13 +33,13 @@
 
 ## 👥 Tim Pengembang
 
-**Tim Risol Laut**
+**Tim Risol Laut** — SMKS Cyber Media
 
 | Nama | Peran | Kontribusi | GitHub |
 |------|-------|------------|--------|
-| **Vano** | Project Lead & Full Stack Developer | Merancang dan membangun seluruh aplikasi, basis data, dan alur pengujian | [@VanoStudio](https://github.com/VanoStudio) |
-| **Husein** | Riset Lapangan | Turun langsung mensurvei lokasi, mengambil foto dan mengisi data aksesibilitas sungguhan | — |
-| **Dakara** | Peneliti Kriteria Aksesibilitas | Menyusun kriteria penilaian dan bahan rujukan regulasi tentang aksesibilitas | — |
+| **Stevano Sunuprakoso Sosroraharjo** | Ketua Tim, Full Stack Developer | Merancang dan membangun seluruh aplikasi, basis data, dan alur pengujian | [@VanoStudio](https://github.com/VanoStudio) |
+| **Muhammad Husein Bal Afif** | Anggota, Riset Lapangan | Turun langsung mensurvei lokasi, mengambil foto dan mengisi data aksesibilitas sungguhan | — |
+| **Daiva Dakara Dhana** | Anggota, Peneliti Kriteria Aksesibilitas | Menyusun kriteria penilaian dan bahan rujukan regulasi tentang aksesibilitas | — |
 
 ---
 

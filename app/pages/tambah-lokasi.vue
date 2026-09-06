@@ -18,8 +18,8 @@ const idUbah = computed(() => {
 })
 const modeUbah = computed(() => idUbah.value !== null)
 
-// Titik awal: koridor Blok M.
-const titik = ref({ lat: -6.2440, lng: 106.7983 })
+// Titik awal sebelum kontributor memakai GPS atau menggeser pin.
+const titik = ref({ lat: -6.2705, lng: 106.8294 })
 const nama = ref('')
 // Sengaja kosong: nilai awal yang sudah terisi ikut terkirim apa adanya oleh orang yang
 // hanya menekan Lanjut.

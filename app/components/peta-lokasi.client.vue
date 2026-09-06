@@ -31,8 +31,9 @@ let peta: maplibregl.Map | null = null
 let penanda = new Map<string, maplibregl.Marker>()
 let penandaSaya: maplibregl.Marker | null = null
 
-// Koridor Blok M, titik mulai survei.
-const PUSAT: [number, number] = [106.7983, -6.2440]
+// Titik tengah koridor yang disurvei, Pejaten sampai Warung Jati. Peta dibuka di sini
+// supaya lokasi yang sudah terisi langsung terlihat, termasuk di layar ponsel.
+const PUSAT: [number, number] = [106.8294, -6.2705]
 
 // Cadangan kalau kunci MapTiler tidak ada atau gagal, supaya peta tetap muncul.
 const GAYA_OSM: maplibregl.StyleSpecification = {

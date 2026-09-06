@@ -9,7 +9,7 @@ const kategori = defineModel<string>('kategori', { required: true })
       <label for="nama-tempat" class="block text-sm font-medium">Nama tempat</label>
       <input
         id="nama-tempat" v-model="nama" type="text" required maxlength="120"
-        placeholder="Stasiun MRT Blok M"
+        placeholder="Halte Pejaten"
         class="mt-1.5 w-full rounded border border-gray-400 px-3 py-2.5 text-base"
       >
     </div>
