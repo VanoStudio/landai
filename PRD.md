@@ -139,7 +139,7 @@ Pemetaan filter ke checklist, disederhanakan untuk MVP, bisa dipertajam nanti:
 - Status lokasi default belum terverifikasi, tetap tampil di peta dengan penanda berongga, bukan terisi, dan naik menjadi terverifikasi setelah tiga warga berbeda mengonfirmasi.
 - Ini bukan sistem anti-fraud berat, cukup untuk menjawab pertanyaan juri soal validitas data. Data dasar diisi langsung dari lapangan, bukan disalin dari sumber lain; jumlah yang tercapai sampai pengumpulan ada di bagian 9.
 
-## 9. Lokasi awal: koridor Pejaten dan Warung Jati, Jakarta Selatan
+## 9. Lokasi awal: koridor Pejaten sampai Warung Buncit, Jakarta Selatan
 
 Survei pertama mengambil satu koridor sepanjang 2,6 km membujur utara-selatan di Jakarta
 Selatan. Lima titik yang terisi, seluruhnya hasil pengukuran dan pemotretan di tempat:

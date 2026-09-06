@@ -120,7 +120,7 @@ useHead({ title: 'Tentang' })
         dampaknya.
       </p>
       <p class="mt-3 text-gray-700">
-        Survei pertama mengambil koridor Pejaten sampai Warung Jati di Jakarta Selatan: satu
+        Survei pertama mengambil koridor Pejaten sampai Warung Buncit di Jakarta Selatan: satu
         rantai halte yang dipakai orang setiap hari, ditambah satu pusat perbelanjaan di
         ujungnya. Campuran itu disengaja, supaya terlihat bedanya antara tempat yang sudah
         ramah akses dan yang belum.
