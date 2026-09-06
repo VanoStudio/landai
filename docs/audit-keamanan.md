@@ -9,8 +9,11 @@ Perubahan pada repo maupun data selama audit: **nihil**
 > kunci API, tanpa alamat proyek, tanpa kredensial. Untuk satu temuan yang belum
 > selesai ditangani, yaitu Temuan 1, lokasi persisnya juga tidak dicantumkan di sini,
 > karena menuliskannya sama saja dengan memasang penunjuk arah. Detail lengkapnya
-> sudah disampaikan langsung ke pemelihara repo. Bagian ini akan dilengkapi setelah
-> kredensialnya diganti.
+> sudah disampaikan langsung ke pemelihara repo.
+
+> **Pemutakhiran 6 September 2026.** Temuan 1 dan Temuan 2 sudah ditutup. Bukti
+> pengujiannya ada di bagian **Tindak lanjut** di akhir berkas ini. Isi bagian 2 dan 4
+> di bawah dibiarkan apa adanya sebagai catatan keadaan pada tanggal auditnya.
 
 ---
 
@@ -19,14 +22,15 @@ Perubahan pada repo maupun data selama audit: **nihil**
 | # | Yang diperiksa | Status |
 | --- | --- | --- |
 | 1 | Row Level Security pada kelima tabel | **Aman** |
-| 2 | Kunci rahasia di kode dan di riwayat commit | **Temuan 1, mendesak** |
+| 2 | Kunci rahasia di kode dan di riwayat commit | Temuan 1, **ditutup 6 September** |
 | 3 | Kebijakan hapus pada bucket Storage | **Aman** |
-| 4 | Pembatasan domain kunci MapTiler | **Temuan 2** |
+| 4 | Pembatasan domain kunci MapTiler | Temuan 2, **ditutup 6 September** |
 | 5 | Perlindungan terhadap suntikan skrip | **Aman** |
 | 6 | Penjaga rute dan batas kepemilikan | **Aman** |
 
 **30 dari 30 pemeriksaan penegakan lolos.** Dua temuan yang tersisa keduanya hanya
-bisa ditutup lewat dasbor pihak ketiga, bukan lewat perubahan kode.
+bisa ditutup lewat dasbor pihak ketiga, bukan lewat perubahan kode. Keduanya sudah
+ditutup pada 6 September 2026, lihat bagian Tindak lanjut.
 
 ---
 
@@ -102,7 +106,8 @@ mengembalikan 19 baris kebijakan.
 
 ## 2. Kunci rahasia di kode dan di riwayat commit
 
-**Status: satu temuan mendesak, sisanya bersih.**
+**Status pada tanggal audit: satu temuan mendesak, sisanya bersih. Temuan itu ditutup
+6 September 2026.**
 
 ### Cara pemeriksaannya
 
@@ -214,7 +219,7 @@ pembersihan sebelum pengumpulan.
 
 ## 4. Pembatasan domain kunci MapTiler
 
-**Status: temuan. Kunci tidak dibatasi.**
+**Status pada tanggal audit: temuan, kunci tidak dibatasi. Ditutup 6 September 2026.**
 
 Kunci MapTiler ikut terkirim ke peramban setiap kali halaman peta dibuka. Itu tidak
 terhindarkan untuk basemap yang dirender di sisi klien, dan berlaku untuk semua produk
@@ -337,14 +342,69 @@ menutup ketiga kolom itu adalah pemberian hak per kolom, bukan kebijakan RLS.
 
 | # | Temuan | Penanganan oleh | Kapan |
 | --- | --- | --- | --- |
-| 1 | Kredensial akun uji pernah ter-commit dan masih berlaku | Pemelihara, dasbor Supabase | Segera |
-| 2 | Kunci MapTiler tanpa pembatasan domain | Pemelihara, dasbor MapTiler | Sebelum penjurian |
-| 3 | Empat folder yatim di bucket Storage | Pemelihara, dasbor Storage | Rendah, sudah terdaftar |
-| 4 | Alamat proyek ter-hardcode di satu skrip uji | Kerapian, bukan kebocoran | Tidak mendesak |
+| 1 | Kredensial akun uji pernah ter-commit dan masih berlaku | Pemelihara, dasbor Supabase | **Selesai 6 September 2026** |
+| 2 | Kunci MapTiler tanpa pembatasan domain | Pemelihara, dasbor MapTiler | **Selesai 6 September 2026** |
+| 3 | Folder yatim di bucket Storage | Pemelihara | **Selesai 6 September 2026** |
+| 4 | Alamat proyek ter-hardcode di satu skrip uji | Kerapian, bukan kebocoran | **Selesai 6 September 2026** |
 
-Temuan 1 dan 2 keduanya hanya bisa ditutup lewat dasbor pihak ketiga. Tidak ada
-perubahan kode yang bisa menyelesaikannya, dan tidak ada perubahan kode yang dilakukan
-dalam audit ini.
+Keempatnya sudah ditutup. Rinciannya di bagian berikut.
+
+---
+
+## Tindak lanjut, 6 September 2026
+
+Bagian ini ditulis sehari setelah auditnya, memuat penanganan keempat temuan beserta
+pengujian ulang yang membuktikan penanganannya bekerja.
+
+### Temuan 1, kredensial akun uji: ditutup
+
+Sandi akun uji diganti dengan sandi acak 16 karakter. Penggantiannya tidak lewat surel
+pemulihan, karena Supabase menolak alamat berdomain `example.com` dengan pesan
+`Email address ... is invalid`. Yang dipakai adalah `PUT /auth/v1/user` memakai sesi
+akun itu sendiri, jadi tanpa `service_role key` dan tanpa surel sama sekali.
+
+| Pengujian ulang | Hasil |
+| --- | --- |
+| Permintaan ganti sandi | HTTP 200 |
+| Masuk memakai sandi baru | Berhasil |
+| Masuk memakai sandi lama | Ditolak |
+
+Nilai yang bocor di riwayat git kini tidak membuka apa pun. Riwayat git sengaja tidak
+ditulis ulang, alasannya tetap seperti yang dijelaskan di bagian 2.
+
+### Temuan 2, kunci MapTiler: ditutup
+
+Kunci dibatasi lewat kolom **Allowed HTTP Origins** di dasbor MapTiler. Kolom itu
+menerima nama domain saja; URL lengkap beserta skema dan porta ditolak dengan pesan
+`Invalid origin restriction`. Yang dipasang adalah domain produksi dan `localhost`.
+
+Diuji ulang dengan permintaan gaya peta memakai header `Origin` yang berbeda-beda:
+
+| Asal permintaan | Sebelum | Sesudah |
+| --- | --- | --- |
+| Domain produksi yang sah | HTTP 200 | HTTP 200 |
+| `localhost` pengembangan | HTTP 200 | HTTP 200 |
+| Domain penyerang yang dikarang | HTTP 200 | **HTTP 403** |
+| Tanpa `Origin` sama sekali | HTTP 200 | **HTTP 403** |
+
+Halaman peta produksi diperiksa ulang sesudahnya memakai peramban sungguhan: 16
+permintaan ke MapTiler seluruhnya HTTP 200, kanvas peta termuat, kelima lokasi tampil,
+nol galat konsol. Pembatasan tidak merusak tampilan yang sah.
+
+### Temuan 3, folder yatim di Storage: ditutup
+
+Jumlahnya bertambah menjadi sembilan folder sejak audit, sisa dari beberapa kali
+menjalankan pengujian menyeluruh. Kesembilannya berisi dua belas berkas, semuanya
+sudah dihapus dan seluruh permintaan hapus dijawab HTTP 200. Bucket kini berisi lima
+folder untuk lima lokasi yang benar-benar ada, tanpa satu pun folder yatim.
+
+Penyebabnya juga ditutup, bukan hanya akibatnya: skrip `docs/qa/uji-menyeluruh.mjs`
+kini menghapus kembali lokasi beserta fotonya di akhir pengujian, sehingga tidak lagi
+meninggalkan data uji di peta yang dilihat orang.
+
+### Temuan 4, alamat proyek ter-hardcode: ditutup
+
+Skrip tersebut kini membaca alamat proyek dari `.env` seperti dua puluh skrip lainnya.
 
 ---
 
@@ -365,6 +425,9 @@ Supaya laporan ini tidak dibaca lebih jauh dari yang sebenarnya dibuktikan:
   tercakup.
 
 ## Keadaan sistem setelah audit
+
+Keadaan di bawah ini berlaku untuk audit tanggal 5 September. Perubahan yang dilakukan
+sebagai tindak lanjut tanggal 6 September tercatat di bagian Tindak lanjut di atas.
 
 - Repo: tidak ada satu berkas pun yang diubah.
 - Basis data: jumlah lokasi kembali seperti semula, tabel foto tetap kosong, tidak ada

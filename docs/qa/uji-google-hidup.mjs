@@ -1,4 +1,13 @@
 import { chromium } from 'playwright'
+import { existsSync, readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
+
+const BERKAS_ENV = ['.env', '../.env'].map(x => resolve(x)).find(existsSync)
+const env = BERKAS_ENV
+  ? Object.fromEntries(readFileSync(BERKAS_ENV, 'utf8')
+      .split(String.fromCharCode(10)).map(x => x.trim()).filter(x => x.includes('='))
+      .map((x) => { const i = x.indexOf('='); return [x.slice(0, i).trim(), x.slice(i + 1).trim()] }))
+  : {}
 
 const BASIS = 'http://localhost:3000'
 const langkah = []
@@ -23,7 +32,7 @@ if (keGoogle) {
   const u = new URL(alamat)
   const balik = u.searchParams.get('redirect_uri')
   catat('redirect_uri menunjuk ke callback Supabase',
-    balik === 'https://eagvqtumjcwzaefbriiq.supabase.co/auth/v1/callback', balik ?? '-')
+    balik === `${env.SUPABASE_URL}/auth/v1/callback`, balik ?? '-')
   catat('Scope meminta email dan profil', (u.searchParams.get('scope') ?? '').includes('email'),
     u.searchParams.get('scope') ?? '-')
   // Google memindahkan parameter aslinya ke dalam opparams setelah rantai
