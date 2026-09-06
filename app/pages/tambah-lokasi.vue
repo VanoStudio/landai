@@ -247,12 +247,23 @@ async function kirim() {
       await supabase.from('location_photos').insert({ location_id: idLokasi, photo_url: pub.publicUrl })
     }
 
-    if (modeUbah.value) {
-      tampilkan(pemilikLokasi.value
-        ? 'Perubahan tersimpan. Lokasi ini kembali berstatus belum terverifikasi.'
-        : 'Terima kasih. Pembaruan Anda tersimpan dan tercatat atas nama Anda, dan lokasi ini kembali berstatus belum terverifikasi.')
-    }
-    await navigateTo(`/lokasi/${idLokasi}`)
+    // Menambah lokasi dulu tidak memberi kabar apa pun, hanya mode ubah yang memberi.
+    // Halaman berganti begitu saja, dan orang yang baru mengisi empat langkah di
+    // lapangan tidak punya penanda bahwa pekerjaannya benar-benar tersimpan.
+    tampilkan(
+      !modeUbah.value
+        ? 'Lokasi tersimpan dan sudah muncul di peta. Terima kasih sudah menambahkannya.'
+        : pemilikLokasi.value
+          ? 'Perubahan tersimpan. Lokasi ini kembali berstatus belum terverifikasi.'
+          : 'Terima kasih. Pembaruan Anda tersimpan dan tercatat atas nama Anda, dan lokasi ini kembali berstatus belum terverifikasi.',
+    )
+
+    // replace, bukan push. Formulir yang sudah selesai tidak boleh tinggal di riwayat
+    // peramban. Menekan tombol kembali di ponsel sesudah menyimpan justru mengembalikan
+    // orang ke formulir, dan karena halaman ini berkunci pada alamat penuhnya, yang
+    // muncul adalah formulir KOSONG, seolah simpanannya hilang. Dengan replace, kembali
+    // berarti kembali ke peta, yang memang yang diharapkan orang.
+    await navigateTo(`/lokasi/${idLokasi}`, { replace: true })
   }
   catch (e: any) {
     pesanError.value = e?.message ?? 'Gagal menyimpan. Coba lagi.'

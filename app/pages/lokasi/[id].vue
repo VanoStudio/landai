@@ -70,6 +70,17 @@ const checklist = computed(() => {
 })
 
 const foto = computed(() => lokasi.value?.location_photos ?? [])
+
+// Pratinjau layar penuh. Menyimpan nomor urutnya, bukan sekadar buka atau tutup,
+// supaya pratinjaunya terbuka tepat pada foto yang diketuk.
+const pratinjauDi = ref<number | null>(null)
+const bukaPratinjau = (i: number) => { pratinjauDi.value = i }
+
+// Daftar foto berubah setelah ada yang menambah atau menghapus. Pratinjau yang
+// sedang terbuka bisa menunjuk ke nomor yang sudah tidak ada, jadi ditutup saja.
+watch(foto, (baru) => {
+  if (pratinjauDi.value !== null && pratinjauDi.value >= baru.length) pratinjauDi.value = null
+})
 const konfirmasi = computed(() => lokasi.value?.confirmations ?? [])
 const jumlahAkurat = computed(() => konfirmasi.value.filter((k: any) => k.is_accurate).length)
 const jumlahBerubah = computed(() => konfirmasi.value.length - jumlahAkurat.value)
@@ -299,12 +310,32 @@ useHead(() => ({ title: lokasi.value ? lokasi.value.nama : 'Lokasi' }))
         </a>
       </div>
 
-      <ul v-if="foto.length" class="mt-5 grid gap-2" :class="foto.length > 1 ? 'grid-cols-2' : 'grid-cols-1'">
-        <li v-for="f in foto" :key="f.id" class="relative">
-          <img
-            :src="f.photo_url" :alt="`Kondisi ${lokasi.nama}`" loading="lazy"
-            class="w-full rounded object-cover" :class="foto.length > 1 ? 'aspect-square' : 'aspect-[4/3]'"
+      <div class="mt-6 flex items-center justify-between gap-3">
+        <h2 class="text-base font-semibold">Foto kondisi</h2>
+        <TambahFoto
+          :id-lokasi="lokasi.id" :jumlah-sekarang="foto.length"
+          @tersimpan="refresh()"
+        />
+      </div>
+
+      <ul v-if="foto.length" class="mt-3 grid gap-2" :class="foto.length > 1 ? 'grid-cols-2' : 'grid-cols-1'">
+        <li v-for="(f, i) in foto" :key="f.id" class="relative">
+          <!-- Fotonya dipangkas jadi kotak supaya kisinya rapi, dan yang terpangkas
+               justru sering bagian yang paling menentukan penilaian. Karena itu tiap
+               foto bisa dibuka utuh, dan pembungkusnya tombol sungguhan supaya bisa
+               dicapai lewat papan ketik, bukan gambar yang diberi penanganan klik. -->
+          <button
+            type="button"
+            :aria-label="`Lihat foto ${i + 1} dari ${foto.length} ukuran penuh`"
+            class="block w-full overflow-hidden rounded"
+            @click="bukaPratinjau(i)"
           >
+            <img
+              :src="f.photo_url" :alt="`Kondisi ${lokasi.nama}`" loading="lazy"
+              class="w-full object-cover transition-transform duration-200 hover:scale-[1.03]"
+              :class="foto.length > 1 ? 'aspect-square' : 'aspect-[4/3]'"
+            >
+          </button>
 
           <!-- Tombol hapus hanya untuk pengunggahnya sendiri atau pemilik lokasi.
                Ketukan pertama meminta kepastian, ketukan kedua menghapus. -->
@@ -329,7 +360,13 @@ useHead(() => ({ title: lokasi.value ? lokasi.value.nama : 'Lokasi' }))
           </button>
         </li>
       </ul>
-      <FotoKosong v-else class="mt-5" />
+      <FotoKosong v-else class="mt-3" />
+
+      <PratinjauFoto
+        v-if="pratinjauDi !== null"
+        :foto="foto" :mulai="pratinjauDi" :nama-lokasi="lokasi.nama"
+        @tutup="pratinjauDi = null"
+      />
 
       <h2 class="mt-8 text-base font-semibold">Rincian fasilitas</h2>
       <ul v-if="checklist" class="mt-2 divide-y divide-gray-200">
