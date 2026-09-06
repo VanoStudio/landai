@@ -1,7 +1,6 @@
 <script setup lang="ts">
-// Simbol aksesibilitas standar internasional. Sengaja tidak didesain ulang,
-// familiaritas lebih penting daripada keunikan (DESIGN.md).
-// Selalu netral, mewarisi currentColor. Warna hanya untuk skor.
+// Simbol aksesibilitas standar internasional. Sengaja tidak didesain ulang, familiaritas
+// lebih penting daripada keunikan.
 defineProps<{
   jenis: 'kursi_roda' | 'tunanetra' | 'lansia_stroller'
   label?: string
@@ -31,10 +30,7 @@ defineProps<{
       <path d="M13 8.5 18 21" />
     </template>
 
-    <!-- Kursi dorong. Digambar ulang supaya sekeluarga dengan dua ikon di atas:
-         kepala sebagai titik pejal berjari-jari 1.8 yang sama, dan roda sebagai
-         lingkaran bergaris seperti roda kursi roda, bukan titik pejal berjari-jari
-         1.3 yang sebelumnya dipakai dan membuat ketebalannya terbaca berbeda. -->
+    <!-- Kursi dorong. -->
     <template v-else>
       <circle cx="8.7" cy="7.9" r="1.8" fill="currentColor" stroke="none" />
       <path d="M4 10.5h9.4v2.4A4.7 4.7 0 0 1 8.7 17.6 4.7 4.7 0 0 1 4 12.9Z" />

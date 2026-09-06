@@ -122,7 +122,7 @@ landai adalah peta interaktif berbasis kontribusi warga. Siapa saja bisa menanda
 Framework    : Nuxt 4 (Vue 3, Composition API)
 Peta         : MapLibre GL JS dengan basemap MapTiler
 Gaya         : Tailwind CSS 4
-Sistem desain: Impeccable, menghasilkan PRODUCT.md dan DESIGN.md
+Sistem desain: Token warna, tipografi, dan komponen sendiri, tanpa kerangka UI siap pakai
 ```
 
 #### Layanan data dan akun
@@ -149,7 +149,6 @@ Pengujian    : Skrip end to end kustom berbasis Playwright, dijalankan lewat bro
 | **Nuxt 4** | Perenderan sisi server mempercepat tampilan pertama peta, dan menyediakan rute server bawaan tanpa perlu backend terpisah |
 | **Supabase** | Autentikasi, basis data, dan penyimpanan foto tersedia dalam satu layanan, dengan Row Level Security dan trigger basis data memindahkan aturan kualitas data ke lapisan yang tidak bisa dilewati dari sisi peramban |
 | **MapLibre GL JS** | Pustaka peta sumber terbuka tanpa keterikatan vendor, mendukung kontrol penuh atas gaya visual peta |
-| **Impeccable** | Membantu memastikan sistem desain terarah dan tidak generik, sesuai filosofi visual yang dipilih untuk proyek ini |
 
 ### Dependencies Utama
 
@@ -220,8 +219,7 @@ landai/
 │   └── screenshots/       # Tangkapan layar untuk dokumentasi
 ├── schema.sql             # Skema basis data awal
 ├── schema-patch-*.sql      # Tambalan basis data berurutan
-├── PRODUCT.md              # Konteks produk untuk sistem desain
-└── DESIGN.md               # Token desain dan filosofi visual
+└── PRD.md                  # Requirement produk, data model, dan alur pengguna
 ```
 
 ---

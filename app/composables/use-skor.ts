@@ -1,5 +1,5 @@
-// Skor 0-100 selalu kelipatan 12,5 karena checklist 8 item.
-// Ambang tiga tingkat: baik 5+/8, sedang 3-4/8, kurang 0-2/8.
+// Skor 0-100 selalu kelipatan 12,5 karena checklist 8 item. Ambang tiga tingkat: baik
+// 5+/8, sedang 3-4/8, kurang 0-2/8.
 export type TingkatSkor = 'baik' | 'sedang' | 'kurang'
 
 export function tingkatSkor(skor: number): TingkatSkor {

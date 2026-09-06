@@ -1,7 +1,6 @@
 <script setup lang="ts">
 // Kode warna dan bentuk penanda tidak menjelaskan dirinya sendiri sampai seseorang
-// mengetuk penanda. Legenda ini menutup jarak itu sekali, lalu bisa ditutup dan
-// tidak muncul lagi di perangkat yang sama.
+// mengetuk penanda.
 const KUNCI = 'landai:legenda-ditutup'
 
 const terlihat = ref(false)
@@ -38,9 +37,7 @@ const TINGKAT = [
     v-if="terlihat"
     class="flex items-center gap-3 rounded-lg border border-gray-200 bg-white px-3 py-2 shadow-lg"
   >
-    <!-- Keempat keterangan duduk dalam satu baris di layar lebar. Yang membuatnya
-         dulu turun tidak sejajar adalah panjang teks keterangan terakhir, bukan
-         ruang yang kurang, jadi teksnya yang dipendekkan. -->
+    <!-- Keempat keterangan duduk dalam satu baris di layar lebar. -->
     <ul class="flex flex-wrap items-center gap-x-3 gap-y-1 sm:flex-nowrap">
       <li v-for="t in TINGKAT" :key="t.label" class="flex items-center gap-1.5">
         <span

@@ -1,11 +1,5 @@
 <script setup lang="ts">
-// Kunci merek: tanda dan tulisan selalu satu kesatuan. Dibungkus dalam satu komponen
-// supaya tidak ada halaman yang bisa menampilkan tandanya sendirian, dan supaya jarak
-// antara keduanya sama persis di mana pun.
-//
-// Tagline diperlakukan sebagai keterangan, bukan elemen sederajat: ukurannya lebih
-// kecil, warnanya lebih pudar, dan letaknya di bawah nama merek. Disembunyikan di
-// layar tersempit karena di sana ruang mendatar adalah barang langka.
+// Kunci merek: tanda dan tulisan selalu satu kesatuan.
 import { NuxtLink } from '#components'
 
 withDefaults(defineProps<{

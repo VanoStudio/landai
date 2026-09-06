@@ -2,13 +2,13 @@
 const props = defineProps<{ lokasi: LokasiPeta }>()
 defineEmits<{ tutup: [] }>()
 
-// Tautan foto bisa mati kalau berkasnya dihapus dari penyimpanan. Gambar rusak
-// lebih buruk daripada tidak ada gambar, jadi disembunyikan begitu gagal dimuat.
+// Tautan foto bisa mati kalau berkasnya dihapus dari penyimpanan. Gambar rusak lebih buruk
+// daripada tidak ada gambar, jadi disembunyikan begitu gagal dimuat.
 const fotoGagal = ref(false)
 watch(() => props.lokasi.id, () => { fotoGagal.value = false })
 
-// Serah terima ke Google Maps, bukan navigasi buatan sendiri. Tidak ada logika rute
-// yang ditulis di aplikasi ini: hanya tautan biasa berisi koordinat tujuan.
+// Serah terima ke Google Maps, bukan navigasi buatan sendiri. Tidak ada logika rute yang
+// ditulis di aplikasi ini: hanya tautan biasa berisi koordinat tujuan.
 const rute = computed(() =>
   `https://www.google.com/maps/dir/?api=1&destination=${props.lokasi.lat},${props.lokasi.lng}`,
 )
@@ -54,10 +54,8 @@ const fasilitas = computed(() => ([
         <p class="pb-1 text-sm font-medium text-gray-700">{{ labelSkor(props.lokasi.skor) }}</p>
       </div>
 
-      <!-- Foto kondisi. Ukurannya sengaja kecil supaya angka skor tetap elemen
-           terbesar di kartu ini. Saat foto belum ada, tempatnya diisi ikon kamera,
-           bukan dibiarkan hilang: tinggi kartu jadi tetap sama antar lokasi, dan
-           bidang kosong itu sekaligus mengabarkan bahwa foto memang bisa ditambah. -->
+      <!-- Foto kondisi. Ukurannya sengaja kecil supaya angka skor tetap elemen terbesar di kartu
+           ini. -->
       <img
         v-if="props.lokasi.foto_utama && !fotoGagal"
         :src="props.lokasi.foto_utama"
@@ -91,15 +89,14 @@ const fasilitas = computed(() => ([
         Lihat detail
       </NuxtLink>
 
-      <!-- Gaya sekunder, bukan utama: perhatian harus tetap jatuh pada informasi
-           aksesibilitasnya dulu, bukan pada cara ke sana. -->
+      <!-- Gaya sekunder, bukan utama: perhatian harus tetap jatuh pada informasi aksesibilitasnya
+           dulu, bukan pada cara ke sana. -->
       <a
         :href="rute" target="_blank" rel="noopener noreferrer"
         class="tombol tombol-sekunder"
       >
-        <!-- Teks yang tampak diperpendek supaya muat berdampingan dengan tombol
-             lihat detail pada kartu selebar 384px. Nama aksesibelnya tetap utuh
-             lewat teks khusus pembaca layar. -->
+        <!-- Teks yang tampak diperpendek supaya muat berdampingan dengan tombol lihat detail pada
+             kartu selebar 384px. Nama aksesibelnya tetap utuh lewat teks khusus pembaca layar. -->
         Buka rute
         <span class="sr-only">di Google Maps,</span>
         <svg
@@ -114,9 +111,8 @@ const fasilitas = computed(() => ([
       </a>
     </div>
 
-    <!-- Ajakan memperbarui, bukan tuduhan bahwa datanya salah. Yang melaporkan pun
-         belum tentu benar, dan yang mengisi data ini warga yang menyempatkan diri
-         datang ke sana. -->
+    <!-- Ajakan memperbarui, bukan tuduhan bahwa datanya salah. Yang melaporkan pun belum tentu
+         benar, dan yang mengisi data ini warga yang menyempatkan diri datang ke sana. -->
     <p
       v-if="perluDiperbarui(props.lokasi)"
       class="mt-2 flex items-start gap-1.5 text-xs text-gray-700"

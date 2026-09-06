@@ -235,8 +235,12 @@ await page.waitForTimeout(900)
 
 const dialog = page.locator('[role=dialog][aria-modal=true]')
 catat('Mengetuk foto membuka pratinjau layar penuh', await dialog.isVisible())
-catat('Pratinjau menampilkan foto utuh, tidak dipangkas',
-  await dialog.locator('img.object-contain').isVisible())
+const rasio = await dialog.locator('img').first().evaluate((el) => {
+  const r = el.getBoundingClientRect()
+  return Math.abs(r.width / r.height - el.naturalWidth / el.naturalHeight)
+})
+catat('Pratinjau menampilkan foto utuh, rasio aslinya dipertahankan',
+  rasio < 0.02, `selisih rasio ${rasio.toFixed(3)}`)
 catat('Pratinjau menunjukkan nomor foto keberapa',
   /1 dari 2/.test(await dialog.innerText()), (await dialog.innerText()).split('\n')[0])
 await page.screenshot({ path: join(KELUARAN, 'pratinjau-foto.png') })

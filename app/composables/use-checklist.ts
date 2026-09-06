@@ -12,8 +12,8 @@ export type KunciChecklist =
 
 export type IsiChecklist = Record<KunciChecklist, boolean>
 
-// Kalimat bantuan ditulis untuk orang yang berdiri di lokasi sambil memegang HP,
-// bukan untuk pembaca dokumen. Pendek, konkret, bisa dicek mata.
+// Kalimat bantuan ditulis untuk orang yang berdiri di lokasi sambil memegang HP, bukan
+// untuk pembaca dokumen. Pendek, konkret, bisa dicek mata.
 export const ITEM_CHECKLIST: { kunci: KunciChecklist, label: string, bantuan: string }[] = [
   { kunci: 'ramp_tersedia', label: 'Ramp tersedia', bantuan: 'Ada jalur landai ke pintu masuk, bukan cuma tangga.' },
   { kunci: 'lebar_pintu_cukup', label: 'Pintu cukup lebar', bantuan: 'Kursi roda bisa lewat tanpa dimiringkan, kira-kira 80 cm.' },
@@ -29,13 +29,13 @@ export function checklistKosong(): IsiChecklist {
   return Object.fromEntries(ITEM_CHECKLIST.map(i => [i.kunci, false])) as IsiChecklist
 }
 
-// Skor sebenarnya dihitung trigger di database. Ini hanya pratinjau supaya
-// kontributor melihat dampak jawabannya saat mengisi.
+// Skor sebenarnya dihitung trigger di database. Ini hanya pratinjau supaya kontributor
+// melihat dampak jawabannya saat mengisi.
 export function pratinjauSkor(isi: IsiChecklist): number {
   const total = ITEM_CHECKLIST.filter(i => isi[i.kunci]).length
   return Math.round((total / ITEM_CHECKLIST.length) * 100)
 }
 
-// Daftar jenis tempat pindah ke use-lokasi.ts, berdampingan dengan label dan
-// contohnya, supaya kunci dan tulisannya tidak pernah lagi hidup di dua berkas
-// terpisah yang bisa berbeda diam-diam.
+// Daftar jenis tempat pindah ke use-lokasi.ts, berdampingan dengan label dan contohnya,
+// supaya kunci dan tulisannya tidak pernah lagi hidup di dua berkas terpisah yang bisa
+// berbeda diam-diam.

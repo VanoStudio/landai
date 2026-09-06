@@ -12,10 +12,9 @@ async function tambahFoto(e: Event) {
   const berkas = (e.target as HTMLInputElement).files?.[0]
   if (!berkas) return
 
-  // Menyembunyikan tombolnya lewat v-if saja tidak cukup: selama pemrosesan foto
-  // ketiga belum selesai, daftar belum bertambah, elemen input masih ada di DOM,
-  // dan beberapa berkas beruntun bisa lolos sekaligus. Terbukti tembus ke empat
-  // foto saat diuji. Batasnya dijaga di sini, bukan di tampilan.
+  // Menyembunyikan tombolnya lewat v-if saja tidak cukup: selama pemrosesan foto ketiga
+  // belum selesai, daftar belum bertambah, elemen input masih ada di DOM, dan beberapa
+  // berkas beruntun bisa lolos sekaligus.
   if (foto.value.length >= MAKS_FOTO) {
     pesanError.value = `Maksimal ${MAKS_FOTO} foto.`
     if (input.value) input.value.value = ''
@@ -27,8 +26,8 @@ async function tambahFoto(e: Event) {
   try {
     const blob = await kecilkanFoto(berkas)
 
-    // Diperiksa ulang setelah menunggu: beberapa pemrosesan bisa berjalan
-    // bersamaan, dan yang datang belakangan harus dibuang, bukan ditumpuk.
+    // Diperiksa ulang setelah menunggu: beberapa pemrosesan bisa berjalan bersamaan, dan yang
+    // datang belakangan harus dibuang, bukan ditumpuk.
     if (foto.value.length >= MAKS_FOTO) {
       pesanError.value = `Maksimal ${MAKS_FOTO} foto.`
       return

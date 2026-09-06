@@ -11,13 +11,7 @@ const { ambilPosisi, memuat: memuatGps, pesanError: pesanErrorGps } = useGps()
 const { tampilkan } = useNotifikasi()
 const akurasi = ref<number | null>(null)
 
-// Dari mana titik yang sekarang berasal. Penting karena ketiganya punya tingkat
-// kepercayaan yang jauh berbeda, dan pencarian nama adalah yang paling rapuh:
-// Nominatim mencocokkan kata, bukan tempat. Kueri "Kantor Kecamatan Kebayoran
-// Baru" mengembalikan "Kantor Kepala Seksi Pendidikan Dasar Kecamatan Kebayoran
-// Baru", kantor yang berbeda, 1,8 km dari kantor kecamatan yang sebenarnya.
-// Surveyor yang menekan hasil pertama tanpa memeriksa akan menyimpan titik yang
-// salah, dan tidak ada satu pun yang memberitahunya.
+// Dari mana titik yang sekarang berasal.
 const asalTitik = ref<'awal' | 'cari' | 'gps' | 'geser'>('awal')
 
 async function cari() {
@@ -110,10 +104,8 @@ function geserManual(t: { lat: number, lng: number }) {
       {{ memuatGps ? 'Membaca lokasi' : 'Pakai lokasi saya' }}
     </button>
 
-    <!-- Peringatan khusus untuk titik hasil pencarian nama. Pencarian mencocokkan
-         kata, bukan tempat, jadi hasil pertamanya bisa gedung lain yang kebetulan
-         namanya mirip. Kalimatnya menyebut jaraknya bisa ratusan meter supaya
-         terbaca sebagai peringatan sungguhan, bukan basa-basi. -->
+    <!-- Peringatan khusus untuk titik hasil pencarian nama. Pencarian mencocokkan kata, bukan
+         tempat, jadi hasil pertamanya bisa gedung lain yang kebetulan namanya mirip. -->
     <p
       v-if="asalTitik === 'cari'" role="status"
       class="rounded-lg border border-skor-sedang bg-white px-3 py-2 text-sm text-gray-800"

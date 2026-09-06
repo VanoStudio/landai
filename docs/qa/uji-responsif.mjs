@@ -4,11 +4,24 @@
 // sasaran sentuh tidak turun di bawah 44 piksel.
 
 import { chromium } from 'playwright'
-import { join } from 'node:path'
+import { existsSync, readFileSync } from 'node:fs'
+import { join, resolve } from 'node:path'
+
+const BERKAS_ENV = ['.env', '../.env'].map(x => resolve(x)).find(existsSync)
+const env = Object.fromEntries(readFileSync(BERKAS_ENV, 'utf8')
+  .split(String.fromCharCode(10)).map(b => b.trim()).filter(b => b.includes('='))
+  .map((b) => { const i = b.indexOf('='); return [b.slice(0, i).trim(), b.slice(i + 1).trim()] }))
+process.env.SUPABASE_URL_UJI = env.SUPABASE_URL
+process.env.SUPABASE_KEY_UJI = env.SUPABASE_KEY
 
 const BASIS = 'http://localhost:3000'
 const KELUARAN = join(process.cwd(), 'gambar')
-const ID_UJI = '22222222-2222-4222-8222-222222222222'
+// Id lokasi diambil dari basis data, bukan ditulis mati. Id yang ditulis mati
+// menunjuk data contoh, dan begitu data itu dihapus, yang terukur justru halaman
+// galat bawaan Nuxt, bukan halaman detail.
+const ID_UJI = (await (await fetch(
+  `${process.env.SUPABASE_URL_UJI}/rest/v1/locations?select=id&limit=1`,
+  { headers: { apikey: process.env.SUPABASE_KEY_UJI } })).json())[0]?.id
 
 const langkah = []
 const catat = (nama, lolos, ket = '') => {

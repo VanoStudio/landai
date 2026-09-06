@@ -1,25 +1,18 @@
 <script setup lang="ts">
-// Peta adalah hero. Tidak ada halaman pembuka sebelum peta (DESIGN.md), dan peta
-// selalu memakai lebar penuh. Daftar lokasi bukan kolom tetap di sampingnya melainkan
-// panel yang dipanggil lewat pemindah tampilan di header lalu ditutup lagi: kolom tetap
-// memangkas lebar peta selamanya, padahal peta yang dilihat, bukan daftarnya.
+// Peta selalu selebar penuh. Daftar lokasi bukan kolom tetap di sampingnya melainkan panel
+// yang dipanggil lalu ditutup lagi: kolom tetap memangkas lebar peta selamanya.
 const { data: semua, pending, error, refresh } = useDaftarLokasi()
 const user = useSupabaseUser()
 
-// Rangka pemuatan hidup di sini, bukan di dalam komponen peta, karena komponen itu
-// khusus sisi klien dan tidak dirender server sama sekali. Ditaruh di halaman berarti
-// rangkanya sudah ada di HTML pertama, menutupi jendela paling kosong yaitu sebelum
-// hidrasi selesai.
+// Rangka pemuatan hidup di sini, bukan di komponen peta, karena komponen itu khusus sisi
+// klien. Di halaman, rangkanya sudah ada di HTML pertama.
 const petaSiap = ref(false)
 
-// Lapisan pembuka hanya untuk muat pertama dalam satu sesi. Kembali ke peta dari
-// halaman lain tidak perlu disambut lagi, dan datanya pun sudah tersimpan.
+// Hanya untuk muat pertama dalam satu sesi.
 const pembukaBelumPernah = useState('pembuka-belum-pernah', () => true)
 
-// Nilainya dibaca saat setup, bukan di onMounted, supaya lapisan ini ikut dirender
-// server dan sudah ada di HTML pertama. Kalau baru dipasang setelah hidrasi, ia justru
-// muncul SESUDAH rangka pemuatan, kebalikan dari gunanya: yang perlu ditutupi adalah
-// jendela sebelum hidrasi, bukan sesudahnya.
+// Dibaca saat setup, bukan di onMounted, supaya ikut dirender server. Kalau baru dipasang
+// setelah hidrasi, ia muncul sesudah rangka pemuatan, kebalikan dari gunanya.
 const pembukaTampil = ref(pembukaBelumPernah.value)
 const pembukaSelesai = ref(false)
 
@@ -29,14 +22,9 @@ onMounted(() => {
 
   const mulai = performance.now()
 
-  // Jeda minimum supaya lapisan ini tidak sekadar berkedip pada muat yang cepat.
-  // Batas maksimumnya sudah dipegang animasi CSS, jadi yang di sini hanya jalan
-  // keluar lebih awal.
-  //
-  // Dibuat menolak panggilan kedua, bukan dengan menghentikan pengamatnya dari dalam
-  // callback-nya sendiri. Dengan immediate, callback berjalan seketika saat watch
-  // dipanggil, jadi rujukan ke penghentinya jatuh sebelum const itu terisi dan
-  // seluruh halaman peta membalas 500.
+  // Menolak panggilan kedua lewat penanda, bukan dengan menghentikan pengamatnya dari dalam
+  // callback-nya sendiri: dengan immediate, rujukan ke penghentinya jatuh sebelum const-nya
+  // terisi dan seluruh halaman membalas 500.
   let sudahTutup = false
   const tutup = () => {
     if (sudahTutup) return
@@ -52,27 +40,22 @@ const petaRef = ref<{
   pindahKe: (lat: number, lng: number, zoom?: number) => void
 } | null>(null)
 
-// Memakai ulang composable GPS yang sama dengan langkah pertama formulir, termasuk
-// pemeriksaan konteks aman dan kalimat galatnya. Tidak ada pembacaan posisi baru
-// yang ditulis di sini.
+// Memakai ulang composable GPS yang sama dengan langkah pertama formulir.
 const { ambilPosisi, memuat: memuatGps, pesanError: errorGps } = useGps()
 const { tampilkan } = useNotifikasi()
 
 async function keLokasiSaya() {
   const p = await ambilPosisi()
   if (!p) {
-    // Galat izin lokasi dulunya kotak menetap yang menimpa kartu ringkas dan tidak
-    // pernah hilang. Sekarang lewat antrean notifikasi yang padam sendiri.
+    // Lewat antrean notifikasi yang padam sendiri, bukan kotak menetap.
     tampilkan(errorGps.value, 'galat')
     return
   }
   petaRef.value?.tandaiPosisiSaya(p.lat, p.lng)
 }
 
-// Baris chip bergulir mendatar di layar sempit. Di 375px ketiga chip berjumlah
-// sekitar 480px, jadi selalu ada yang di luar layar. Chip ketiga yang terpotong
-// separuh sudah menjadi petunjuk, tetapi tidak cukup jelas, jadi ditambah kabut di
-// tepi kanan yang padam sendiri begitu gulirannya sampai ujung.
+// Di 375px ketiga chip berjumlah sekitar 480px, jadi selalu ada yang di luar layar. Kabut
+// di tepi kanan menandainya, dan padam sendiri di ujung guliran.
 const barisChip = ref<HTMLElement | null>(null)
 const adaLanjutan = ref(false)
 
@@ -92,10 +75,8 @@ const filterAktif = ref<Kebutuhan[]>([])
 const terpilihId = ref<string | null>(null)
 const tampilan = ref<'peta' | 'daftar'>('peta')
 
-// Labelnya ditulis lengkap, tidak lagi memakai nilai keadaannya sendiri sebagai
-// tulisan. "Daftar" sendirian berarti dua hal dalam Bahasa Indonesia, senarai dan
-// mendaftar akun, dan tombol ini duduk berdampingan dengan "Masuk" dan "Tambah
-// lokasi" yang keduanya urusan akun. Kata "Lokasi" yang menyudahi keraguan itu.
+// Label ditulis lengkap. "Daftar" sendirian berarti senarai sekaligus mendaftar akun, dan
+// tombol ini duduk berdampingan dengan Masuk dan Tambah lokasi.
 const TAMPILAN = [
   { nilai: 'peta', label: 'Peta' },
   { nilai: 'daftar', label: 'Daftar Lokasi' },
@@ -103,8 +84,7 @@ const TAMPILAN = [
 
 const DAFTAR_KEBUTUHAN: Kebutuhan[] = ['kursi_roda', 'tunanetra', 'lansia_stroller']
 
-// Beberapa filter aktif = lokasi harus memenuhi semuanya. Rombongan dengan
-// kebutuhan campuran perlu tempat yang memenuhi seluruhnya, bukan salah satu.
+// Beberapa filter aktif berarti lokasi harus memenuhi semuanya, bukan salah satu.
 const lokasiTersaring = computed(() =>
   (semua.value ?? []).filter(l => filterAktif.value.every(k => cocokKebutuhan(l, k))),
 )
@@ -126,8 +106,7 @@ function ubahFilter(k: Kebutuhan) {
     : [...filterAktif.value, k]
 }
 
-// Lebar layar dibaca sekali dan diikuti perubahannya. Ini semata keadaan tampilan,
-// bukan data: dipakai hanya untuk memutuskan apakah panel daftar perlu ditutup.
+// Keadaan tampilan, bukan data: dipakai untuk memutuskan panel daftar perlu ditutup.
 const layarLebar = ref(false)
 let pantau: MediaQueryList | null = null
 const ikutiLebar = (e: MediaQueryListEvent) => { layarLebar.value = e.matches }
@@ -140,10 +119,8 @@ onMounted(() => {
 
 onBeforeUnmount(() => pantau?.removeEventListener('change', ikutiLebar))
 
-// Menekan butir daftar memindahkan fokus peta sekaligus membuka kartunya. Di ponsel
-// panelnya ikut ditutup, karena kalau tidak, kartu yang baru dibuka berada di layar
-// yang sedang tidak dilihat. Di layar lebar panelnya dibiarkan terbuka supaya orang
-// bisa menyusuri daftar satu per satu tanpa membukanya berulang kali.
+// Di ponsel panelnya ikut ditutup, karena kalau tidak, kartu yang baru dibuka berada di
+// layar yang sedang tidak dilihat.
 function pilihDariDaftar(l: LokasiPeta) {
   terpilihId.value = l.id
   if (!layarLebar.value) tampilan.value = 'peta'
@@ -156,23 +133,15 @@ function pilihDariDaftar(l: LokasiPeta) {
   <div class="flex h-[100dvh] w-full flex-col overflow-hidden">
     <LayarPembuka v-if="pembukaTampil" :selesai="pembukaSelesai" />
 
-    <!-- Identitas, pencarian area, pemindah tampilan, akun.
-         Membungkus jadi dua baris di layar sempit: kolom pencarian diberi lebar penuh
-         supaya teks bantuannya tidak terpotong, dan urutannya ditukar di layar lebar
-         supaya ketiganya duduk dalam satu baris. -->
+    <!-- Membungkus jadi dua baris di layar sempit. -->
     <header class="flex shrink-0 flex-wrap items-center gap-2 border-b border-gray-200 bg-white px-4 py-2.5">
-      <!-- Tanda tidak pernah tampil tanpa tulisan di sampingnya, jadi keduanya satu
-           komponen. Tagline duduk di bawah nama merek, lebih kecil dan lebih pudar,
-           supaya terbaca sebagai keterangan bukan sebagai nama kedua. -->
+      <!-- Tanda tidak pernah tampil tanpa tulisan di sampingnya. -->
       <MerekLandai class="order-1" :ukuran="26" tagline />
 
       <div class="order-2 ml-auto flex shrink-0 items-center gap-2 text-sm lg:order-3 lg:ml-0">
-        <!-- Pemindah tampilan pindah ke sini, terpisah dari baris chip penyaring.
-             Menyaring data dan mengganti cara melihat data adalah dua pekerjaan
-             berbeda, jadi tidak duduk dalam satu baris yang sama. -->
-        <!-- Segmen mengisi penuh tinggi wadah, bukan 36px di dalam bantalan 4px.
-             Keduanya bersentuhan, jadi pengecualian jarak pada aturan ukuran sasaran
-             tidak berlaku dan sasarannya harus utuh 44px. -->
+        <!-- Menyaring data dan mengganti cara melihatnya dua pekerjaan berbeda, jadi tidak duduk
+             dalam satu baris. -->
+        <!-- Keduanya bersentuhan, jadi sasaran sentuhnya harus utuh 44px. -->
         <div
           class="flex h-11 shrink-0 items-stretch overflow-hidden rounded-full border border-gray-300"
           role="tablist" aria-label="Pindah tampilan"
@@ -203,19 +172,13 @@ function pilihDariDaftar(l: LokasiPeta) {
           <span class="hidden sm:inline">Tentang</span>
         </NuxtLink>
 
-        <!-- Satu-satunya aksi utama di layar ini. Pengunjung yang belum masuk tetap
-             melihatnya dan dialihkan ke halaman masuk, sama seperti tombol mengambang
-             di ponsel: menyembunyikannya membuat pengunjung baru tidak punya jalan
-             masuk untuk berkontribusi sama sekali. -->
+        <!-- Satu-satunya aksi utama di layar ini. -->
         <NuxtLink
           :to="user ? '/tambah-lokasi' : '/masuk'"
           class="tombol tombol-utama hidden md:inline-flex"
         >Tambah lokasi</NuxtLink>
 
-        <!-- Satu tombol untuk seluruh urusan akun, menggantikan ikon akun dan tombol
-             keluar yang dulu berdiri sendiri-sendiri. Aksi akun berikutnya masuk ke
-             dalam menunya, bukan ke dalam baris header, jadi baris ini berhenti tumbuh
-             dan tidak ada lagi yang hilang diam-diam di layar sempit. -->
+        <!-- Satu tombol untuk seluruh urusan akun. -->
         <MenuAkun v-if="user" />
 
         <NuxtLink
@@ -231,8 +194,7 @@ function pilihDariDaftar(l: LokasiPeta) {
       />
     </header>
 
-    <!-- Baris penyaring kebutuhan. Hanya penyaring, tidak lagi bercampur dengan
-         kontrol pindah tampilan. -->
+    <!-- Baris penyaring kebutuhan. -->
     <div class="relative shrink-0 border-b border-gray-200 bg-white">
       <div
         ref="barisChip"
@@ -256,9 +218,8 @@ function pilihDariDaftar(l: LokasiPeta) {
     </div>
 
     <div class="relative flex min-h-0 flex-1">
-      <!-- Peta selalu selebar penuh. Panel daftar melayang di atasnya, bukan memotong
-           lebarnya, jadi kanvas peta tidak pernah berubah ukuran saat panel dibuka
-           atau ditutup. -->
+      <!-- Panel melayang di atas peta, bukan memotong lebarnya, jadi kanvas peta tidak pernah
+           berubah ukuran saat panel dibuka. -->
       <div class="relative min-w-0 flex-1">
         <PetaLokasi
           ref="petaRef"
@@ -268,8 +229,7 @@ function pilihDariDaftar(l: LokasiPeta) {
           @siap="petaSiap = true"
         />
 
-        <!-- Rangka pemuatan peta. Bentuknya meniru blok kota dan garis jalan, bukan
-             deretan batang abu generik, supaya jelas yang sedang dimuat sebuah peta. -->
+        <!-- Rangka pemuatan peta, meniru blok kota dan garis jalan. -->
         <Transition name="rangka">
           <div
             v-if="!petaSiap"
@@ -290,10 +250,8 @@ function pilihDariDaftar(l: LokasiPeta) {
 
         <p v-if="!petaSiap" class="sr-only" role="status">Memuat peta</p>
 
-        <!-- Dua kartu orientasi ditumpuk dalam satu kolom di sudut yang sama, bukan
-             disebar ke sudut berbeda: keduanya menjawab pertanyaan yang sama, "ini
-             sebenarnya apa". Wadahnya tembus klik, hanya kartunya yang menangkap
-             ketukan, jadi peta di belakangnya tetap bisa digeser. -->
+        <!-- Wadahnya tembus klik, hanya kartunya yang menangkap ketukan, jadi peta di belakangnya
+             tetap bisa digeser. -->
         <div class="pointer-events-none absolute left-4 top-4 z-20 flex w-fit max-w-[calc(100%-2rem)] flex-col items-start gap-2">
           <LegendaSkor
             v-if="(semua?.length ?? 0) > 0"
@@ -322,16 +280,14 @@ function pilihDariDaftar(l: LokasiPeta) {
           </p>
         </div>
 
-        <!-- Kartu ringkas. Naik dari bawah, bukan muncul mendadak, supaya mata sempat
-             mengikuti dari penanda yang diketuk ke kartunya. -->
+        <!-- Naik dari bawah, bukan muncul mendadak, supaya mata sempat mengikutinya. -->
         <Transition name="kartu">
           <div v-if="lokasiTerpilih" class="absolute inset-x-0 bottom-0 z-20 p-4 sm:max-w-sm">
             <KartuRingkas :lokasi="lokasiTerpilih" @tutup="terpilihId = null" />
           </div>
         </Transition>
 
-        <!-- Lokasi saya. Ditaruh tepat di atas kontrol perbesar, mengikuti kebiasaan
-             aplikasi peta, supaya ibu jari menemukannya tanpa mencari. -->
+        <!-- Di atas kontrol perbesar, mengikuti kebiasaan aplikasi peta. -->
         <button
           type="button"
           :disabled="memuatGps"
@@ -361,9 +317,7 @@ function pilihDariDaftar(l: LokasiPeta) {
         </NuxtLink>
       </div>
 
-      <!-- Panel daftar lokasi. Muncul hanya saat diminta, di ponsel menutupi layar,
-           di layar lebar menempel di tepi kanan peta dengan bayangan supaya jelas ia
-           melayang di atas peta, bukan memotongnya. -->
+      <!-- Muncul hanya saat diminta: menutupi layar di ponsel, melayang di layar lebar. -->
       <Transition name="panel">
         <aside
           v-if="tampilan === 'daftar'"

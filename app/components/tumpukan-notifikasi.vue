@@ -1,18 +1,12 @@
 <script setup lang="ts">
-// Wadah notifikasi, dipasang sekali di app.vue sehingga berlaku di semua halaman.
-//
-// Letaknya di tepi atas, di tengah. Tepi bawah sudah dipakai kartu ringkas lokasi,
-// dan sudut kanan bawah dipakai kendali perbesar peta serta tombol lokasi saya,
-// jadi keduanya tidak boleh dipakai. Sudut kiri atas dipakai legenda dan kartu
-// pengenalan, tetapi keduanya berada di dalam bidang peta, di bawah header, jadi
-// tidak bertabrakan dengan lapisan ini.
+// Wadah notifikasi, dipasang sekali di app.vue sehingga berlaku di semua halaman. Letaknya
+// di tepi atas, di tengah.
 const { daftar, tutup } = useNotifikasi()
 </script>
 
 <template>
-  <!-- Wadahnya tembus klik supaya tidak ada satu pun bagian layar yang menjadi
-       mati hanya karena sebuah pesan sedang lewat. Hanya kartunya yang menangkap
-       ketukan, dan itu perlu supaya tombol tutupnya bisa ditekan. -->
+  <!-- Wadahnya tembus klik supaya tidak ada satu pun bagian layar yang menjadi mati hanya
+       karena sebuah pesan sedang lewat. -->
   <div
     class="pointer-events-none fixed inset-x-0 top-0 z-50 flex flex-col items-center gap-2 px-3 pt-3"
     aria-live="polite"

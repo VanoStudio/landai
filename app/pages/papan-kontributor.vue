@@ -1,19 +1,13 @@
 <script setup lang="ts">
-// Papan kontributor. Murni bacaan: menghitung ulang dari tabel locations dan profiles
-// yang sudah bisa dibaca siapa saja. Tidak ada tabel baru, tidak ada perubahan aturan
-// keamanan, tidak ada mekanisme klaim maupun penukaran apa pun.
-//
-// Penghitungan per kontributor dilakukan di sisi klien, bukan lewat kueri agregat,
-// karena PostgREST tidak menyediakan GROUP BY tanpa membuat view di basis data, dan
-// membuat view berarti mengubah skema. Jumlah barisnya puluhan, jadi menghitungnya
-// di peramban tidak menimbulkan beban yang berarti.
+// Papan kontributor. Murni bacaan: menghitung ulang dari tabel locations dan profiles yang
+// sudah bisa dibaca siapa saja.
 
 const supabase = useSupabaseClient()
 const user = useSupabaseUser()
 const idPengguna = useIdPengguna()
 
-// Ambang tingkat ditulis sebagai konstanta di sini, bukan disimpan di basis data,
-// supaya bisa diubah tanpa migrasi dan supaya jelas ini keputusan tampilan.
+// Ambang tingkat ditulis sebagai konstanta di sini, bukan disimpan di basis data, supaya
+// bisa diubah tanpa migrasi dan supaya jelas ini keputusan tampilan.
 const TINGKAT = [
   { nama: 'Baru mulai', minimal: 1, berikutnya: 3 },
   { nama: 'Kontributor aktif', minimal: 3, berikutnya: 6 },
@@ -35,9 +29,7 @@ function tingkatDari(jumlah: number) {
 }
 
 // Kemajuan diukur dari nol menuju ambang tingkat berikutnya, bukan dari ambang masuk
-// tingkat yang sedang dijalani. Cara kedua membuat kontributor pertama, yang baru
-// punya satu lokasi, mendapat bilah kosong yang terlihat seperti kegagalan memuat.
-// Yang sudah di tingkat teratas selalu penuh.
+// tingkat yang sedang dijalani.
 function kemajuanDari(jumlah: number, t: (typeof TINGKAT)[number]) {
   if (t.berikutnya === null) return 100
   return Math.min(100, Math.round((jumlah / t.berikutnya) * 100))
@@ -48,8 +40,8 @@ const { data: kontributor, pending, error } = await useAsyncData<Kontributor[]>(
   async () => {
     const { data, error } = await supabase
       .from('locations')
-      // Relasi disebut lewat kolom kunci asingnya. Sejak updated_by ada, locations punya
-      // dua kunci asing ke profiles dan PostgREST menolak menebak yang mana yang dimaksud.
+      // Relasi disebut lewat kolom kunci asingnya. Sejak updated_by ada, locations punya dua
+      // kunci asing ke profiles dan PostgREST menolak menebak yang mana yang dimaksud.
       .select('created_by, profiles!created_by ( nama )')
       .not('created_by', 'is', null)
 
@@ -106,8 +98,8 @@ useHead({ title: 'Papan Kontributor' })
         atau ditukar dari halaman ini.
       </p>
 
-      <!-- Di sinilah orang paling mungkin menyadari namanya perlu dirapikan, jadi di
-           sini pula jalan keluarnya ditawarkan. -->
+      <!-- Di sinilah orang paling mungkin menyadari namanya perlu dirapikan, jadi di sini pula
+           jalan keluarnya ditawarkan. -->
       <p v-if="user" class="mt-2 text-sm text-gray-600">
         Nama di daftar ini diambil dari profil Anda.
         <NuxtLink to="/akun" class="font-medium text-brand underline">Ubah nama tampilan</NuxtLink>.
@@ -130,8 +122,8 @@ useHead({ title: 'Papan Kontributor' })
       </div>
 
       <ol v-else class="mt-8 divide-y divide-gray-200">
-        <!-- Baris milik sendiri ditandai. Tanpa ini, papan ini hanya daftar nama orang
-             lain, padahal justru di sinilah seseorang memeriksa kemajuannya sendiri. -->
+        <!-- Baris milik sendiri ditandai. Tanpa ini, papan ini hanya daftar nama orang lain, padahal
+             justru di sinilah seseorang memeriksa kemajuannya sendiri. -->
         <li
           v-for="(k, i) in kontributor" :key="k.id"
           class="-mx-3 rounded-lg px-3 py-4"
@@ -153,8 +145,8 @@ useHead({ title: 'Papan Kontributor' })
 
           <p class="mt-1 text-sm text-gray-600">{{ k.tingkat }}</p>
 
-          <!-- Bilah kemajuan. Terisi memakai hijau merek yang sudah ada, tidak ada
-               warna baru, dan bukan warna skor supaya tidak tertukar artinya. -->
+          <!-- Bilah kemajuan. Terisi memakai hijau merek yang sudah ada, tidak ada warna baru, dan
+               bukan warna skor supaya tidak tertukar artinya. -->
           <div
             class="mt-2 h-2 overflow-hidden rounded-full bg-gray-200"
             role="progressbar"

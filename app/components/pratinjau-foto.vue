@@ -1,13 +1,8 @@
 <script setup lang="ts">
-// Pratinjau foto layar penuh.
-//
-// Foto di halaman detail dipangkas jadi kotak supaya kisinya rapi, dan pemangkasan
-// itu justru membuang bagian yang sering paling penting: ujung ramp, tepi trotoar,
-// pegangan tangga. Tanpa cara membuka fotonya utuh, orang menilai aksesibilitas
-// sebuah tempat dari potongan gambar. Di sini fotonya ditampilkan seutuhnya,
-// dimuat pas ke dalam layar tanpa dipangkas sama sekali.
+// Pratinjau foto layar penuh. Foto di kisi dipangkas jadi kotak, dan yang terpangkas
+// sering justru ujung ramp atau tepi trotoar, jadi tiap foto bisa dibuka utuh.
 const props = defineProps<{
-  foto: { id: string, photo_url: string }[]
+  foto: { id: string, photo_url: string, created_at?: string }[]
   mulai: number
   namaLokasi: string
 }>()
@@ -19,6 +14,14 @@ const tombolTutup = ref<HTMLButtonElement | null>(null)
 const memuat = ref(true)
 
 const sekarang = computed(() => props.foto[posisi.value] ?? null)
+
+// Sama seperti di kisi foto: yang diunggah sebelum penandaan otomatis ada diberi lapisan
+// tanda supaya tampilannya konsisten.
+const SEJAK_BERTANDA = Date.parse('2026-09-06T08:46:00Z')
+const perluTanda = computed(() => {
+  const f = sekarang.value as any
+  return !!f && (!f.created_at || Date.parse(f.created_at) < SEJAK_BERTANDA)
+})
 const banyak = computed(() => props.foto.length > 1)
 
 function geser(arah: number) {
@@ -33,8 +36,8 @@ function tombolPapan(e: KeyboardEvent) {
   if (e.key === 'ArrowLeft') geser(-1)
 }
 
-// Geser jari untuk berpindah foto. Di ponsel inilah cara yang dicari orang lebih
-// dulu, sebelum mencari tombol panah.
+// Geser jari untuk berpindah foto. Di ponsel inilah cara yang dicari orang lebih dulu,
+// sebelum mencari tombol panah.
 let mulaiX = 0
 function sentuhMulai(e: TouchEvent) {
   mulaiX = e.changedTouches[0]?.clientX ?? 0
@@ -58,7 +61,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <!-- Latarnya nyaris pekat dan diburamkan. Pada 92 persen, tulisan halaman di
+  <!-- Latarnya nyaris pekat dan diburamkan. Pada 92 persen, tulisan halaman di -->
        belakang masih terbaca menembus lapisan ini, dan mata ikut membacanya alih-alih
        memperhatikan fotonya. Foto di sini bukti kondisi lapangan, jadi ia harus
        berdiri sendiri. -->
@@ -91,15 +94,19 @@ onBeforeUnmount(() => {
     </div>
 
     <div class="relative flex min-h-0 flex-1 items-center justify-center px-2 pb-4" @click.self="emit('tutup')">
-      <!-- object-contain, bukan object-cover. Seluruh bingkai foto harus terlihat. -->
-      <img
-        v-if="sekarang"
-        :key="sekarang.id"
-        :src="sekarang.photo_url"
-        :alt="`Kondisi ${namaLokasi}, foto ${posisi + 1} dari ${foto.length}`"
-        class="max-h-full max-w-full rounded object-contain"
-        @load="memuat = false"
-      >
+      <!-- Ukuran gambar dibiarkan mengikuti rasio aslinya, bukan dipaksa memenuhi -->
+           kotak lalu disisipi object-contain. Dengan object-contain, kotak elemennya
+           tetap selebar wadah sementara gambarnya menyusut di tengah, dan tanda yang
+           ditempel di sudut kotak melayang di bidang hitam di samping fotonya. -->
+      <div v-if="sekarang" :key="sekarang.id" class="relative">
+        <img
+          :src="sekarang.photo_url"
+          :alt="`Kondisi ${namaLokasi}, foto ${posisi + 1} dari ${foto.length}`"
+          class="block h-auto max-h-[calc(100vh-7rem)] w-auto max-w-full rounded"
+          @load="memuat = false"
+        >
+        <TandaFoto v-if="perluTanda && !memuat" />
+      </div>
 
       <p v-if="memuat" class="absolute text-sm text-white/70" role="status">Memuat foto</p>
 

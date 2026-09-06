@@ -1,16 +1,5 @@
-// Penyaring isi kasar untuk formulir kontribusi. Seluruhnya berjalan di peramban:
-// tanpa API luar, tanpa panggilan server, tanpa perubahan skema. Daftar katanya ada
-// di daftar-kata-kasar.ts.
-//
-// Yang dijaga berkas ini bukan cuma "menemukan kata kasar", melainkan TIDAK salah
-// menuduh. Nama tempat sungguhan ditulis orang yang sedang berdiri di lapangan,
-// sering dengan singkatan, angka, dan tanda baca. Peringatan palsu pada nama yang
-// wajar lebih merugikan daripada satu umpatan yang lolos, karena ia membuat orang
-// berhenti percaya pada peringatannya.
-//
-// Karena itu pencocokan dilakukan PER KATA UTUH, bukan per potongan. "Anjungan",
-// "bangsal", dan "asuransi" tidak boleh tertangkap hanya karena mengandung huruf
-// yang mirip.
+// Penyaring isi kasar untuk formulir kontribusi. Seluruhnya berjalan di peramban: tanpa
+// API luar, tanpa panggilan server, tanpa perubahan skema.
 
 import {
   KATA_KASAR,
@@ -18,21 +7,18 @@ import {
   PENANDA_KONTEKS_WAJAR,
 } from './daftar-kata-kasar'
 
-// Pemetaan leetspeak yang lazim. Sengaja hanya angka dan dua simbol yang memang
-// dipakai sebagai pengganti huruf. Tanda seru TIDAK dipetakan: "anjing!!!" jauh
-// lebih sering muncul sebagai penekanan daripada sebagai penyamaran, dan
-// memetakannya justru merusak pencocokan.
+// Pemetaan leetspeak yang lazim. Sengaja hanya angka dan dua simbol yang memang dipakai
+// sebagai pengganti huruf.
 const PETA_LEET: Record<string, string> = {
   4: 'a', '@': 'a', 3: 'e', 1: 'i', 0: 'o', 5: 's', $: 's',
 }
 
-// Kata gabungan hanya diperiksa untuk entri sepanjang ini ke atas. Menggabungkan
-// dua kata pendek yang bersebelahan terlalu mudah menghasilkan kebetulan.
+// Kata gabungan hanya diperiksa untuk entri sepanjang ini ke atas. Menggabungkan dua kata
+// pendek yang bersebelahan terlalu mudah menghasilkan kebetulan.
 const PANJANG_MINIMAL_GABUNGAN = 5
 
-// Seberapa dekat penanda konteks harus berada supaya sebuah kata dianggap dipakai
-// dalam arti sebenarnya. Tiga kata cukup untuk menutup "Klinik Hewan Anjing dan
-// Kucing" tanpa ikut memaafkan umpatan yang kebetulan sekalimat dengan kata biasa.
+// Seberapa dekat penanda konteks harus berada supaya sebuah kata dianggap dipakai dalam
+// arti sebenarnya.
 const JANGKAUAN_KONTEKS = 3
 
 function terjemahkanLeet(s: string): string {
@@ -41,10 +27,7 @@ function terjemahkanLeet(s: string): string {
   return keluar
 }
 
-// Huruf berulang dirapatkan jadi satu, bukan tiga jadi satu. Aturan yang lebih
-// keras ini aman karena daftar katanya dinormalkan dengan aturan yang sama persis,
-// jadi tidak ada entri yang berubah bentuk. Sebaliknya, aturan "tiga atau lebih"
-// meloloskan "anjjir" yang hanya berulang dua kali.
+// Huruf berulang dirapatkan jadi satu, bukan tiga jadi satu.
 function rapatkanUlangan(s: string): string {
   return s.replace(/(.)\1+/g, '$1')
 }
@@ -57,12 +40,8 @@ function bakukan(s: string): string {
   return rapatkanUlangan(hurufSaja(terjemahkanLeet(s.toLowerCase())))
 }
 
-// Satu kata menghasilkan dua bentuk baku, dan keduanya perlu.
-//
-// Bentuk pertama memangkas tanda baca di ujung lebih dulu, supaya "anjing@@@"
-// tidak berubah jadi "anjinga". Bentuk kedua menerjemahkan leetspeak lebih dulu
-// tanpa memangkas apa pun, supaya "@njing" tetap terbaca "anjing". Satu bentuk
-// saja akan meloloskan salah satu dari keduanya.
+// Satu kata menghasilkan dua bentuk baku, dan keduanya perlu. Bentuk pertama memangkas
+// tanda baca di ujung lebih dulu, supaya "anjing@@@" tidak berubah jadi "anjinga".
 function bentukKata(kata: string): string[] {
   const dipangkas = kata.replace(/^[^a-z0-9]+/, '').replace(/[^a-z0-9]+$/, '')
   const a = bakukan(dipangkas)
@@ -74,18 +53,13 @@ function pecah(teks: string): string[] {
   return String(teks ?? '').toLowerCase().split(/\s+/).filter(Boolean)
 }
 
-/**
- * Membakukan teks: huruf kecil, leetspeak diterjemahkan, tanda baca penghubung
- * dibuang, huruf berulang dirapatkan. Spasi antar kata dipertahankan, karena
- * pencocokan dilakukan per kata utuh dan bukan per potongan.
- */
+/* Membakukan teks: huruf kecil, leetspeak diterjemahkan, tanda baca penghubung dibuang,
+   huruf berulang dirapatkan. */
 export function normalizeText(text: string): string {
   return pecah(text).map(k => bentukKata(k)[0]).filter(Boolean).join(' ')
 }
 
 // Daftar kata ikut dibakukan dengan aturan yang sama, sekali saat modul dimuat.
-// Nilainya menyimpan ejaan asli, supaya yang dilaporkan ke pengguna adalah kata
-// yang dikenalinya, bukan hasil normalisasi yang terlihat aneh.
 const petaKasar = new Map(KATA_KASAR.map(k => [bakukan(k), k]))
 const petaKasarBerkonteks = new Map(KATA_KASAR_BERKONTEKS.map(k => [bakukan(k), k]))
 const penandaKonteks = new Set(PENANDA_KONTEKS_WAJAR.map(bakukan))
@@ -104,13 +78,7 @@ export interface HasilSaringan {
   matchedWords: string[]
 }
 
-/**
- * Memeriksa sebuah teks terhadap daftar kata kasar.
- *
- * Yang dikembalikan pada `matchedWords` adalah ejaan asli dari daftar, bukan
- * potongan teks pengguna, supaya banner peringatan tidak ikut menampilkan ulang
- * tulisan aslinya.
- */
+/* Memeriksa sebuah teks terhadap daftar kata kasar. */
 export function detectToxicWords(text: string): HasilSaringan {
   const kata = pecah(text)
   if (kata.length === 0) return { isToxic: false, matchedWords: [] }
@@ -130,10 +98,8 @@ export function detectToxicWords(text: string): HasilSaringan {
 
   bentuk.forEach((bentukan, i) => bentukan.forEach(b => catatKalauCocok(b, i)))
 
-  // Menyisipkan spasi di tengah kata adalah cara penyamaran yang paling sering
-  // dipakai, jadi setiap pasangan kata bersebelahan ikut diperiksa sebagai satu
-  // kata. Dibatasi pada entri yang cukup panjang supaya dua kata pendek yang
-  // kebetulan bersebelahan tidak menghasilkan tuduhan.
+  // Menyisipkan spasi di tengah kata adalah cara penyamaran yang paling sering dipakai, jadi
+  // setiap pasangan kata bersebelahan ikut diperiksa sebagai satu kata.
   for (let i = 0; i < utama.length - 1; i++) {
     const gabungan = (utama[i] ?? '') + (utama[i + 1] ?? '')
     if (gabungan.length < PANJANG_MINIMAL_GABUNGAN) continue
@@ -144,11 +110,9 @@ export function detectToxicWords(text: string): HasilSaringan {
   return { isToxic: matchedWords.length > 0, matchedWords }
 }
 
-/**
- * Menyamarkan bagian tengah kata untuk ditampilkan di layar. Peringatannya perlu
- * menyebut kata mana yang terpicu supaya bisa ditindaklanjuti, tapi tidak perlu
- * menuliskannya ulang secara utuh.
- */
+/* Menyamarkan bagian tengah kata untuk ditampilkan di layar. Peringatannya perlu menyebut
+   kata mana yang terpicu supaya bisa ditindaklanjuti, tapi tidak perlu menuliskannya ulang
+   secara utuh. */
 export function sensorKata(kata: string): string {
   if (kata.length <= 2) return kata[0] + '*'
   return kata[0] + '*'.repeat(kata.length - 2) + kata[kata.length - 1]

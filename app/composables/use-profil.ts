@@ -1,9 +1,4 @@
 // Profil pengguna yang sedang masuk.
-//
-// Dipisah ke composable, bukan ditulis ulang di tiap halaman, karena kuncinya harus
-// sama persis di mana pun: useAsyncData berbagi keadaan lewat kunci, jadi menu akun di
-// header dan halaman akun memakai satu hasil yang sama, bukan dua permintaan yang
-// bisa saling menyalip lalu menampilkan nama yang berbeda di dua tempat.
 export function useProfilSaya() {
   const supabase = useSupabaseClient()
   const idPengguna = useIdPengguna()

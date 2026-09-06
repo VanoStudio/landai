@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
-/* Token dari DESIGN.md.
-   Tiga warna skor HANYA untuk mengkodekan skor aksesibilitas, bukan dekorasi. */
+/* Tiga warna skor HANYA untuk mengkodekan skor aksesibilitas, bukan
+   dekorasi. */
 @theme {
   --font-sans: 'Public Sans', ui-sans-serif, system-ui, -apple-system, sans-serif;
 
@@ -11,33 +11,23 @@
   --color-skor-sedang: #BA7517;
   --color-skor-kurang: #E24B4A;
 
-  /* Posisi pengguna di peta. Bukan warna kode skor, dan tidak pernah dipakai di
-     elemen lain. Biru dipilih karena "kamu di sini" adalah konvensi peta yang
-     sudah dikenal universal, dan hijau akan tertukar dengan arti skor. */
+  /* Posisi pengguna di peta. Bukan warna kode skor, dan tidak pernah dipakai di elemen lain. */
   --color-posisi: #1D6FE0;
 
-  /* Jarak kendali peta ke tepi, dan celah antar kendali. Dipakai bersama oleh kendali
-     bawaan MapLibre dan tombol lokasi saya yang dirender Vue, supaya keduanya tidak
-     bisa lagi bergeser sendiri-sendiri. */
+  /* Jarak kendali peta ke tepi, dan celah antar kendali. */
   --sisi-kendali-peta: 16px;
   --celah-kendali-peta: 12px;
 
-  /* Jarak dari tepi bawah peta ke sisi bawah grup perbesar. Nilainya ditentukan
-     MapLibre sendiri: tinggi atribusi ringkas ditambah margin bawahnya. Diukur, bukan
-     dikarang, dan dijaga uji docs/uji-kendali-peta.mjs supaya tidak diam-diam meleset
-     kalau MapLibre berganti versi. */
+  /* Jarak dari tepi bawah peta ke sisi bawah grup perbesar. Nilainya ditentukan MapLibre
+     sendiri: tinggi atribusi ringkas ditambah margin bawahnya. */
   --dasar-kendali-peta: 48px;
 
   /* Tinggi grup perbesar: dua tombol 44px yang ditumpuk. */
   --tinggi-grup-zoom: 88px;
 }
 
-/* Aturan dasar dan komponen dibungkus lapisan.
-   Tailwind 4 mendaftarkan @layer theme, base, components, utilities. CSS yang ditulis
-   tanpa lapisan berada DI ATAS seluruh lapisan itu, apa pun urutan berkasnya, jadi
-   .tombol yang tadinya tanpa lapisan mengalahkan utilitas seperti hidden dan sm:hidden:
-   tombol tambah lokasi yang seharusnya hilang di layar lebar tetap tampil, dan tidak ada
-   pesan galat apa pun yang memberi tahu. Dengan dibungkus, utilitas kembali menang. */
+/* Aturan dasar dan komponen dibungkus lapisan. Tailwind 4 mendaftarkan @layer theme, base,
+   components, utilities. */
 @layer base {
   html {
     -webkit-text-size-adjust: 100%;
@@ -75,27 +65,12 @@
 
 @layer components {
   /* Penanda peta dirender MapLibre di luar pohon Vue, jadi gayanya global.
-     Angka skor ada di dalam penanda: elemen tipografi utama produk ini.
 
-     PEMBAGIAN TUGAS DI BAWAH INI WAJIB DIPERTAHANKAN.
-     Properti `transform` pada elemen penanda milik MapLibre seorang. CSS tidak
-     boleh menyentuhnya, sekalipun lewat :hover, :active, transisi, atau animasi.
-
-     Sebabnya begini. MapLibre menulis posisi penanda ke style inline elemen itu,
-     diperbarui tiap bingkai selama peta bergerak. Sementara itu animasi dan transisi
-     CSS menduduki lapisan kaskade DI ATAS style inline. Jadi begitu ada animasi atau
-     transisi transform yang berjalan pada elemen yang sama, nilai dari MapLibre
-     diabaikan sepanjang animasi itu, dan yang terlukis hanya nilai dari stylesheet,
-     yaitu scale tanpa translasi sama sekali. Penanda pun terjun ke titik nol wadah,
-     yakni pojok kiri atas peta, lalu kembali begitu animasinya habis.
-
-     Itu bukan dugaan. Terukur pada jalur ketuk penanda: penanda terlukis menyimpang
-     sampai 699px dari titik yang diperintahkan peta, selama 260ms, tanpa satu pun
-     elemen dibuat ulang. Lihat docs/qa/uji-penanda-jalur.mjs.
-
-     Karena itu seluruh penekanan visual, yaitu lingkaran, bayangan, dan denyut saat
-     dipilih, tinggal di elemen anak `.penanda-bulat`, yang tidak pernah disentuh
-     MapLibre. Elemen luarnya tinggal kotak 44px penangkap ketukan. */
+     Properti transform pada .penanda-skor milik MapLibre seorang: ia menulis posisi
+     penanda ke style inline tiap bingkai, sedangkan animasi dan transisi CSS menduduki
+     kaskade di atas style inline. Begitu ada transform CSS pada elemen yang sama,
+     penanda terlukis di pojok kiri atas peta, terukur menyimpang 699px. Karena itu
+     seluruh penekanan visual tinggal di elemen anak .penanda-bulat. */
   .penanda-skor,
   .penanda-kluster {
     display: block;
@@ -142,9 +117,9 @@
     outline-offset: 3px;
   }
 
-  /* Belum terverifikasi: penanda berongga, bukan terisi. Bentuknya yang membedakan,
-     bukan warnanya, jadi statusnya tetap terbaca tanpa bergantung pada penglihatan
-     warna (PRD bagian 8). Angka tetap gelap supaya kontrasnya lolos AA. */
+  /* Belum terverifikasi: penanda berongga, bukan terisi. Bentuknya yang membedakan, bukan
+     warnanya, jadi statusnya tetap terbaca tanpa bergantung pada penglihatan warna (PRD
+     bagian 8). */
   .penanda-skor[data-status='belum_terverifikasi'] .penanda-bulat {
     background: #fff;
     color: var(--color-gray-900);
@@ -164,15 +139,8 @@
     box-shadow: inset 0 0 0 3px var(--warna-skor), 0 0 0 3px #fff, 0 0 0 6px var(--warna-skor), 0 3px 10px rgb(0 0 0 / 0.4);
   }
 
-  /* ---------------------------------------------------------------------------
-     Hierarki tombol. Sebelumnya gaya aksi utama ditulis ulang di sepuluh berkas
-     dengan enam varian tinggi dan bantalan yang berbeda-beda, begitu pula aksi
-     sekunder. Didefinisikan sekali di sini, dipakai ulang lewat nama kelas.
-
-     Aturannya satu: aksi utama terisi penuh warna merek, aksi sekunder bergaris,
-     aksi tersier tanpa isian maupun garis. Satu layar tidak boleh punya dua aksi
-     utama yang bersaing.
-     --------------------------------------------------------------------------- */
+  /* Hierarki tombol. Sebelumnya gaya aksi utama ditulis ulang di sepuluh berkas dengan enam
+     varian tinggi dan bantalan yang berbeda-beda, begitu pula aksi sekunder. */
   .tombol {
     display: inline-flex;
     align-items: center;
@@ -226,17 +194,15 @@
     color: var(--color-gray-900);
   }
 
-  /* Keadaan terpilih untuk pilihan yang bukan aksi utama. Dipakai pada tombol
-     "sudah berubah" di halaman detail: pilihan itu perlu terlihat aktif, tetapi
-     tidak boleh memakai warna merek yang berarti aksi utama. */
+  /* Keadaan terpilih untuk pilihan yang bukan aksi utama. */
   .tombol-dipilih-gelap {
     background: var(--color-gray-900);
     border-color: var(--color-gray-900);
     color: #fff;
   }
 
-  /* Bentuk pil hanya untuk tombol mengambang di atas peta, yang harus terbaca
-     sebagai benda terpisah dari bidang petanya. */
+  /* Bentuk pil hanya untuk tombol mengambang di atas peta, yang harus terbaca sebagai benda
+     terpisah dari bidang petanya. */
   .tombol-pil {
     border-radius: 9999px;
     padding-inline: 1.25rem;
@@ -249,16 +215,15 @@
     }
   }
 
-  /* Penanda kelompok. Netral gelap, bukan warna skor: satu kelompok memuat beberapa
-     skor sekaligus, jadi memberinya satu warna akan menyampaikan hal yang keliru.
-     Bentuknya tetap lingkaran berangka supaya sekeluarga dengan penanda tunggal. */
+  /* Penanda kelompok. Netral gelap, bukan warna skor: satu kelompok memuat beberapa skor
+     sekaligus, jadi memberinya satu warna akan menyampaikan hal yang keliru. */
   .penanda-kluster .penanda-bulat {
     background: var(--color-gray-800);
   }
 
-  /* Varian penanda untuk panel daftar: bentuk dan kode statusnya sama persis dengan
-     penanda peta, hanya lebih kecil dan tanpa perilaku interaktif, supaya pembaca
-     mengenali keduanya sebagai benda yang sama. */
+  /* Varian penanda untuk panel daftar: bentuk dan kode statusnya sama persis dengan penanda
+     peta, hanya lebih kecil dan tanpa perilaku interaktif, supaya pembaca mengenali keduanya
+     sebagai benda yang sama. */
   .penanda-daftar {
     width: 38px;
     height: 38px;
@@ -275,8 +240,8 @@
     transform: none;
   }
 
-  /* Titik posisi pengguna. Biru dipakai sebagai konvensi peta yang sudah dikenal,
-     bukan sebagai warna kode skor, dan tidak pernah muncul di elemen lain. */
+  /* Titik posisi pengguna. Biru dipakai sebagai konvensi peta yang sudah dikenal, bukan
+     sebagai warna kode skor, dan tidak pernah muncul di elemen lain. */
   .titik-saya {
     width: 18px;
     height: 18px;
@@ -302,34 +267,26 @@
 }
 
 /* Basemap streets-v2 membawa warnanya sendiri: jalan kuning, taman hijau, dan ikon
-   kategori termasuk salib merah rumah sakit yang bersaing langsung dengan penanda
-   merah skor. Saturasinya diredam di lapisan kanvas, bukan dengan mengubah warna
-   skor. Penanda adalah elemen DOM bersaudara dengan kanvas, bukan anaknya, jadi
-   sama sekali tidak terkena penapis ini dan tetap berwarna penuh. */
+   kategori termasuk salib merah rumah sakit yang bersaing langsung dengan penanda merah
+   skor. */
 .maplibregl-canvas {
   filter: saturate(0.6);
 }
 
 /* Kontrol MapLibre disamakan sudutnya dengan bahasa visual sisanya, dan tombolnya
-   dinaikkan dari 29px bawaan ke 44px. Ukuran bawaannya dirancang untuk tetikus;
-   di layar 375px ia menjadi sasaran sentuh terkecil di seluruh aplikasi, jauh di
-   bawah ambang yang dipakai setiap tombol lain di sini. */
+   dinaikkan dari 29px bawaan ke 44px. */
 .maplibregl-ctrl-group {
   border-radius: 6px;
 }
 
-/* Nama kelasnya sengaja ditulis dua kali. CSS milik MapLibre memakai pemilih
-   dengan kekhususan yang sama persis dan dimuat sesudah berkas ini, jadi pada
-   kekhususan seri ia yang menang. Pengulangan menaikkan kekhususan satu tingkat
-   tanpa perlu !important. */
-/* Kendali peta disusun sebagai satu kolom di sudut kanan bawah: tombol lokasi saya,
-   grup perbesar, lalu atribusi. Ketiganya harus segaris dan berjarak sama.
-   Terukur sebelum perbaikan, sama di 375, 390, 768, dan 1440: tombol lokasi saya
-   berjarak 16px dari tepi sedangkan grup perbesar 10px, jadi kolomnya goyang, dan
-   celah antar keduanya MINUS 14px, artinya keduanya saling menindih. */
-/* Nama kelasnya ditulis dua kali. CSS milik MapLibre memakai pemilih dengan
-   kekhususan yang sama persis dan dimuat sesudah berkas ini, jadi pada kekhususan
-   seri ia yang menang. Pengulangan menaikkannya satu tingkat tanpa !important. */
+/* Nama kelasnya sengaja ditulis dua kali. CSS milik MapLibre memakai pemilih dengan
+   kekhususan yang sama persis dan dimuat sesudah berkas ini, jadi pada kekhususan seri ia
+   yang menang. */
+/* Kendali peta disusun sebagai satu kolom di sudut kanan bawah: tombol lokasi saya, grup
+   perbesar, lalu atribusi. Ketiganya harus segaris dan berjarak sama. */
+/* Nama kelasnya ditulis dua kali. CSS milik MapLibre memakai pemilih dengan kekhususan
+   yang sama persis dan dimuat sesudah berkas ini, jadi pada kekhususan seri ia yang
+   menang. */
 .maplibregl-ctrl-bottom-right.maplibregl-ctrl-bottom-right .maplibregl-ctrl {
   margin: 0 var(--sisi-kendali-peta) var(--celah-kendali-peta) 0;
 }
@@ -339,9 +296,8 @@
   height: 44px;
 }
 
-/* Tombol lokasi saya duduk di kolom yang sama dengan kendali MapLibre, tepat di
-   atas grup perbesar. Letaknya dihitung dari token yang sama, bukan dari angka lepas,
-   supaya kolomnya tidak bisa lagi bergeser sendiri-sendiri. */
+/* Tombol lokasi saya duduk di kolom yang sama dengan kendali MapLibre, tepat di atas grup
+   perbesar. */
 .kendali-lokasi-saya {
   right: var(--sisi-kendali-peta);
   bottom: calc(var(--dasar-kendali-peta) + var(--tinggi-grup-zoom) + var(--celah-kendali-peta));
@@ -352,8 +308,8 @@
 }
 
 @layer components {
-  /* Rangka pemuatan peta. Denyutnya pelan dan kontrasnya rendah: ini penanda tunggu,
-     bukan sesuatu yang perlu ditonton. */
+  /* Rangka pemuatan peta. Denyutnya pelan dan kontrasnya rendah: ini penanda tunggu, bukan
+     sesuatu yang perlu ditonton. */
   .rangka-peta span {
     position: absolute;
     display: block;
@@ -392,8 +348,8 @@
     opacity: 0;
   }
 
-  /* Kartu ringkas naik dari bawah sambil memudar masuk. Easing keluar eksponensial
-     supaya berhenti dengan lembut, bukan mengerem mendadak. */
+  /* Kartu ringkas naik dari bawah sambil memudar masuk. Easing keluar eksponensial supaya
+     berhenti dengan lembut, bukan mengerem mendadak. */
   .kartu-enter-active {
     transition: opacity 220ms ease-out, transform 260ms cubic-bezier(0.16, 1, 0.3, 1);
   }
@@ -408,9 +364,9 @@
     transform: translateY(12px);
   }
 
-  /* Umpan balik saat penanda diketuk: satu denyut singkat lalu berhenti di ukuran
-     terpilih. Hanya sekali, tidak berdenyut terus, supaya tidak menarik perhatian
-     dari angka skornya sendiri. */
+  /* Umpan balik saat penanda diketuk: satu denyut singkat lalu berhenti di ukuran terpilih.
+     Hanya sekali, tidak berdenyut terus, supaya tidak menarik perhatian dari angka skornya
+     sendiri. */
   @keyframes denyut-penanda {
     0%   { transform: scale(1); }
     45%  { transform: scale(1.32); }
@@ -451,9 +407,8 @@
     }
   }
 
-  /* Panel daftar lokasi. Di ponsel ia menggantikan pandangan, jadi naik dari bawah
-     seperti lembar; di layar lebar ia menempel di tepi kanan peta, jadi masuk dari
-     kanan. Arahnya mengikuti dari mana benda itu datang, bukan satu animasi seragam. */
+  /* Panel daftar lokasi. Di ponsel ia menggantikan pandangan, jadi naik dari bawah seperti
+     lembar; di layar lebar ia menempel di tepi kanan peta, jadi masuk dari kanan. */
   .panel-enter-active,
   .panel-leave-active {
     transition: opacity 200ms ease, transform 260ms cubic-bezier(0.16, 1, 0.3, 1);
@@ -503,15 +458,15 @@
     transition: transform 240ms cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  /* Kabut penanda kelanjutan pada baris chip yang bergulir mendatar. Fungsinya
-     memberi tahu masih ada isi di luar layar, bukan hiasan, jadi ia padam sendiri
-     begitu gulirannya sampai ujung. */
+  /* Kabut penanda kelanjutan pada baris chip yang bergulir mendatar. Fungsinya memberi tahu
+     masih ada isi di luar layar, bukan hiasan, jadi ia padam sendiri begitu gulirannya
+     sampai ujung. */
   .kabut-gulir {
     background: linear-gradient(to left, var(--color-white), transparent);
   }
 
-  /* Batang gulir baris chip disembunyikan di peramban desktop: di sana barisnya
-     membungkus, jadi batang itu tidak pernah punya guna. */
+  /* Batang gulir baris chip disembunyikan di peramban desktop: di sana barisnya membungkus,
+     jadi batang itu tidak pernah punya guna. */
   .baris-chip {
     scrollbar-width: none;
   }
@@ -538,8 +493,8 @@
 }
 
 @layer components {
-  /* Lapisan pembuka. Latarnya warna merek pekat tanpa gradien dan tanpa hiasan lain
-     di luar wordmark, sesuai keputusan yang tercatat di DESIGN.md. */
+  /* Lapisan pembuka. Latarnya warna merek pekat tanpa gradien dan tanpa hiasan lain di luar
+     wordmark, sesuai keputusan desain. */
   .layar-pembuka {
     position: fixed;
     inset: 0;
@@ -550,8 +505,8 @@
     animation: pembuka-pergi 2000ms linear forwards;
   }
 
-  /* Batas keras dua detik ditegakkan di sini, bukan di JavaScript. Kalau skrip gagal
-     dimuat, lapisan ini tetap padam dan aplikasi tetap bisa dipakai. */
+  /* Batas keras dua detik ditegakkan di sini, bukan di JavaScript. Kalau skrip gagal dimuat,
+     lapisan ini tetap padam dan aplikasi tetap bisa dipakai. */
   @keyframes pembuka-pergi {
     0%, 84% {
       opacity: 1;
@@ -581,10 +536,8 @@
     }
   }
 
-  /* Anak tangga melebur menjadi garis landai. Kedua jalur punya urutan perintah yang
-     sama persis, jadi peramban menginterpolasi titik demi titik. Kalau properti d
-     tidak didukung, jalurnya tetap tergambar sebagai tangga dari atribut d, dan yang
-     hilang cuma peralihannya. */
+  /* Anak tangga melebur menjadi garis landai. Kedua jalur punya urutan perintah yang sama
+     persis, jadi peramban menginterpolasi titik demi titik. */
   .pembuka-glif {
     animation: melebur 1100ms cubic-bezier(0.65, 0, 0.35, 1) 260ms forwards;
   }

@@ -1,8 +1,5 @@
-// Proxy ke Nominatim. Dari browser header User-Agent tidak bisa diatur, padahal
-// kebijakan pemakaian Nominatim mewajibkan identifikasi aplikasi. Lewat server
-// route ini header bisa dipasang, sekalian lolos CORS.
-// Pencarian hanya dipicu saat user menekan cari, bukan tiap ketikan, supaya
-// batas satu permintaan per detik tidak dilanggar.
+// Proxy ke Nominatim. Dari browser header User-Agent tidak bisa diatur, padahal kebijakan
+// pemakaian Nominatim mewajibkan identifikasi aplikasi.
 
 interface HasilNominatim {
   display_name: string

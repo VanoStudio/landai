@@ -125,6 +125,6 @@ Dipetakan langsung ke rubrik penilaian penyisihan ITechno Cup 2026:
 - Kesesuaian tema, dijawab lewat kaitan eksplisit ke SDG 11 di halaman tentang.
 - Inovasi dan orisinalitas, dijawab lewat penegasan belum ada crowdmap aksesibilitas serupa di Indonesia.
 - Fungsionalitas, dijawab lewat seluruh alur MVP di atas berjalan end to end tanpa error.
-- UI/UX, dijawab lewat desain yang dibangun memakai Impeccable, lihat DESIGN.md.
+- UI/UX, dijawab lewat sistem desain sendiri: token warna, tipografi, dan komponen yang dipakai konsisten di seluruh halaman.
 - Implementasi teknologi, dijawab lewat penggunaan Supabase, MapLibre, dan geocoding terdokumentasi di README.
 - Dokumentasi dan repo, dijawab lewat README sesuai template resmi lomba.

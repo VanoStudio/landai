@@ -206,6 +206,13 @@ try {
   catat('Belum ada peringatan sebelum nama diketik', sebelumKetik === false)
 
   await page.fill('#nama-tempat', 'Blok M Plaza')
+
+  // Jenis tempat wajib dipilih sejak schema-patch-7.sql, jadi tombol Lanjut mati
+  // sampai ada yang dipilih. Tanpa ini, yang teruji bukan peringatan duplikatnya.
+  await page.evaluate(() => {
+    const r = document.querySelector('fieldset input[type=radio]')
+    r && r.click()
+  })
   await page.waitForTimeout(700)
 
   const peringatan = await page.evaluate(() => {

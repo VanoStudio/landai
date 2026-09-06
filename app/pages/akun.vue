@@ -1,15 +1,5 @@
 <script setup lang="ts">
 // Halaman akun. Isinya satu hal saja: nama yang tampil di peta.
-//
-// Ada karena nama itu bukan urusan kosmetik di aplikasi ini. Nama inilah yang tertulis
-// pada "Ditambahkan ... " di halaman detail dan pada papan kontributor, jadi ia
-// dibaca siapa pun yang membuka peta. Sebelum halaman ini ada, nama hanya bisa diubah
-// lewat SQL, dan nama yang ikut terbawa dari penyedia masuk seperti Google dipakai apa
-// adanya, termasuk kalau bentuknya bukan nama yang ingin ditampilkan ke publik.
-//
-// Surel sengaja hanya ditampilkan, tidak bisa diubah di sini. Mengubah surel berarti
-// mengubah identitas masuk, dan itu perlu pengiriman tautan konfirmasi ke dua alamat
-// sekaligus. Di luar cakupan, dan salah kalau dikerjakan setengah.
 const supabase = useSupabaseClient()
 const user = useSupabaseUser()
 const idPengguna = useIdPengguna()

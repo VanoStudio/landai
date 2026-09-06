@@ -1,18 +1,6 @@
 <script setup lang="ts">
-// Lapisan pembuka yang sangat singkat, bukan pengganti rangka pemuatan.
-//
-// Rangka peta sudah dirender server, jadi ia hadir di HTML pertama. Yang masih kosong
-// adalah jeda sebelum gaya dan huruf selesai dimuat pada jaringan lambat. Lapisan ini
-// menutup jeda itu, lalu menyerahkannya kembali ke rangka.
-//
-// Isinya wordmark itu sendiri yang menganimasikan filosofinya: tiga anak tangga di
-// kiri melebur menjadi satu garis diagonal halus. Kedua jalur punya urutan perintah
-// yang sama persis, hanya titiknya berbeda, jadi peramban bisa menginterpolasi
-// keduanya. Titik pada jalur akhir semuanya duduk pada satu garis lurus dari ujung
-// kiri bawah ke ujung kanan atas.
-//
-// Batas dua detik ditegakkan animasi CSS, bukan JavaScript. Kalau skrip gagal jalan
-// sama sekali, lapisan ini tetap padam sendiri dan tidak pernah mengurung aplikasi.
+// Lapisan pembuka yang sangat singkat, bukan pengganti rangka pemuatan. Rangka peta sudah
+// dirender server, jadi ia hadir di HTML pertama.
 defineProps<{ selesai?: boolean }>()
 
 const TANGGA = 'M5 25 L5 22.6 L7.9 22.6 Q8.3 22.6 8.3 22.2 L8.3 19.6 Q8.3 19.2 8.7 19.2 '
@@ -21,9 +9,8 @@ const TANGGA = 'M5 25 L5 22.6 L7.9 22.6 Q8.3 22.6 8.3 22.2 L8.3 19.6 Q8.3 19.2 8
 </script>
 
 <template>
-  <!-- Disembunyikan dari pembaca layar. Kabar "sedang memuat" sudah dibawa teks
-       khusus pembaca layar di halaman peta, dan menyuarakannya dua kali justru
-       mengganggu. -->
+  <!-- Disembunyikan dari pembaca layar. Kabar "sedang memuat" sudah dibawa teks khusus pembaca
+       layar di halaman peta, dan menyuarakannya dua kali justru mengganggu. -->
   <div class="layar-pembuka" :class="{ 'pembuka-selesai': selesai }" aria-hidden="true">
     <div class="flex items-center gap-3">
       <svg viewBox="0 0 32 32" class="h-14 w-14 shrink-0" focusable="false">

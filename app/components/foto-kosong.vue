@@ -1,14 +1,12 @@
 <script setup lang="ts">
-// Keadaan ketika sebuah lokasi belum punya foto. Sebelumnya berupa kotak abu
-// bergaris putus dengan teks kecil, yang mudah disalahartikan sebagai gambar rusak.
-// Diganti ikon kamera yang jelas disengaja, plus kalimat yang mengundang, bukan
-// kalimat yang sekadar memberitakan ketiadaan.
+// Keadaan ketika sebuah lokasi belum punya foto. Sebelumnya berupa kotak abu bergaris
+// putus dengan teks kecil, yang mudah disalahartikan sebagai gambar rusak.
 withDefaults(defineProps<{ ringkas?: boolean }>(), { ringkas: false })
 </script>
 
 <template>
-  <!-- Bentuk ringkas dipakai di kartu peta: hanya ikon, karena bidangnya 64 piksel
-       dan teks apa pun di situ akan lebih kecil daripada batas keterbacaan. -->
+  <!-- Bentuk ringkas dipakai di kartu peta: hanya ikon, karena bidangnya 64 piksel dan teks
+       apa pun di situ akan lebih kecil daripada batas keterbacaan. -->
   <div
     v-if="ringkas"
     class="grid h-16 w-16 shrink-0 place-items-center rounded border border-gray-200 bg-gray-50"

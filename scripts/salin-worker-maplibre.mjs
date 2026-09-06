@@ -1,13 +1,5 @@
-// maplibre-gl v6 memuat worker-nya lewat `new URL('./maplibre-gl-worker.mjs', import.meta.url)`
-// dengan nama berkas yang dirakit saat runtime. Bundler tidak bisa melihat referensi itu
-// secara statis, jadi worker tidak pernah ikut ter-emit ke hasil build dan peta gagal
-// merender tile tanpa pesan error yang jelas.
-//
-// Worker itu sendiri mengimpor "./maplibre-gl-shared.mjs" secara relatif, jadi keduanya
-// harus disalin berdampingan. Menyalin worker saja membuatnya mati dengan 404 senyap.
-//
-// Plugin klien menunjuk MapLibre ke salinan ini lewat setWorkerUrl().
-// Dijalankan otomatis saat install, dev, dan build.
+// maplibre-gl v6 memuat worker-nya lewat `new URL('./maplibre-gl-worker.mjs',
+// import.meta.url)` dengan nama berkas yang dirakit saat runtime.
 
 import { copyFile, mkdir } from 'node:fs/promises'
 import { existsSync } from 'node:fs'

@@ -1,11 +1,6 @@
 <script setup lang="ts">
-// Halaman pendaratan setelah pengguna kembali dari tautan konfirmasi email atau
-// dari alur Google. @nuxtjs/supabase yang menukar kode jadi sesi; di sini cukup
-// menunggu user terisi lalu memindahkan ke peta.
-//
-// Kalau yang datang justru kegagalan, penyebabnya harus terbaca. Supabase menaruh
-// keterangannya di query untuk sebagian galat dan di fragmen alamat untuk sebagian
-// lain, jadi keduanya dibaca.
+// Halaman pendaratan setelah pengguna kembali dari tautan konfirmasi email atau dari alur
+// Google.
 const user = useSupabaseUser()
 const route = useRoute()
 

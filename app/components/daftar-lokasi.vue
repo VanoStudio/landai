@@ -1,9 +1,6 @@
 <script setup lang="ts">
 // Panel daftar lokasi. Dipanggil lewat pemindah tampilan di header, lalu bisa ditutup
-// lagi: di layar lebar ia melayang di tepi kanan peta, di ponsel menutupi seluruh
-// layar. Peta tidak pernah menyusut karenanya, jadi peta tetap elemen utama berapa pun
-// banyaknya lokasi nanti. Menekan satu butir memindahkan fokus peta ke lokasi itu
-// sekaligus membuka kartunya, jadi daftar dan peta selalu sinkron.
+// lagi: di layar lebar ia melayang di tepi kanan peta, di ponsel menutupi seluruh layar.
 
 const props = defineProps<{
   lokasi: LokasiPeta[]
@@ -12,8 +9,8 @@ const props = defineProps<{
 
 const emit = defineEmits<{ pilih: [LokasiPeta], tutup: [] }>()
 
-// Diurutkan dari skor tertinggi. Orang membuka daftar untuk mencari tempat yang
-// bisa dimasuki, bukan untuk membaca urutan pemasukan data.
+// Diurutkan dari skor tertinggi. Orang membuka daftar untuk mencari tempat yang bisa
+// dimasuki, bukan untuk membaca urutan pemasukan data.
 const terurut = computed(() =>
   [...props.lokasi].sort((a, b) => b.skor - a.skor || a.nama.localeCompare(b.nama, 'id')),
 )
@@ -50,9 +47,8 @@ const terurut = computed(() =>
           :aria-current="l.id === props.terpilih ? 'true' : undefined"
           @click="emit('pilih', l)"
         >
-          <!-- Angka skor memakai bentuk yang sama dengan penanda peta: terisi berarti
-               terverifikasi, berongga berarti belum. Bentuknya yang membedakan, bukan
-               warnanya, supaya tetap terbaca tanpa membedakan warna. -->
+          <!-- Angka skor memakai bentuk yang sama dengan penanda peta: terisi berarti terverifikasi,
+               berongga berarti belum. -->
           <span
             class="penanda-skor penanda-daftar shrink-0"
             :style="{ '--warna-skor': warnaSkor(l.skor) }"

@@ -1,18 +1,7 @@
 <script setup lang="ts">
-// Peringatan isi kasar pada formulir kontribusi.
-//
-// Bentuknya sengaja sama persis dengan peringatan kemungkinan duplikat yang sudah
-// ada di formulir yang sama: garis amber, latar putih, dua aksi. Keduanya jenis
-// pesan yang sama, yaitu "ini mungkin keliru, tapi Anda yang lebih tahu", jadi
-// keduanya harus terlihat sebagai benda yang sama.
-//
-// Amber, bukan merah. Merah di aplikasi ini dipakai untuk kegagalan yang benar
-// benar menghentikan, misalnya simpanan yang ditolak basis data. Ini bukan itu:
-// pengguna tetap boleh mengirim, dan warnanya harus mengatakan demikian.
-//
-// Kata yang terpicu disebutkan supaya bisa ditindaklanjuti, tetapi disensor bagian
-// tengahnya. Menuliskannya ulang secara utuh tidak menambah kejelasan apa pun dan
-// justru menaruh kata itu di layar untuk kedua kalinya.
+// Peringatan isi kasar pada formulir kontribusi. Bentuknya sengaja sama persis dengan
+// peringatan kemungkinan duplikat yang sudah ada di formulir yang sama: garis amber, latar
+// putih, dua aksi.
 const props = defineProps<{
   matchedWords: string[]
   kolom: ('nama' | 'catatan')[]
@@ -25,8 +14,8 @@ const emit = defineEmits<{
 
 const daftar = computed(() => props.matchedWords.map(sensorKata).join(', '))
 
-// Kedua kolom disebut kalau keduanya bermasalah. Menyebut salah satu saja membuat
-// orang memperbaiki satu lalu tertahan lagi oleh yang lain tanpa tahu sebabnya.
+// Kedua kolom disebut kalau keduanya bermasalah. Menyebut salah satu saja membuat orang
+// memperbaiki satu lalu tertahan lagi oleh yang lain tanpa tahu sebabnya.
 const namaKolom = computed(() => {
   const nama = props.kolom.map(k => (k === 'nama' ? 'nama tempat' : 'catatan tambahan'))
   return nama.length > 1 ? nama.join(' dan ') : (nama[0] ?? 'isian')

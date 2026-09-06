@@ -1,20 +1,6 @@
 <script setup lang="ts">
-// Menu akun. Satu tombol yang menggantikan dua kendali header sekaligus, yaitu ikon
-// akun dan tombol keluar, lalu membuka seluruh urusan akun di dalamnya.
-//
-// Alasannya bukan kerapian. Sebelum ini, aksi milik akun tersebar sebagai tombol
-// terpisah di header, jadi setiap tambahan memakan lebar, dan yang tidak muat di ponsel
-// langsung hilang. Akibatnya terukur: di layar 414px, pengguna yang sudah masuk sama
-// sekali tidak punya jalan ke halaman akun maupun papan kontributor, kecuali lewat ikon
-// tentang lalu menggulir ke tengah halaman. Menu ini membuat penambahan berikutnya
-// masuk ke dalam daftar, bukan ke dalam baris header.
-//
-// Di ponsel penggantian itu justru menghemat ruang: tombol keluar selebar sekitar 72px
-// diganti tombol bundar 44px.
-//
-// Tombolnya memakai huruf awal nama, bukan ikon orang generik, karena selain membuka
-// menu ia sekaligus menjawab pertanyaan yang selama ini tidak dijawab di mana pun:
-// sedang masuk sebagai siapa.
+// Menu akun. Satu tombol yang menggantikan dua kendali header sekaligus, yaitu ikon akun
+// dan tombol keluar, lalu membuka seluruh urusan akun di dalamnya.
 const user = useSupabaseUser()
 const { data: profil } = useProfilSaya()
 const keluar = useKeluar()
@@ -23,9 +9,7 @@ const terbuka = ref(false)
 const pemicu = ref<HTMLButtonElement | null>(null)
 const panel = ref<HTMLElement | null>(null)
 
-// Panel dipasang fixed, bukan absolute. Wadah halaman peta memakai overflow-hidden
-// supaya halamannya tidak ikut tergulir, dan panel absolute apa pun yang menjulur ke
-// bawah header akan terpotong oleh wadah itu.
+// Panel dipasang fixed, bukan absolute.
 const posisi = ref({ atas: 0, kanan: 0 })
 
 const nama = computed(() => profil.value?.nama?.trim() || 'Warga')
@@ -116,8 +100,8 @@ async function keluarDanTutup() {
         class="fixed z-50 w-64 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-2xl"
         :style="{ top: `${posisi.atas}px`, right: `${posisi.kanan}px` }"
       >
-        <!-- Identitas ditaruh paling atas. Sebelum ada menu ini, tidak ada satu tempat
-             pun di aplikasi yang menyebutkan sedang masuk sebagai siapa. -->
+        <!-- Identitas ditaruh paling atas. Sebelum ada menu ini, tidak ada satu tempat pun di
+             aplikasi yang menyebutkan sedang masuk sebagai siapa. -->
         <div class="border-b border-gray-200 px-4 py-3">
           <p class="truncate font-semibold">{{ nama }}</p>
           <p class="mt-0.5 truncate text-xs text-gray-600">{{ surel }}</p>

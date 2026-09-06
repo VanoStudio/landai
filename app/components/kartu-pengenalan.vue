@@ -1,12 +1,7 @@
 <script setup lang="ts">
-// Sapaan untuk pengunjung pertama. Sengaja bukan jendela modal dan bukan tur
-// bertahap: keduanya menahan orang di depan pintu, padahal peta di belakangnya
-// justru barang yang mereka datangi. Kartu ini menempel di sudut, petanya tetap
-// bisa digeser dan diketuk, dan satu ketukan menutupnya untuk selamanya.
-//
-// Ambangnya penyimpanan lokal peramban, bukan status akun. Orang yang sudah paham
-// aturan mainnya tidak perlu diberi tahu lagi hanya karena belum mendaftar, dan
-// perangkat baru memang pantas diberi tahu sekali lagi.
+// Sapaan untuk pengunjung pertama. Sengaja bukan jendela modal dan bukan tur bertahap:
+// keduanya menahan orang di depan pintu, padahal peta di belakangnya justru barang yang
+// mereka datangi.
 const KUNCI = 'landai:pengenalan-ditutup'
 
 const terlihat = ref(false)
@@ -16,8 +11,8 @@ onMounted(() => {
     terlihat.value = localStorage.getItem(KUNCI) !== '1'
   }
   catch {
-    // Mode penyamaran atau penyimpanan situs diblokir. Tanpa catatan, kunjungan
-    // ini tidak bisa dibedakan dari kunjungan pertama, jadi kartunya tetap tampil.
+    // Mode penyamaran atau penyimpanan situs diblokir. Tanpa catatan, kunjungan ini tidak bisa
+    // dibedakan dari kunjungan pertama, jadi kartunya tetap tampil.
     terlihat.value = true
   }
 })

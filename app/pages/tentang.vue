@@ -1,6 +1,6 @@
 <script setup lang="ts">
-// Halaman ini juga jadi jalan masuk ke halaman akun di layar tersempit, karena di
-// sana baris header peta sudah terisi penuh dan tidak muat satu tombol lagi.
+// Halaman ini juga jadi jalan masuk ke halaman akun di layar tersempit, karena di sana
+// baris header peta sudah terisi penuh dan tidak muat satu tombol lagi.
 const user = useSupabaseUser()
 
 useHead({ title: 'Tentang' })

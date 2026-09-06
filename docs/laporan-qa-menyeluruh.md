@@ -135,7 +135,7 @@ terpisah sempurna dengan satu ketukan.
 **C2. Ketebalan garis ikon berbeda tipis antar peran.** Diukur optis, yaitu
 `stroke-width` dikali rasio render terhadap viewBox: ikon kebutuhan 1,5 px, kendali
 1,67 px, tanda centang daftar periksa 1,75 px, panah "tautan membuka tab baru"
-1,33 px. Selisih terlebarnya 0,42 px. Tidak ada aturan ketebalan ikon di DESIGN.md,
+1,33 px. Selisih terlebarnya 0,42 px. Tidak ada aturan ketebalan ikon yang ditetapkan,
 jadi ini keputusan gaya, bukan penyimpangan. Kalau mau diseragamkan, yang paling
 menonjol adalah panah tautan luar yang paling tipis.
 

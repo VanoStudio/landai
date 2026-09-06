@@ -1,35 +1,13 @@
 <script setup lang="ts">
-// Kartu tunggal, bukan grid kartu kecil (DESIGN.md).
+// Kartu tunggal, bukan grid kartu kecil.
 const route = useRoute()
 const supabase = useSupabaseClient()
 const user = useSupabaseUser()
 const idPengguna = useIdPengguna()
 const id = computed(() => String(route.params.id))
 
-// Kolom jejak pembaruan datang dari schema-patch-5.sql. Kueri dicoba lengkap dulu,
-// dan kalau kolomnya belum ada di basis data, diulang tanpa keduanya. Tanpa ini,
-// mendorong kode lebih dulu daripada menjalankan tambalannya membuat seluruh halaman
-// detail membalas galat, bukan sekadar kehilangan satu baris keterangan.
-//
-// Relasi ke profiles WAJIB disebut lewat kolom kunci asingnya. Sejak updated_by ada,
-// locations punya DUA kunci asing ke profiles, dan PostgREST menolak menebak yang mana
-// yang dimaksud: "PGRST201 Could not embed because more than one relationship was
-// found". Galatnya bukan soal kolom yang hilang, jadi jaring pengaman di bawah tidak
-// menangkapnya, dan halaman ini sempat mati begitu tambalannya dijalankan. Petunjuknya
-// memakai nama kolom, bukan nama batasan, karena nama batasan dibuat otomatis dan bisa
-// berbeda di basis data lain.
-// Dua kelompok kolom di bawah ini datang dari tambalan yang berbeda: jejak pembaruan
-// dari schema-patch-5.sql, dan pengunggah foto dari schema-patch-6.sql. Kueri dicoba
-// lengkap dulu, lalu kelompoknya dilepas satu per satu kalau basis datanya belum
-// menerima tambalan itu. Tanpa ini, mendorong kode lebih dulu daripada menjalankan
-// tambalannya membuat seluruh halaman detail membalas galat, bukan sekadar kehilangan
-// satu keterangan.
-//
-// Relasi ke profiles WAJIB disebut lewat kolom kunci asingnya. Sejak updated_by ada,
-// locations punya DUA kunci asing ke profiles, dan PostgREST menolak menebak yang mana
-// yang dimaksud: "PGRST201 Could not embed because more than one relationship was
-// found". Petunjuknya memakai nama kolom, bukan nama batasan, karena nama batasan
-// dibuat otomatis dan bisa berbeda di basis data lain.
+// Kueri dicoba lengkap dulu, lalu kelompok kolom dari tambalan belakangan dilepas satu per
+// satu kalau basis datanya belum menerimanya.
 async function ambilLokasi(pakaiJejak: boolean, pakaiPengunggah: boolean) {
   return supabase
     .from('locations')
@@ -37,7 +15,7 @@ async function ambilLokasi(pakaiJejak: boolean, pakaiPengunggah: boolean) {
       id, nama, kategori, lat, lng, skor, status, created_at, created_by,
       ${pakaiJejak ? 'updated_by, updated_at, pembaru:profiles!updated_by ( nama ),' : ''}
       accessibility_checklist (*),
-      location_photos ( id, photo_url${pakaiPengunggah ? ', uploaded_by' : ''} ),
+      location_photos ( id, photo_url, created_at${pakaiPengunggah ? ', uploaded_by' : ''} ),
       confirmations ( id, user_id, is_accurate ),
       penambah:profiles!created_by ( nama )
     `)
@@ -71,13 +49,18 @@ const checklist = computed(() => {
 
 const foto = computed(() => lokasi.value?.location_photos ?? [])
 
-// Pratinjau layar penuh. Menyimpan nomor urutnya, bukan sekadar buka atau tutup,
-// supaya pratinjaunya terbuka tepat pada foto yang diketuk.
+// Foto yang diunggah sejak penandaan otomatis ada sudah membawa tandanya di dalam
+// berkasnya. Yang lebih tua ditandai lewat lapisan tampilan.
+const SEJAK_BERTANDA = Date.parse('2026-09-06T08:46:00Z')
+const perluTanda = (f: any) => !f.created_at || Date.parse(f.created_at) < SEJAK_BERTANDA
+
+// Menyimpan nomor urut, bukan sekadar buka atau tutup, supaya pratinjaunya terbuka tepat
+// pada foto yang diketuk.
 const pratinjauDi = ref<number | null>(null)
 const bukaPratinjau = (i: number) => { pratinjauDi.value = i }
 
-// Daftar foto berubah setelah ada yang menambah atau menghapus. Pratinjau yang
-// sedang terbuka bisa menunjuk ke nomor yang sudah tidak ada, jadi ditutup saja.
+// Pratinjau yang terbuka bisa menunjuk nomor yang sudah tidak ada setelah daftarnya
+// berubah.
 watch(foto, (baru) => {
   if (pratinjauDi.value !== null && pratinjauDi.value >= baru.length) pratinjauDi.value = null
 })
@@ -89,23 +72,17 @@ const konfirmasiSaya = computed(() =>
   konfirmasi.value.find((k: any) => k.user_id === idPengguna.value) ?? null,
 )
 
-// Tombol sunting hanya untuk pemiliknya. Ini lapisan tampilan saja: yang benar-benar
-// menahan orang lain adalah aturan keamanan tingkat baris, ditambah pemeriksaan
-// kepemilikan di halaman formulirnya sendiri.
+// Lapisan tampilan saja: yang menahan orang lain adalah RLS di basis data.
 const pemilik = computed(() =>
   !!idPengguna.value && lokasi.value?.created_by === idPengguna.value,
 )
 
-// Laporan "sudah berubah" lebih banyak daripada "masih akurat". Kalimatnya mengajak
-// memperbarui, bukan menuduh datanya salah: yang melaporkan pun belum tentu benar,
-// dan yang mengisi data ini warga yang menyempatkan diri datang ke sana.
-// Ambangnya dipakai bersama dengan kartu ringkas, ditulis sekali di use-lokasi.
+// Ambangnya dipakai bersama kartu ringkas, ditulis sekali di use-lokasi.
 const butuhPembaruan = computed(() =>
   perluDiperbarui({ jumlah_akurat: jumlahAkurat.value, jumlah_berubah: jumlahBerubah.value }),
 )
 
-// Baris tanpa created_by berarti data contoh yang dimasukkan lewat SQL, bukan
-// kiriman warga. Jangan menyebut kontributor yang tidak pernah ada.
+// Baris tanpa created_by berarti data contoh lewat SQL, bukan kiriman warga.
 const namaKontributor = computed(() => {
   const p = lokasi.value?.penambah
   const satu = Array.isArray(p) ? p[0] : p
@@ -113,15 +90,9 @@ const namaKontributor = computed(() => {
   return lokasi.value?.created_by ? 'Warga' : null
 })
 
-// Zona waktu ditulis eksplisit, bukan diserahkan ke zona mesin. Server render
-// berjalan di UTC sedangkan peramban kontributor di WIB, jadi tanpa ini satu baris
-// yang sama menghasilkan dua tanggal berbeda: server "4 September", peramban
-// "5 September". Selisihnya membuat Vue menandai hidrasi tidak cocok, dan pembaca
-// sempat melihat tanggal yang meleset satu hari sebelum hidrasi mengoreksinya.
-// Aplikasinya memetakan kota di Indonesia, jadi WIB adalah zona yang benar untuk
-// dibaca semua orang, termasuk juri yang membukanya dari zona lain.
-// Jejak pembaruan. Hanya tampil kalau lokasi ini memang pernah diperbarui sesudah
-// dibuat; pemicu di basis data sengaja tidak mengisinya saat baris pertama dibuat.
+// Zona waktu eksplisit. Server render berjalan di UTC sedangkan peramban kontributor di
+// WIB, dan tanpa ini keduanya menghasilkan tanggal berbeda sehingga Vue menandai hidrasi
+// tidak cocok.
 const pembaru = computed(() => {
   const l = lokasi.value
   if (!l?.updated_by || !l?.updated_at) return null
@@ -142,7 +113,7 @@ const tanggal = computed(() =>
     : '',
 )
 
-// Sama seperti di kartu ringkas: tautan biasa ke Google Maps, bukan navigasi sendiri.
+// Tautan biasa ke Google Maps, bukan navigasi buatan sendiri.
 const rute = computed(() =>
   lokasi.value
     ? `https://www.google.com/maps/dir/?api=1&destination=${lokasi.value.lat},${lokasi.value.lng}`
@@ -152,16 +123,8 @@ const rute = computed(() =>
 const mengirim = ref(false)
 const pesanError = ref('')
 
-// ---------------------------------------------------------------------------
-// Menghapus foto.
-//
-// Boleh dilakukan pengunggahnya sendiri atau pemilik lokasi. Yang benar-benar
-// menegakkannya adalah kebijakan di basis data; yang di sini hanya supaya tombolnya
-// tidak disodorkan kepada orang yang pasti ditolak.
-//
-// Baris foto lama tidak punya catatan pengunggah, jadi untuk baris itu hanya pemilik
-// lokasi yang bisa menghapus, sama seperti aturan sebelumnya.
-// ---------------------------------------------------------------------------
+// Boleh dihapus pengunggahnya sendiri atau pemilik lokasi. Yang menegakkannya kebijakan
+// basis data; di sini hanya supaya tombolnya tidak disodorkan sia-sia.
 const { tampilkan } = useNotifikasi()
 const mintaKonfirmasi = ref<string | null>(null)
 const menghapusFoto = ref<string | null>(null)
@@ -172,9 +135,8 @@ function bolehHapusFoto(f: any): boolean {
 }
 
 async function hapusFoto(f: any) {
-  // Ketukan pertama meminta kepastian, ketukan kedua menghapus. Menghapus foto tidak
-  // bisa dibatalkan, dan jendela konfirmasi bawaan peramban mudah tertekan tanpa
-  // dibaca di layar sentuh.
+  // Dua ketukan, bukan dialog bawaan peramban: dialog mudah tertekan tanpa dibaca di layar
+  // sentuh, dan menghapus foto tidak bisa dibatalkan.
   if (mintaKonfirmasi.value !== f.id) {
     mintaKonfirmasi.value = f.id
     return
@@ -182,10 +144,8 @@ async function hapusFoto(f: any) {
 
   menghapusFoto.value = f.id
 
-  // Barisnya dihapus lebih dulu, baru berkasnya. Urutan ini yang aman: kalau
-  // penghapusan berkas gagal, yang tertinggal hanya berkas yatim yang tidak tampil di
-  // mana pun. Urutan sebaliknya bisa menyisakan baris yang menunjuk gambar yang sudah
-  // tidak ada, dan itu tampil sebagai gambar rusak bagi semua orang.
+  // Baris dulu, baru berkasnya. Kalau terbalik dan penghapusan baris gagal, yang tertinggal
+  // adalah baris yang menunjuk gambar hilang, tampil rusak bagi semua orang.
   const { error: galatBaris } = await supabase
     .from('location_photos')
     .delete()
@@ -270,8 +230,7 @@ useHead(() => ({ title: lokasi.value ? lokasi.value.nama : 'Lokasi' }))
         </div>
       </div>
 
-      <!-- Penanda perlu diperbarui. Ditaruh tepat di bawah skor karena justru
-           angka itulah yang sedang diragukan warga. -->
+      <!-- Ditaruh tepat di bawah skor karena angka itulah yang sedang diragukan warga. -->
       <p
         v-if="butuhPembaruan" role="status"
         class="mt-4 rounded-lg border border-skor-sedang bg-white px-3 py-2.5 text-sm text-gray-800"
@@ -282,9 +241,8 @@ useHead(() => ({ title: lokasi.value ? lokasi.value.nama : 'Lokasi' }))
       </p>
 
       <div class="mt-5 flex flex-wrap gap-3">
-        <!-- Sejak schema-patch-5.sql, memperbarui kondisi fasilitas terbuka untuk siapa
-             pun yang sudah masuk. Labelnya dibedakan supaya jelas apa yang bisa diubah:
-             pemilik mengubah seluruh datanya, yang lain memperbarui kondisinya. -->
+        <!-- Label dibedakan supaya jelas apa yang bisa diubah: pemilik mengubah seluruh datanya,
+             yang lain hanya kondisinya. -->
         <NuxtLink
           v-if="user"
           :to="`/tambah-lokasi?ubah=${lokasi.id}`"
@@ -316,22 +274,13 @@ useHead(() => ({ title: lokasi.value ? lokasi.value.nama : 'Lokasi' }))
         </a>
       </div>
 
-      <!-- Judul bagian berdiri sendiri selebar penuh, sama seperti judul bagian lain
-           di halaman ini. Sebelumnya ia berbagi baris dengan tombol tambah foto, dan
-           itu menghasilkan dua cacat sekaligus: judulnya jadi satu-satunya yang tidak
-           selebar penuh, dan tombolnya jadi satu-satunya yang rata kanan sementara
-           semua tombol lain rata kiri. Terukur di 430px: rute rata kiri di y=297,
-           tambah foto rata kanan di y=365, konfirmasi rata kiri di y=1343. Mata
-           membaca deretan itu sebagai zigzag. Tombolnya kini bergabung ke baris aksi
-           di atas, bersama tombol lain. -->
+      <!-- Judul bagian berdiri sendiri selebar penuh, seperti judul bagian lainnya. -->
       <h2 class="mt-6 text-base font-semibold">Foto kondisi</h2>
 
       <ul v-if="foto.length" class="mt-3 grid gap-2" :class="foto.length > 1 ? 'grid-cols-2' : 'grid-cols-1'">
         <li v-for="(f, i) in foto" :key="f.id" class="relative">
-          <!-- Fotonya dipangkas jadi kotak supaya kisinya rapi, dan yang terpangkas
-               justru sering bagian yang paling menentukan penilaian. Karena itu tiap
-               foto bisa dibuka utuh, dan pembungkusnya tombol sungguhan supaya bisa
-               dicapai lewat papan ketik, bukan gambar yang diberi penanganan klik. -->
+          <!-- Dipangkas jadi kotak supaya kisinya rapi, dan yang terpangkas sering justru bagian yang
+               menentukan penilaian, jadi tiap foto bisa dibuka utuh. -->
           <button
             type="button"
             :aria-label="`Lihat foto ${i + 1} dari ${foto.length} ukuran penuh`"
@@ -345,8 +294,9 @@ useHead(() => ({ title: lokasi.value ? lokasi.value.nama : 'Lokasi' }))
             >
           </button>
 
-          <!-- Tombol hapus hanya untuk pengunggahnya sendiri atau pemilik lokasi.
-               Ketukan pertama meminta kepastian, ketukan kedua menghapus. -->
+          <TandaFoto v-if="perluTanda(f)" />
+
+          <!-- Hanya untuk pengunggahnya sendiri atau pemilik lokasi. -->
           <button
             v-if="bolehHapusFoto(f)"
             type="button"

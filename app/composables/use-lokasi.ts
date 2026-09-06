@@ -12,11 +12,11 @@ export interface LokasiPeta {
   guiding_block_tersambung: boolean
   tempat_duduk_tersedia: boolean
   lift_tersedia_berfungsi: boolean
-  /** Foto pertama, dipakai sebagai gambar kecil di kartu ringkas. */
+  /* Foto pertama, dipakai sebagai gambar kecil di kartu ringkas. */
   foto_utama: string | null
-  /** Jumlah warga yang menyatakan data ini masih akurat. */
+  /* Jumlah warga yang menyatakan data ini masih akurat. */
   jumlah_akurat: number
-  /** Jumlah warga yang menyatakan kondisinya sudah berubah. */
+  /* Jumlah warga yang menyatakan kondisinya sudah berubah. */
   jumlah_berubah: number
 }
 
@@ -35,8 +35,8 @@ export function cocokKebutuhan(l: LokasiPeta, k: Kebutuhan): boolean {
   return l.tempat_duduk_tersedia || l.lift_tersedia_berfungsi
 }
 
-// Sembilan jenis tempat, digeneralkan di schema-patch-7.sql. Urutannya adalah
-// urutan tampil pada formulir, disusun dari yang paling sering disurvei.
+// Sembilan jenis tempat, digeneralkan di schema-patch-7.sql. Urutannya adalah urutan
+// tampil pada formulir, disusun dari yang paling sering disurvei.
 export const LABEL_KATEGORI: Record<KategoriLokasi, string> = {
   transportasi_umum: 'Transportasi umum',
   perbelanjaan: 'Pusat perbelanjaan',
@@ -49,9 +49,9 @@ export const LABEL_KATEGORI: Record<KategoriLokasi, string> = {
   lainnya: 'Lainnya',
 }
 
-// Contoh yang muncul di bawah tiap pilihan pada formulir. Tanpa ini, "Transportasi
-// umum" mudah dikira hanya kereta, dan halte kembali jatuh ke "Lainnya" seperti
-// sebelum tambalan ini ada.
+// Contoh yang muncul di bawah tiap pilihan pada formulir. Tanpa ini, "Transportasi umum"
+// mudah dikira hanya kereta, dan halte kembali jatuh ke "Lainnya" seperti sebelum tambalan
+// ini ada.
 export const CONTOH_KATEGORI: Record<KategoriLokasi, string> = {
   transportasi_umum: 'Halte, stasiun, terminal',
   perbelanjaan: 'Mal, pasar, pertokoan',
@@ -66,8 +66,8 @@ export const CONTOH_KATEGORI: Record<KategoriLokasi, string> = {
 
 export const KATEGORI_PILIHAN = Object.keys(LABEL_KATEGORI) as KategoriLokasi[]
 
-// Baris lama yang belum ikut dipindahkan tambalan tetap punya tulisan yang masuk
-// akal, bukan kolom kosong. Jaring pengaman, bukan jalur yang diharapkan terpakai.
+// Baris lama yang belum ikut dipindahkan tambalan tetap punya tulisan yang masuk akal,
+// bukan kolom kosong. Jaring pengaman, bukan jalur yang diharapkan terpakai.
 const PADANAN_LAMA: Record<string, KategoriLokasi> = {
   stasiun: 'transportasi_umum',
   mal: 'perbelanjaan',
@@ -80,8 +80,8 @@ export function labelKategori(k: string | null | undefined): string {
   return LABEL_KATEGORI[(PADANAN_LAMA[k] ?? k) as KategoriLokasi] ?? LABEL_KATEGORI.lainnya
 }
 
-// Lebih banyak laporan "sudah berubah" daripada "masih akurat". Dipakai bersama oleh
-// kartu ringkas dan halaman detail supaya ambangnya tidak ditulis dua kali.
+// Lebih banyak laporan "sudah berubah" daripada "masih akurat". Dipakai bersama oleh kartu
+// ringkas dan halaman detail supaya ambangnya tidak ditulis dua kali.
 export function perluDiperbarui(l: { jumlah_akurat: number, jumlah_berubah: number }): boolean {
   return l.jumlah_berubah > l.jumlah_akurat && l.jumlah_berubah > 0
 }
@@ -105,8 +105,8 @@ export function useDaftarLokasi() {
 
     if (error) throw error
 
-    // PostgREST mengembalikan relasi sebagai objek atau array tergantung
-    // inferensi kardinalitas. Diratakan di sini supaya komponen tidak perlu tahu.
+    // PostgREST mengembalikan relasi sebagai objek atau array tergantung inferensi
+    // kardinalitas. Diratakan di sini supaya komponen tidak perlu tahu.
     return (data ?? []).map((baris: any) => {
       const c = Array.isArray(baris.accessibility_checklist)
         ? baris.accessibility_checklist[0]
@@ -114,10 +114,8 @@ export function useDaftarLokasi() {
 
       const foto = Array.isArray(baris.location_photos) ? baris.location_photos : []
 
-      // Konfirmasi ikut diambil dalam kueri yang sama, bukan lewat permintaan kedua:
-      // jumlahnya puluhan baris, dan memisahkannya berarti dua perjalanan jaringan
-      // untuk satu tampilan. Dihitung di sini karena PostgREST tidak bisa memberi dua
-      // agregat dengan penyaring berbeda dalam satu kueri.
+      // Konfirmasi ikut diambil dalam kueri yang sama, bukan lewat permintaan kedua: jumlahnya
+      // puluhan baris, dan memisahkannya berarti dua perjalanan jaringan untuk satu tampilan.
       const konfirmasi = Array.isArray(baris.confirmations) ? baris.confirmations : []
       const akurat = konfirmasi.filter((k: any) => k.is_accurate).length
 

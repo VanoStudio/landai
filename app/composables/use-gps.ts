@@ -10,8 +10,8 @@ export function useGps() {
       return null
     }
 
-    // Geolocation hanya jalan di HTTPS atau localhost. Kalau dibuka lewat
-    // alamat IP lokal, browser memblokirnya tanpa penjelasan yang jelas.
+    // Geolocation hanya jalan di HTTPS atau localhost. Kalau dibuka lewat alamat IP lokal,
+    // browser memblokirnya tanpa penjelasan yang jelas.
     if (!window.isSecureContext) {
       pesanError.value = 'Lokasi otomatis butuh koneksi aman. Buka lewat alamat https.'
       return null

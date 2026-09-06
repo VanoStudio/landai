@@ -1,8 +1,5 @@
-// Supabase menyiarkan daftar provider yang aktif lewat /auth/v1/settings, endpoint
-// publik yang hanya butuh kunci publishable. Diperiksa sebelum pengguna dialihkan,
-// karena menembak /auth/v1/authorize dengan provider yang mati membalas HTTP 400
-// berisi JSON mentah, bukan pengalihan balik: pengguna akan mendarat di halaman
-// putih penuh kode dan tidak tahu apa yang salah.
+// Supabase menyiarkan daftar provider yang aktif lewat /auth/v1/settings, endpoint publik
+// yang hanya butuh kunci publishable.
 
 interface SetelanAuth {
   external?: Record<string, boolean>
@@ -31,8 +28,8 @@ export function useProviderAuth() {
       return (await daftarProvider())[nama] === true
     }
     catch {
-      // Kalau pemeriksaannya sendiri gagal, jangan menghalangi pengguna. Biarkan
-      // percobaan masuk berjalan dan galatnya ditangani di halaman pendaratan.
+      // Kalau pemeriksaannya sendiri gagal, jangan menghalangi pengguna. Biarkan percobaan masuk
+      // berjalan dan galatnya ditangani di halaman pendaratan.
       return true
     }
   }

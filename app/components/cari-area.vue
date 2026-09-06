@@ -1,10 +1,5 @@
 <script setup lang="ts">
-// Pencarian area di peta utama. Memakai rute server /api/geocode yang sama dengan
-// langkah pertama formulir tambah lokasi, tetapi tujuannya berbeda: yang ini hanya
-// memindahkan pandangan peta, tidak menaruh titik apa pun.
-//
-// Pencarian dipicu saat dikirim, bukan tiap ketikan, karena Nominatim membatasi
-// satu permintaan per detik.
+// Pencarian area di peta utama.
 
 interface HasilArea {
   nama: string
@@ -68,9 +63,9 @@ onBeforeUnmount(() => document.removeEventListener('click', klikLuar))
 
 <template>
   <div ref="wadah" class="relative min-w-0">
-    <!-- Tombol kirim ditaruh di dalam kolom, bukan sebagai tombol terpisah di
-         sampingnya. Di layar 390px, tombol terpisah menyisakan kolom terlalu
-         sempit sampai teks bantuannya terpotong. -->
+    <!-- Tombol kirim ditaruh di dalam kolom, bukan sebagai tombol terpisah di sampingnya. Di
+         layar 390px, tombol terpisah menyisakan kolom terlalu sempit sampai teks bantuannya
+         terpotong. -->
     <form class="relative" @submit.prevent="cari">
       <input
         v-model="kueri" type="search" inputmode="search"

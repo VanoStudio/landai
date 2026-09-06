@@ -1,17 +1,5 @@
 <script setup lang="ts">
 // Menambah foto langsung dari halaman detail lokasi.
-//
-// Sebelum ini satu-satunya jalan menambah foto adalah membuka formulir sunting lalu
-// menyusuri tiga langkah yang tidak ada hubungannya, yaitu titik, nama, dan daftar
-// periksa, hanya untuk sampai ke langkah keempat. Padahal justru foto yang paling
-// sering ditambahkan belakangan: orang lewat, melihat kondisinya, lalu memotret.
-// Halaman detail sudah menyatakan "satu foto kondisinya sangat membantu warga lain",
-// tetapi sebelumnya tidak memberi satu pun tombol untuk melakukannya.
-//
-// Siapa pun yang sudah masuk boleh menambah, bukan hanya pemilik lokasi. Itu bukan
-// pelonggaran baru: aturan basis data sudah berbunyi begitu sejak schema-patch-5.sql,
-// dan formulir sunting pun sudah mengizinkannya. Yang berubah hanya jalannya
-// dipersingkat.
 const props = defineProps<{
   idLokasi: string
   jumlahSekarang: number
@@ -29,8 +17,8 @@ const input = ref<HTMLInputElement | null>(null)
 const mengunggah = ref(false)
 const kemajuan = ref('')
 
-// Halaman induk yang memutuskan kapan tombol ini berhenti ditawarkan, jadi di sini
-// sisa kuota hanya dipakai untuk memotong berkas yang dipilih sekaligus.
+// Halaman induk yang memutuskan kapan tombol ini berhenti ditawarkan, jadi di sini sisa
+// kuota hanya dipakai untuk memotong berkas yang dipilih sekaligus.
 const sisa = computed(() => Math.max(0, MAKS_PER_LOKASI - props.jumlahSekarang))
 
 async function pilihBerkas(e: Event) {
@@ -38,8 +26,8 @@ async function pilihBerkas(e: Event) {
   const berkas = [...(el.files ?? [])]
   if (berkas.length === 0) return
 
-  // Dipotong di sini, bukan hanya disembunyikan di tampilan. Memilih empat berkas
-  // sekaligus lewat pemilih berkas bawaan tetap mungkin walau tombolnya disembunyikan.
+  // Dipotong di sini, bukan hanya disembunyikan di tampilan. Memilih empat berkas sekaligus
+  // lewat pemilih berkas bawaan tetap mungkin walau tombolnya disembunyikan.
   const dipakai = berkas.slice(0, sisa.value)
   const dibuang = berkas.length - dipakai.length
 
@@ -64,8 +52,8 @@ async function pilihBerkas(e: Event) {
         .from('location_photos')
         .insert({ location_id: props.idLokasi, photo_url: pub.publicUrl })
 
-      // Baris gagal tersimpan berarti fotonya tidak akan pernah tampil. Berkasnya
-      // ditarik lagi supaya tidak tertinggal sebagai berkas yatim di Storage.
+      // Baris gagal tersimpan berarti fotonya tidak akan pernah tampil. Berkasnya ditarik lagi
+      // supaya tidak tertinggal sebagai berkas yatim di Storage.
       if (errBaris) {
         await supabase.storage.from('location-photos').remove([jalur])
         continue
@@ -95,9 +83,8 @@ async function pilihBerkas(e: Event) {
 </script>
 
 <template>
-  <!-- Pengunjung tanpa akun diberi tahu apa yang perlu dilakukan, bukan disodori
-       tombol yang lalu menolaknya. Alamat kembalinya ikut dibawa, jadi setelah masuk
-       ia mendarat lagi di halaman lokasi yang sedang dilihatnya, bukan di peta. -->
+  <!-- Pengunjung tanpa akun diberi tahu apa yang perlu dilakukan, bukan disodori tombol yang
+       lalu menolaknya. -->
   <NuxtLink
     v-if="!user"
     :to="`/masuk?redirect=/lokasi/${idLokasi}`"
@@ -118,8 +105,8 @@ async function pilihBerkas(e: Event) {
     </svg>
     {{ mengunggah ? kemajuan : 'Tambah foto' }}
 
-    <!-- capture environment membuka kamera belakang langsung di ponsel, karena foto
-         di sini memang harus diambil di lokasinya, bukan diambil dari galeri. -->
+    <!-- capture environment membuka kamera belakang langsung di ponsel, karena foto di sini
+         memang harus diambil di lokasinya, bukan diambil dari galeri. -->
     <input
       ref="input" type="file" accept="image/*" capture="environment" multiple
       class="sr-only" :disabled="mengunggah"

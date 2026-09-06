@@ -17,11 +17,7 @@ const kategori = defineModel<string>('kategori', { required: true })
     <fieldset>
       <legend class="text-sm font-medium">Jenis tempat</legend>
 
-      <!-- Satu kolom, bukan dua. Sejak jenisnya digeneralkan, tiap pilihan membawa
-           contoh di bawahnya, dan contoh itulah yang menyudahi keraguan: tanpa
-           "halte, stasiun, terminal", orang membaca "Transportasi umum" sebagai
-           kereta saja lalu memilih "Lainnya", persis yang terjadi pada empat halte
-           di survei pertama. Dua kolom memaksa contohnya terpotong. -->
+      <!-- Satu kolom, bukan dua. -->
       <div class="mt-2 grid gap-2">
         <label
           v-for="k in KATEGORI_PILIHAN" :key="k"
