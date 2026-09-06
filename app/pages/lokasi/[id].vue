@@ -252,7 +252,7 @@ useHead(() => ({ title: lokasi.value ? lokasi.value.nama : 'Lokasi' }))
 
     <article v-else-if="lokasi" class="px-4 pb-16 pt-5">
       <h1 class="text-2xl font-bold leading-tight">{{ lokasi.nama }}</h1>
-      <p class="mt-1 text-sm text-gray-600">{{ LABEL_KATEGORI[lokasi.kategori as KategoriLokasi] }}</p>
+      <p class="mt-1 text-sm text-gray-600">{{ labelKategori(lokasi.kategori) }}</p>
 
       <!-- Angka skor: fokus visual halaman ini -->
       <div class="mt-5 flex items-end justify-between gap-4 border-y border-gray-200 py-5">
@@ -293,11 +293,17 @@ useHead(() => ({ title: lokasi.value ? lokasi.value.nama : 'Lokasi' }))
           {{ pemilik ? 'Edit lokasi' : 'Perbarui kondisi' }}
         </NuxtLink>
 
+        <TambahFoto
+          v-if="foto.length < MAKS_FOTO_PER_LOKASI"
+          :id-lokasi="lokasi.id" :jumlah-sekarang="foto.length"
+          @tersimpan="refresh()"
+        />
+
         <a
-        :href="rute" target="_blank" rel="noopener noreferrer"
-        class="tombol tombol-sekunder"
-      >
-        Buka rute di Google Maps
+          :href="rute" target="_blank" rel="noopener noreferrer"
+          class="tombol tombol-sekunder"
+        >
+          Buka rute di Google Maps
         <svg
             viewBox="0 0 24 24" class="h-4 w-4 shrink-0" fill="none" stroke="currentColor"
             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
@@ -310,13 +316,15 @@ useHead(() => ({ title: lokasi.value ? lokasi.value.nama : 'Lokasi' }))
         </a>
       </div>
 
-      <div class="mt-6 flex items-center justify-between gap-3">
-        <h2 class="text-base font-semibold">Foto kondisi</h2>
-        <TambahFoto
-          :id-lokasi="lokasi.id" :jumlah-sekarang="foto.length"
-          @tersimpan="refresh()"
-        />
-      </div>
+      <!-- Judul bagian berdiri sendiri selebar penuh, sama seperti judul bagian lain
+           di halaman ini. Sebelumnya ia berbagi baris dengan tombol tambah foto, dan
+           itu menghasilkan dua cacat sekaligus: judulnya jadi satu-satunya yang tidak
+           selebar penuh, dan tombolnya jadi satu-satunya yang rata kanan sementara
+           semua tombol lain rata kiri. Terukur di 430px: rute rata kiri di y=297,
+           tambah foto rata kanan di y=365, konfirmasi rata kiri di y=1343. Mata
+           membaca deretan itu sebagai zigzag. Tombolnya kini bergabung ke baris aksi
+           di atas, bersama tombol lain. -->
+      <h2 class="mt-6 text-base font-semibold">Foto kondisi</h2>
 
       <ul v-if="foto.length" class="mt-3 grid gap-2" :class="foto.length > 1 ? 'grid-cols-2' : 'grid-cols-1'">
         <li v-for="(f, i) in foto" :key="f.id" class="relative">
@@ -361,6 +369,10 @@ useHead(() => ({ title: lokasi.value ? lokasi.value.nama : 'Lokasi' }))
         </li>
       </ul>
       <FotoKosong v-else class="mt-3" />
+
+      <p v-if="foto.length >= MAKS_FOTO_PER_LOKASI" class="mt-2 text-sm text-gray-600">
+        Sudah ada {{ MAKS_FOTO_PER_LOKASI }} foto di lokasi ini, jumlah maksimalnya.
+      </p>
 
       <PratinjauFoto
         v-if="pratinjauDi !== null"

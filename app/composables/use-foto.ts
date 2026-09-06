@@ -3,6 +3,10 @@
 const SISI_MAKS = 1600
 const MUTU = 0.8
 
+// Batas foto per lokasi, bukan per unggahan. Ditulis di sini, bukan di komponennya,
+// karena halaman detail juga perlu tahu kapan berhenti menawarkan tombol tambah.
+export const MAKS_FOTO_PER_LOKASI = 6
+
 // Watermark ditanam ke berkasnya, bukan ditumpuk lewat CSS saat ditampilkan.
 // Bedanya penting: foto di sini adalah bukti kondisi lapangan, dan begitu diunduh
 // atau dibagikan ulang lepas dari peta, lapisan CSS ikut hilang sementara tanda

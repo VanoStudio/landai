@@ -19,9 +19,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{ tersimpan: [] }>()
 
-// Batas per lokasi, bukan per unggahan. Tanpa batas per lokasi, satu tempat bisa
-// menumpuk foto tanpa henti karena tiap unggahan mulai dari nol lagi.
-const MAKS_PER_LOKASI = 6
+const MAKS_PER_LOKASI = MAKS_FOTO_PER_LOKASI
 
 const supabase = useSupabaseClient()
 const user = useSupabaseUser()
@@ -31,8 +29,9 @@ const input = ref<HTMLInputElement | null>(null)
 const mengunggah = ref(false)
 const kemajuan = ref('')
 
+// Halaman induk yang memutuskan kapan tombol ini berhenti ditawarkan, jadi di sini
+// sisa kuota hanya dipakai untuk memotong berkas yang dipilih sekaligus.
 const sisa = computed(() => Math.max(0, MAKS_PER_LOKASI - props.jumlahSekarang))
-const penuh = computed(() => sisa.value === 0)
 
 async function pilihBerkas(e: Event) {
   const el = e.target as HTMLInputElement
@@ -97,14 +96,15 @@ async function pilihBerkas(e: Event) {
 
 <template>
   <!-- Pengunjung tanpa akun diberi tahu apa yang perlu dilakukan, bukan disodori
-       tombol yang lalu menolaknya. -->
-  <NuxtLink v-if="!user" to="/masuk" class="tombol tombol-sekunder">
-    Masuk untuk menambah foto
+       tombol yang lalu menolaknya. Alamat kembalinya ikut dibawa, jadi setelah masuk
+       ia mendarat lagi di halaman lokasi yang sedang dilihatnya, bukan di peta. -->
+  <NuxtLink
+    v-if="!user"
+    :to="`/masuk?redirect=/lokasi/${idLokasi}`"
+    class="tombol tombol-sekunder"
+  >
+    Masuk untuk tambah foto
   </NuxtLink>
-
-  <p v-else-if="penuh" class="text-sm text-gray-600">
-    Sudah ada {{ MAKS_PER_LOKASI }} foto di lokasi ini, jumlah maksimalnya.
-  </p>
 
   <label
     v-else
