@@ -7,7 +7,7 @@
   [![GitHub](https://img.shields.io/badge/GitHub-Repository-181717?style=for-the-badge&logo=github)](https://github.com/VanoStudio/landai)
   [![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
 
-  **Submission for ITECHNO CUP 2026 - Web Development**
+  **Submission for ITECHNO CUP 2026, kategori Web Development**
 
   **By Risol Laut**
 
@@ -33,13 +33,13 @@
 
 ## 👥 Tim Pengembang
 
-**Tim Risol Laut** — SMKS Cyber Media
+**Tim Risol Laut**, SMKS Cyber Media
 
 | Nama | Peran | Kontribusi | GitHub |
 |------|-------|------------|--------|
 | **Stevano Sunuprakoso Sosroraharjo** | Ketua Tim, Full Stack Developer | Merancang dan membangun seluruh aplikasi, basis data, dan alur pengujian | [@VanoStudio](https://github.com/VanoStudio) |
-| **Muhammad Husein Bal Afif** | Anggota, Riset Lapangan | Turun langsung mensurvei lokasi, mengambil foto dan mengisi data aksesibilitas sungguhan | — |
-| **Daiva Dakara Dhana** | Anggota, Peneliti Kriteria Aksesibilitas | Menyusun kriteria penilaian dan bahan rujukan regulasi tentang aksesibilitas | — |
+| **Muhammad Husein Bal Afif** | Anggota, Riset Lapangan | Turun langsung mensurvei lokasi, mengambil foto dan mengisi data aksesibilitas sungguhan | Tidak ada |
+| **Daiva Dakara Dhana** | Anggota, Peneliti Kriteria Aksesibilitas | Menyusun kriteria penilaian dan bahan rujukan regulasi tentang aksesibilitas | Tidak ada |
 
 ---
 
@@ -74,15 +74,15 @@ landai adalah peta interaktif berbasis kontribusi warga. Siapa saja bisa menanda
 
 ### Fitur Tambahan
 
-- **Papan kontributor** - Menampilkan warga yang paling banyak menambahkan lokasi, sebagai bentuk pengakuan atas kontribusi mereka.
-- **Pembaruan terbuka** - Siapa pun yang masuk bisa memperbarui daftar periksa dan foto sebuah lokasi kalau kondisinya berubah, dan nama pengubahnya tercatat. Nama, kategori, dan koordinat tetap hanya bisa diubah pemilik asli.
-- **Deteksi kemungkinan duplikat** - Memberi tahu kontributor kalau ada lokasi serupa di dekat titik yang sedang diisi, sebelum data baru tersimpan.
-- **Tambah foto langsung dari halaman lokasi** - Menambah foto ke lokasi yang sudah ada cukup satu ketukan dari halaman lokasi, tanpa mengisi ulang formulir empat langkah.
-- **Pratinjau foto ukuran penuh** - Ketuk foto untuk membukanya utuh tanpa terpangkas, lalu berpindah antar foto dengan geser jari, tombol panah, atau tombol panah papan ketik.
-- **Tanda landai pada setiap foto** - Tanda ditanam ke berkas gambarnya saat diunggah, jadi asal foto tetap terbaca ketika fotonya dibagikan ulang di luar peta.
-- **Peringatan isi kasar** - Nama tempat dan catatan lapangan diperiksa di peramban terhadap daftar kata kasar berbahasa Indonesia. Peringatan muncul sekali, dan kontributor tetap bisa melanjutkan kalau kata itu memang bagian dari nama tempat yang sah.
-- **Buka rute ke Google Maps** - Satu tautan dari halaman lokasi membuka rute ke tempat tersebut di Google Maps.
-- **Masuk dengan Google** - Alternatif pendaftaran cepat selain email dan kata sandi.
+- **Papan kontributor.** Menampilkan warga yang paling banyak menambahkan lokasi, sebagai bentuk pengakuan atas kontribusi mereka.
+- **Pembaruan terbuka.** Siapa pun yang masuk bisa memperbarui daftar periksa dan foto sebuah lokasi kalau kondisinya berubah, dan nama pengubahnya tercatat. Nama, kategori, dan koordinat tetap hanya bisa diubah pemilik asli.
+- **Deteksi kemungkinan duplikat.** Memberi tahu kontributor kalau ada lokasi serupa di dekat titik yang sedang diisi, sebelum data baru tersimpan.
+- **Tambah foto langsung dari halaman lokasi.** Menambah foto ke lokasi yang sudah ada cukup satu ketukan dari halaman lokasi, tanpa mengisi ulang formulir empat langkah.
+- **Pratinjau foto ukuran penuh.** Ketuk foto untuk membukanya utuh tanpa terpangkas, lalu berpindah antar foto dengan geser jari, tombol panah, atau tombol panah papan ketik.
+- **Tanda landai pada setiap foto.** Tanda ditanam ke berkas gambarnya saat diunggah, jadi asal foto tetap terbaca ketika fotonya dibagikan ulang di luar peta.
+- **Peringatan isi kasar.** Nama tempat dan catatan lapangan diperiksa di peramban terhadap daftar kata kasar berbahasa Indonesia. Peringatan muncul sekali, dan kontributor tetap bisa melanjutkan kalau kata itu memang bagian dari nama tempat yang sah.
+- **Buka rute ke Google Maps.** Satu tautan dari halaman lokasi membuka rute ke tempat tersebut di Google Maps.
+- **Masuk dengan Google.** Alternatif pendaftaran cepat selain email dan kata sandi.
 
 ---
 
@@ -96,7 +96,7 @@ landai adalah peta interaktif berbasis kontribusi warga. Siapa saja bisa menanda
 
 <div align="center">
   <img src="docs/screenshots/peta-utama.png" alt="Peta utama" width="800"/>
-  <p><em>Peta utama - penanda berwarna sesuai skor aksesibilitas</em></p>
+  <p><em>Peta utama dengan penanda berwarna sesuai skor aksesibilitas</em></p>
 
   <img src="docs/screenshots/detail-lokasi.png" alt="Detail lokasi" width="800"/>
   <p><em>Halaman detail lokasi dengan rincian delapan fasilitas</em></p>
@@ -198,11 +198,11 @@ Peramban pengguna
 
 Lima tabel utama, didefinisikan lengkap pada schema.sql dan tambalannya:
 
-- `profiles` - data akun, dibuat otomatis lewat trigger saat pendaftaran
-- `locations` - lokasi, skor, status verifikasi, dan jejak pembaru
-- `accessibility_checklist` - delapan fasilitas per lokasi, sumber perhitungan skor
-- `location_photos` - foto lokasi, maksimal tiga per lokasi
-- `confirmations` - konfirmasi akurasi dari warga, penentu naik turunnya status verifikasi
+- `profiles` menyimpan data akun, dibuat otomatis lewat trigger saat pendaftaran
+- `locations` menyimpan lokasi, skor, status verifikasi, dan jejak pembaru
+- `accessibility_checklist` menyimpan delapan fasilitas per lokasi, sumber perhitungan skor
+- `location_photos` menyimpan foto lokasi, maksimal tiga per lokasi
+- `confirmations` menyimpan konfirmasi akurasi dari warga, penentu naik turunnya status verifikasi
 
 ### Folder Structure
 
@@ -306,7 +306,7 @@ node docs/qa/uji-menyeluruh.mjs
 
 ## 📄 Lisensi
 
-Proyek ini dilisensikan di bawah [MIT License](LICENSE) - lihat file LICENSE untuk detail lebih lanjut.
+Proyek ini dilisensikan di bawah [MIT License](LICENSE). Lihat berkas LICENSE untuk detail lebih lanjut.
 
 ---
 

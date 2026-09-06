@@ -1,4 +1,4 @@
-# Laporan QA menyeluruh — landai
+# Laporan QA menyeluruh landai
 
 Sasaran uji: <https://landai-zeta.vercel.app> (produksi, kode commit `dee00e9`).
 Tanggal sesi: 5 September 2026. Alat: Playwright Chromium, dipasang sementara
@@ -64,7 +64,7 @@ pengujian sebelumnya.
 | 20 | Lima pemilihan berkas serentak | LOLOS | 5 event `change` dalam satu tick, tepat 3 pratinjau, dan tepat 3 baris `location_photos` setelah disimpan. `01-batas-foto-pratinjau.png`, `02-batas-foto-detail.png` |
 | 21 | Papan kontributor | LOLOS | urutan 1 UJI QA Alfa 3 lokasi, 2 Akun Uji 1 lokasi, 3 UJI QA Beta 1 lokasi. Tingkat: Kontributor aktif, Baru mulai, Baru mulai. Bilah 50%, 33%, 33% persis sesuai rumus. `01-papan-kontributor.png`. Catatan produk C3 |
 | 22 | Halaman tentang | LOLOS | "Program apresiasi bagi kontributor yang paling aktif dan paling akurat juga menjadi arah pengembangan lanjutan setelah masa lomba." dan tombol "Lihat papan kontributor" mendarat di `/papan-kontributor`. `02-tentang.png`, `03-tentang-ke-papan.png` |
-| 23 | Masuk dengan Google | LOLOS | rantai `supabase.co/auth/v1/authorize` ke `accounts.google.com/o/oauth2/v2/auth` ke layar "Login dengan Google — Lanjutkan ke eagvqtumjcwzaefbriiq.supabase.co". Tidak diselesaikan dengan kredensial. `05-google-layar-izin.png` |
+| 23 | Masuk dengan Google | LOLOS | rantai `supabase.co/auth/v1/authorize` ke `accounts.google.com/o/oauth2/v2/auth` ke layar izin Google yang menyebut tujuan pengalihannya, yaitu alamat callback proyek Supabase ini. Tidak diselesaikan dengan kredensial. `05-google-layar-izin.png` |
 | 24 | Layar pembuka | LOLOS | umur 2.103 ms pada koneksi normal, 2.059 ms pada koneksi 50 kbps latensi 400 ms, walau layarnya baru muncul di detik 13,8. Wordmark beranimasi `melebur 1.1s`, batas ditegakkan animasi CSS 2 detik |
 | 25 | Kartu pengenalan sekali saja | LOLOS | muncul "Baru pertama ke sini?", ditutup, `localStorage {"landai:pengenalan-ditutup":"1"}`, muat ulang tidak memunculkannya lagi. `01-pengenalan-pertama.png`, `02-pengenalan-setelah-muat-ulang.png` |
 | 26 | Lebar 375 piksel | LOLOS | 3 chip terjangkau, chip terakhir utuh setelah baris digulir, nol gulir mendatar. Detail dan keempat langkah formulir: nol elemen keluar bidang. `03-375-peta-chip-digulir.png`, `04-375-detail.png`, `05-375-form-tambah.png`, `06-375-form-langkah-akhir.png` |
@@ -77,7 +77,9 @@ pengujian sebelumnya.
 
 ## 3. Cacat dan statusnya
 
-### A. Tanggal kontributor beda antara server dan peramban — **SUDAH DIPERBAIKI, belum di-commit**
+### A. Tanggal kontributor beda antara server dan peramban
+
+**Status: sudah diperbaiki.**
 
 `new Date(created_at).toLocaleDateString('id-ID', …)` tanpa `timeZone`. Server render
 Vercel berjalan di UTC, peramban kontributor di WIB. Baris yang sama menghasilkan dua
@@ -97,7 +99,9 @@ Perbaikan: `timeZone: 'Asia/Jakarta'` pada opsi format, di
 tanggal WIB, termasuk untuk juri yang membuka dari zona lain. Bukti ulang:
 `node docs/qa/08-bukti-hidrasi.mjs`.
 
-### B. Foto di Storage tidak bisa dihapus siapa pun — **TAMBALAN DITULIS, BELUM DIJALANKAN**
+### B. Foto di Storage tidak bisa dihapus siapa pun
+
+**Status: tambalan ditulis, saat laporan ini dibuat belum dijalankan.**
 
 `schema-patch-2.sql` memasang kebijakan INSERT untuk `storage.objects` tapi tidak
 memasang DELETE. Tanpa kebijakan, RLS menolak diam-diam.

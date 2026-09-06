@@ -2,20 +2,20 @@
 
 Sumber laporan progres. PDF hasilnya ada di `../laporan-progres-landai.pdf`.
 
-- `tangkapan/` — **tidak ikut ke repo**, sengaja digitignore bersama PDF-nya supaya
+- `tangkapan/` **tidak ikut ke repo**, sengaja digitignore bersama PDF-nya supaya
   riwayat git tidak membawa puluhan megabita berkas biner. Isinya 38 tangkapan
   antarmuka, ponsel 390x844 dan desktop 1440x900, keduanya pada device scale factor 2.
   Dibuat ulang dengan `node tangkap-layar.mjs` selagi dev server jalan di port 3000.
-- `laporan.html` — sumber laporan. Merujuk gambar di `tangkapan/` secara relatif.
-- `tangkap-layar.mjs` — pengambil tangkapan. Butuh dev server jalan di port 3000,
+- `laporan.html` adalah sumber laporan. Merujuk gambar di `tangkapan/` secara relatif.
+- `tangkap-layar.mjs` mengambil tangkapan. Butuh dev server jalan di port 3000,
   dan penjaga rute `/tambah-lokasi` dibuka sementara supaya empat langkah form
   bisa direkam tanpa akun.
-- `buat-pdf.mjs` — merender `laporan.html` menjadi PDF A4.
-- `buat-aset.mjs` — merender aset raster dari `public/tanda.svg`: gambar pratinjau
+- `buat-pdf.mjs` merender `laporan.html` menjadi PDF A4.
+- `buat-aset.mjs` merender aset raster dari `public/tanda.svg`: gambar pratinjau
   tautan 1200x630 dan dua ukuran favicon. Perlu raster karena WhatsApp dan Telegram
   tidak merender og:image berformat SVG. Jalankan `node buat-aset.mjs ..` dari folder
   ini setiap kali tandanya berubah.
-- `qa/` — seluruh skrip pengujian ujung ke ujung, lihat bagian di bawah.
+- `qa/` berisi seluruh skrip pengujian ujung ke ujung, lihat bagian di bawah.
 
 Urutan membuat ulang laporan lengkap:
 
@@ -46,21 +46,21 @@ node docs/qa/uji-menyeluruh.mjs
 
 Beberapa contoh yang mencakup area terpenting:
 
-- `qa/uji-menyeluruh.mjs` — 14 langkah, dari mendaftar sampai keluar.
-- `qa/uji-tulis-bersama.mjs` — batas hak tulis antar pengguna, 35 pemeriksaan.
-- `qa/uji-responsif.mjs` — tata letak di lebar 320px sampai desktop, 50 pemeriksaan.
-- `qa/uji-filter.mjs` — jumlah penanda di peta dicocokkan dengan isi basis data.
-- `qa/uji-batas-foto-ketat.mjs` — empat pemilihan berkas serentak, memastikan batas
+- `qa/uji-menyeluruh.mjs` menjalankan 15 langkah, dari mendaftar sampai keluar, lalu menghapus kembali lokasi yang dibuatnya.
+- `qa/uji-tulis-bersama.mjs` menguji batas hak tulis antar pengguna, 35 pemeriksaan.
+- `qa/uji-responsif.mjs` memeriksa tata letak di lebar 320px sampai desktop, 67 pemeriksaan.
+- `qa/uji-filter.mjs` mencocokkan jumlah penanda di peta dengan isi basis data.
+- `qa/uji-batas-foto-ketat.mjs` melakukan empat pemilihan berkas serentak, memastikan batas
   tiga foto ditegakkan di logika, bukan sekadar disembunyikan.
 
 Dua skrip lain tidak membuka peramban sama sekali karena yang diujinya logika murni:
 
-- `qa/uji-saring-kata.mjs` — matriks penyaring isi kasar, 44 pemeriksaan. Separuhnya
+- `qa/uji-saring-kata.mjs` menjalankan matriks penyaring isi kasar, 44 pemeriksaan. Separuhnya
   justru menguji hal sebaliknya, yaitu nama tempat sah seperti "Anjungan Tunai
   Mandiri" dan "Klinik Hewan Anjing dan Kucing" yang TIDAK boleh dituduh. Berkas yang
   diujinya TypeScript, jadi dikemas dulu dengan esbuild yang memang sudah ikut sebagai
   dependensi Vite. Tidak ada dependensi baru.
-- `qa/uji-peringatan-kata.mjs` — alur peringatannya di peramban sungguhan: menahan
+- `qa/uji-peringatan-kata.mjs` menelusuri alur peringatannya di peramban sungguhan: menahan
   pengiriman satu kali, melanjutkan setelah disetujui, dan muncul lagi kalau isinya
   diubah.
 
