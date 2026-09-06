@@ -1,4 +1,5 @@
-// Audit responsif tiga lebar: 375 (iPhone SE), 390 (iPhone 14), dan desktop.
+// Audit responsif empat lebar: 320 (layar tersempit yang masih dipakai), 375 (iPhone SE),
+// 390 (iPhone 14), dan desktop.
 // Yang diperiksa: tidak ada limpahan mendatar, tidak ada elemen header yang saling
 // menindih, tidak ada teks terpotong, seluruh chip penyaring bisa dijangkau, dan
 // sasaran sentuh tidak turun di bawah 44 piksel.
@@ -81,6 +82,7 @@ const browser = await chromium.launch({
 })
 
 for (const [label, vp] of [
+  ['320', { viewport: { width: 320, height: 640 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true }],
   ['375', { viewport: { width: 375, height: 667 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true }],
   ['390', { viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true }],
   ['desktop', { viewport: { width: 1440, height: 900 }, deviceScaleFactor: 2 }],
