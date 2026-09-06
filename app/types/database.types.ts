@@ -2,12 +2,22 @@
 // Dipakai otomatis oleh @nuxtjs/supabase supaya query salah kolom ketahuan
 // saat menulis kode, bukan saat demo.
 
+// Sembilan jenis sejak schema-patch-7.sql. Digeneralkan setelah survei pertama
+// memperlihatkan masalahnya: empat halte bus terpaksa dicatat sebagai "lainnya"
+// karena satu-satunya pilihan transportasi adalah "stasiun".
+//
+// Nilai lama masih diterima batasan basis data supaya tidak ada jendela waktu yang
+// gagal saat tambalan dan kode ter-deploy tidak bersamaan, tetapi antarmuka tidak
+// pernah mengirimnya lagi, jadi tidak ikut ditulis di tipe ini.
 export type KategoriLokasi =
-  | 'stasiun'
-  | 'mal'
-  | 'kantor_pemerintah'
-  | 'taman'
+  | 'transportasi_umum'
+  | 'perbelanjaan'
+  | 'kantor_layanan'
   | 'kesehatan'
+  | 'pendidikan'
+  | 'ibadah'
+  | 'ruang_publik'
+  | 'kuliner'
   | 'lainnya'
 
 export type StatusLokasi = 'belum_terverifikasi' | 'terverifikasi'

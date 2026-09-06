@@ -29,7 +29,7 @@ const fasilitas = computed(() => ([
     <div class="flex items-start justify-between gap-3">
       <div class="min-w-0">
         <h2 class="truncate text-base font-semibold text-gray-900">{{ props.lokasi.nama }}</h2>
-        <p class="mt-0.5 text-sm text-gray-600">{{ LABEL_KATEGORI[props.lokasi.kategori] }}</p>
+        <p class="mt-0.5 text-sm text-gray-600">{{ labelKategori(props.lokasi.kategori) }}</p>
       </div>
 
       <button

@@ -84,6 +84,12 @@ async function isiFormulir(namaTempat) {
   await page.getByRole('button', { name: 'Lanjut' }).click()   // titik
   await page.waitForTimeout(600)
   await page.fill('#nama-tempat', namaTempat)
+
+  // Jenis tempat wajib dipilih sejak schema-patch-7.sql.
+  await page.evaluate(() => {
+    const r = document.querySelector('fieldset input[type=radio]')
+    r && r.click()
+  })
   await page.waitForTimeout(300)
 }
 

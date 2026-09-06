@@ -136,7 +136,7 @@ await klik(page, 'Lanjut')
 await page.fill('#nama-tempat', 'Taman Literasi Martha Christina Tiahahu')
 await page.evaluate(() => {
   const r = [...document.querySelectorAll('input[type=radio]')]
-    .find(i => i.value === 'taman')
+    .find(i => i.value === 'ruang_publik')
   r.click()
 })
 await page.waitForTimeout(500)

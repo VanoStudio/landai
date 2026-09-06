@@ -36,6 +36,6 @@ export function pratinjauSkor(isi: IsiChecklist): number {
   return Math.round((total / ITEM_CHECKLIST.length) * 100)
 }
 
-export const KATEGORI_PILIHAN = [
-  'stasiun', 'mal', 'kantor_pemerintah', 'taman', 'kesehatan', 'lainnya',
-] as const satisfies readonly Database['public']['Tables']['locations']['Row']['kategori'][]
+// Daftar jenis tempat pindah ke use-lokasi.ts, berdampingan dengan label dan
+// contohnya, supaya kunci dan tulisannya tidak pernah lagi hidup di dua berkas
+// terpisah yang bisa berbeda diam-diam.

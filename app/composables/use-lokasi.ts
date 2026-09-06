@@ -35,13 +35,49 @@ export function cocokKebutuhan(l: LokasiPeta, k: Kebutuhan): boolean {
   return l.tempat_duduk_tersedia || l.lift_tersedia_berfungsi
 }
 
+// Sembilan jenis tempat, digeneralkan di schema-patch-7.sql. Urutannya adalah
+// urutan tampil pada formulir, disusun dari yang paling sering disurvei.
 export const LABEL_KATEGORI: Record<KategoriLokasi, string> = {
-  stasiun: 'Stasiun',
-  mal: 'Mal',
-  kantor_pemerintah: 'Kantor pemerintah',
-  taman: 'Taman',
+  transportasi_umum: 'Transportasi umum',
+  perbelanjaan: 'Pusat perbelanjaan',
+  kantor_layanan: 'Kantor layanan publik',
   kesehatan: 'Fasilitas kesehatan',
+  pendidikan: 'Pendidikan',
+  ibadah: 'Tempat ibadah',
+  ruang_publik: 'Taman dan ruang publik',
+  kuliner: 'Rumah makan dan kafe',
   lainnya: 'Lainnya',
+}
+
+// Contoh yang muncul di bawah tiap pilihan pada formulir. Tanpa ini, "Transportasi
+// umum" mudah dikira hanya kereta, dan halte kembali jatuh ke "Lainnya" seperti
+// sebelum tambalan ini ada.
+export const CONTOH_KATEGORI: Record<KategoriLokasi, string> = {
+  transportasi_umum: 'Halte, stasiun, terminal',
+  perbelanjaan: 'Mal, pasar, pertokoan',
+  kantor_layanan: 'Kelurahan, kecamatan, kantor pos',
+  kesehatan: 'Rumah sakit, puskesmas, klinik',
+  pendidikan: 'Sekolah, kampus, perpustakaan',
+  ibadah: 'Masjid, gereja, pura, vihara',
+  ruang_publik: 'Taman, alun-alun, trotoar',
+  kuliner: 'Rumah makan, kafe, warung',
+  lainnya: 'Tidak masuk kategori mana pun',
+}
+
+export const KATEGORI_PILIHAN = Object.keys(LABEL_KATEGORI) as KategoriLokasi[]
+
+// Baris lama yang belum ikut dipindahkan tambalan tetap punya tulisan yang masuk
+// akal, bukan kolom kosong. Jaring pengaman, bukan jalur yang diharapkan terpakai.
+const PADANAN_LAMA: Record<string, KategoriLokasi> = {
+  stasiun: 'transportasi_umum',
+  mal: 'perbelanjaan',
+  kantor_pemerintah: 'kantor_layanan',
+  taman: 'ruang_publik',
+}
+
+export function labelKategori(k: string | null | undefined): string {
+  if (!k) return LABEL_KATEGORI.lainnya
+  return LABEL_KATEGORI[(PADANAN_LAMA[k] ?? k) as KategoriLokasi] ?? LABEL_KATEGORI.lainnya
 }
 
 // Lebih banyak laporan "sudah berubah" daripada "masih akurat". Dipakai bersama oleh

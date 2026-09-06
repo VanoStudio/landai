@@ -63,7 +63,7 @@ const terurut = computed(() =>
           <span class="min-w-0 flex-1">
             <span class="block truncate text-sm font-medium">{{ l.nama }}</span>
             <span class="mt-0.5 block text-xs text-gray-600">
-              {{ LABEL_KATEGORI[l.kategori] }}, {{ labelSkor(l.skor) }}
+              {{ labelKategori(l.kategori) }}, {{ labelSkor(l.skor) }}
             </span>
           </span>
 

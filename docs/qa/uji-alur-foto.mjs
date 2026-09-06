@@ -174,6 +174,13 @@ await page.waitForTimeout(4500)
 await page.getByRole('button', { name: 'Lanjut', exact: true }).click()
 await page.waitForTimeout(600)
 await page.fill('#nama-tempat', NAMA_UJI)
+// Jenis tempat wajib dipilih sejak schema-patch-7.sql: nilai awalnya sengaja kosong
+// supaya tidak ada lokasi yang tercatat dengan jenis yang tidak dipilih siapa pun.
+await page.evaluate(() => {
+  const r = document.querySelector('fieldset input[type=radio]')
+  r && r.click()
+})
+await page.waitForTimeout(300)
 await page.waitForTimeout(300)
 for (let i = 0; i < 2; i++) {
   await page.getByRole('button', { name: 'Lanjut', exact: true }).click()

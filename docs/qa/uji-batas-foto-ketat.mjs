@@ -46,6 +46,13 @@ await page.goto(`${BASIS}/tambah-lokasi`, { waitUntil: 'domcontentloaded' })
 await page.waitForTimeout(4000)
 await klik('Lanjut')
 await page.fill('#nama-tempat', 'Uji Batas Foto Ketat')
+// Jenis tempat wajib dipilih sejak schema-patch-7.sql: nilai awalnya sengaja kosong
+// supaya tidak ada lokasi yang tercatat dengan jenis yang tidak dipilih siapa pun.
+await page.evaluate(() => {
+  const r = document.querySelector('fieldset input[type=radio]')
+  r && r.click()
+})
+await page.waitForTimeout(300)
 await klik('Lanjut')
 await klik('Lanjut')
 await page.waitForTimeout(600)

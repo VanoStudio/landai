@@ -25,7 +25,10 @@ const modeUbah = computed(() => idUbah.value !== null)
 // Titik awal: koridor Blok M (PRD bagian 9).
 const titik = ref({ lat: -6.2440, lng: 106.7983 })
 const nama = ref('')
-const kategori = ref<string>('stasiun')
+// Sengaja kosong, bukan berisi jenis pertama. Nilai awal yang sudah terisi ikut
+// terkirim apa adanya oleh orang yang hanya menekan Lanjut, dan itulah yang membuat
+// empat halte pada survei pertama tercatat dengan jenis yang tidak dipilih siapa pun.
+const kategori = ref<string>('')
 const checklist = ref<IsiChecklist>(checklistKosong())
 const foto = ref<{ blob: Blob, pratinjau: string }[]>([])
 const catatan = ref('')
@@ -98,8 +101,16 @@ const langkah = computed(() => langkahTersedia.value[posisi.value] ?? 0)
 const terakhir = computed(() => posisi.value >= langkahTersedia.value.length - 1)
 
 const bolehLanjut = computed(() => {
-  if (langkah.value === 1) return nama.value.trim().length >= 3
+  if (langkah.value === 1) return nama.value.trim().length >= 3 && kategori.value !== ''
   return true
+})
+
+// Kalimat penuntunnya menyebut apa yang KURANG, bukan satu kalimat tetap yang
+// menyuruh mengisi nama padahal namanya sudah diisi dan yang belum justru jenisnya.
+const kurangApa = computed(() => {
+  if (nama.value.trim().length < 3) return 'Isi nama tempat dulu, minimal 3 huruf.'
+  if (kategori.value === '') return 'Pilih jenis tempatnya dulu.'
+  return ''
 })
 
 async function maju() {
@@ -554,8 +565,8 @@ useHead(() => ({ title: modeUbah.value ? 'Edit Lokasi' : 'Tambah Lokasi' }))
         </button>
       </div>
 
-      <p v-if="langkah === 1 && !bolehLanjut" class="mt-2 text-sm text-gray-600">
-        Isi nama tempat dulu, minimal 3 huruf.
+      <p v-if="langkah === 1 && kurangApa" class="mt-2 text-sm text-gray-600">
+        {{ kurangApa }}
       </p>
     </footer>
   </div>

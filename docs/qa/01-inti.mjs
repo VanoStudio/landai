@@ -102,7 +102,7 @@ nilai(3, 'Langkah 1 titik di peta', true, `koordinat ${titik}`)
 await klik(page, 'Lanjut')
 await page.fill('#nama-tempat', NAMA_LOKASI)
 await page.evaluate(() => {
-  const r = [...document.querySelectorAll('input[type=radio]')].find(i => i.value === 'taman')
+  const r = [...document.querySelectorAll('input[type=radio]')].find(i => i.value === 'ruang_publik')
   r.click()
 })
 await page.waitForTimeout(400)

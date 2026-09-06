@@ -59,7 +59,7 @@ async function tambahLokasi(p, nama, fraksiX, fraksiY, indeksCentang) {
   await klik(p, 'Lanjut')
   await p.fill('#nama-tempat', nama)
   await p.evaluate(() => {
-    const r = [...document.querySelectorAll('input[type=radio]')].find(i => i.value === 'mal')
+    const r = [...document.querySelectorAll('input[type=radio]')].find(i => i.value === 'perbelanjaan')
     r.click()
   })
   await klik(p, 'Lanjut')

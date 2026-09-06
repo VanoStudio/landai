@@ -172,6 +172,13 @@ try {
   await pA.waitForTimeout(1200)
 
   await pA.fill('#nama-tempat', NAMA_LOKASI)
+// Jenis tempat wajib dipilih sejak schema-patch-7.sql: nilai awalnya sengaja kosong
+// supaya tidak ada lokasi yang tercatat dengan jenis yang tidak dipilih siapa pun.
+await pA.evaluate(() => {
+  const r = document.querySelector('fieldset input[type=radio]')
+  r && r.click()
+})
+await pA.waitForTimeout(300)
   await pA.waitForTimeout(400)
   await klikTeks(pA, 'Lanjut')
   await pA.waitForTimeout(900)
