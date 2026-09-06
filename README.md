@@ -9,7 +9,7 @@
 
   **Submission for ITECHNO CUP 2026 - Web Development**
 
-  **By [ISI: nama tim resmi kalau ada, kalau tidak pakai nama tiga anggota]**
+  **By Risol Laut**
 
 </div>
 
@@ -33,11 +33,13 @@
 
 ## 👥 Tim Pengembang
 
-| Nama | Peran | Kontribusi |
-|------|-------|------------|
-| **Vano** | Project Lead & Full Stack Developer | Merancang dan membangun seluruh aplikasi, basis data, dan alur pengujian |
-| **Husein** | Riset Lapangan | Turun langsung mensurvei lokasi, mengambil foto dan mengisi data aksesibilitas sungguhan |
-| **Dakara** | Peneliti Kriteria Aksesibilitas | Menyusun kriteria penilaian dan bahan rujukan regulasi tentang aksesibilitas |
+**Tim Risol Laut**
+
+| Nama | Peran | Kontribusi | GitHub |
+|------|-------|------------|--------|
+| **Vano** | Project Lead & Full Stack Developer | Merancang dan membangun seluruh aplikasi, basis data, dan alur pengujian | [@VanoStudio](https://github.com/VanoStudio) |
+| **Husein** | Riset Lapangan | Turun langsung mensurvei lokasi, mengambil foto dan mengisi data aksesibilitas sungguhan | — |
+| **Dakara** | Peneliti Kriteria Aksesibilitas | Menyusun kriteria penilaian dan bahan rujukan regulasi tentang aksesibilitas | — |
 
 ---
 
@@ -66,7 +68,7 @@ landai adalah peta interaktif berbasis kontribusi warga. Siapa saja bisa menanda
 | Fitur | Deskripsi | Keunggulan |
 |----------|--------------|---------------|
 | **Peta interaktif dengan skor aksesibilitas** | Setiap lokasi ditandai warna hijau, amber, atau merah sesuai skor, dan bentuk terisi atau berongga sesuai status verifikasi | Warna dan bentuk dipakai bersamaan, sehingga tetap terbaca oleh mata yang tidak membedakan warna |
-| **Formulir kontribusi empat langkah** | Menandai titik lewat GPS perangkat atau geser manual, mengisi identitas tempat, delapan daftar periksa fasilitas, dan foto wajib dari kamera langsung | Foto tidak bisa diambil dari galeri, mencegah data yang tidak diverifikasi di lapangan |
+| **Formulir kontribusi empat langkah** | Menandai titik lewat GPS perangkat atau geser manual, mengisi identitas tempat dari sembilan jenis umum, delapan daftar periksa fasilitas, dan foto wajib dari kamera langsung | Foto tidak bisa diambil dari galeri, mencegah data yang tidak diverifikasi di lapangan |
 | **Verifikasi komunitas otomatis** | Status lokasi naik menjadi terverifikasi setelah tiga warga berbeda mengonfirmasi, dan turun kembali kalau ada laporan sudah berubah | Kepercayaan data ditentukan komunitas, bukan satu admin, dan tetap bisa diperbarui seiring waktu |
 | **Penyaringan berdasarkan kebutuhan** | Filter terpisah untuk kebutuhan kursi roda, tunanetra, dan lansia atau stroller, bisa digabung sekaligus | Setiap filter dihitung dari kombinasi fasilitas yang relevan, bukan sekadar kategori umum |
 
@@ -76,6 +78,10 @@ landai adalah peta interaktif berbasis kontribusi warga. Siapa saja bisa menanda
 - **Pembaruan terbuka** - Siapa pun yang masuk bisa membantu memperbarui daftar periksa dan foto sebuah lokasi, tercatat siapa pengubahnya, sementara nama, kategori, dan koordinat tetap hanya bisa diubah pemilik asli.
 - **Deteksi kemungkinan duplikat** - Memperingatkan kontributor kalau lokasi serupa sudah ada di dekatnya sebelum menyimpan data baru.
 - **Buka rute ke Google Maps** - Menyerahkan navigasi ke Google Maps lewat satu tautan, karena landai fokus pada data aksesibilitas, bukan membangun ulang sistem navigasi.
+- **Tambah foto langsung dari halaman lokasi** - Foto paling sering ditambahkan belakangan oleh orang yang kebetulan lewat, jadi tidak perlu membuka formulir empat langkah hanya untuk menambah satu foto.
+- **Pratinjau foto ukuran penuh** - Foto di kisi dipangkas jadi kotak, padahal yang terpangkas sering justru ujung ramp atau tepi trotoar. Ketuk untuk membukanya utuh, lengkap dengan perpindahan antar foto dan geser jari.
+- **Tanda landai menempel pada foto** - Ditanam ke berkasnya saat diunggah, bukan ditumpuk lewat CSS, sehingga asal fotonya tetap terbaca kalau beredar lepas dari peta.
+- **Peringatan isi kasar** - Nama tempat dan catatan lapangan diperiksa terhadap daftar kata lokal di peramban, tanpa API luar. Menegur sekali lalu mempersilakan, karena penyaring kata mana pun bisa salah menuduh nama tempat yang sah.
 - **Masuk dengan Google** - Alternatif pendaftaran cepat selain email dan kata sandi.
 
 ---
@@ -100,14 +106,10 @@ landai adalah peta interaktif berbasis kontribusi warga. Siapa saja bisa menanda
 </div>
 
 > **Catatan tangkapan layar.** Ketiganya diambil dari tautan hosting yang sedang
-> berjalan, bukan dari mockup, tetapi memakai data yang ada saat ini: tiga lokasi
-> contoh beserta beberapa lokasi kiriman awal. **Tangkapan ini belum final dan harus
-> diambil ulang setelah data survei lapangan sungguhan masuk**, supaya yang terlihat
-> adalah kondisi aksesibilitas yang benar-benar disurvei di tempat.
-
-### Video Demo
-
-📹 **[ISI: opsional, link video demo kalau sempat dibuat]**
+> berjalan, bukan dari mockup, dan memakai data survei lapangan sungguhan di koridor
+> Pejaten sampai Warung Buncit, Jakarta Selatan. Data contoh sudah dihapus seluruhnya
+> dari basis data produksi, jadi yang terlihat pada peta adalah kondisi aksesibilitas
+> yang benar-benar didatangi dan difoto di tempat.
 
 ---
 
@@ -312,6 +314,6 @@ Proyek ini dilisensikan di bawah [MIT License](LICENSE) - lihat file LICENSE unt
 
 <div align="center">
 
-  **Dibuat oleh Vano, Husein, dan Dakara untuk ITECHNO CUP 2026**
+  **Made with ❤️ by Tim Risol Laut for ITECHNO CUP 2026**
 
 </div>
