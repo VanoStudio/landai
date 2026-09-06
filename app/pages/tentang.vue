@@ -61,7 +61,8 @@ useHead({ title: 'Tentang' })
         </li>
         <li>
           <span class="font-medium">Memotret kondisinya.</span>
-          Foto diambil langsung lewat kamera perangkat, bukan dipilih dari galeri.
+          Di ponsel, tombol fotonya membuka kamera belakang langsung, jadi kondisi tempat
+          terekam apa adanya saat Anda berada di sana.
         </li>
       </ol>
 

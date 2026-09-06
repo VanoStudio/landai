@@ -105,8 +105,8 @@ async function pilihBerkas(e: Event) {
     </svg>
     {{ mengunggah ? kemajuan : 'Tambah foto' }}
 
-    <!-- capture environment membuka kamera belakang langsung di ponsel, karena foto di sini
-         memang harus diambil di lokasinya, bukan diambil dari galeri. -->
+    <!-- capture environment membuka kamera belakang langsung di ponsel. Di desktop atribut
+         ini diabaikan peramban dan yang terbuka tetap pemilih berkas biasa. -->
     <input
       ref="input" type="file" accept="image/*" capture="environment" multiple
       class="sr-only" :disabled="mengunggah"

@@ -61,10 +61,8 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <!-- Latarnya nyaris pekat dan diburamkan. Pada 92 persen, tulisan halaman di -->
-       belakang masih terbaca menembus lapisan ini, dan mata ikut membacanya alih-alih
-       memperhatikan fotonya. Foto di sini bukti kondisi lapangan, jadi ia harus
-       berdiri sendiri. -->
+  <!-- Latar nyaris pekat dan diburamkan: pada opasitas lebih rendah, tulisan halaman
+       di belakang masih terbaca dan ikut menarik mata dari fotonya. -->
   <div
     role="dialog" aria-modal="true" :aria-label="`Foto ${namaLokasi}`"
     class="fixed inset-0 z-50 flex flex-col bg-black/96 backdrop-blur-sm"
@@ -94,10 +92,9 @@ onBeforeUnmount(() => {
     </div>
 
     <div class="relative flex min-h-0 flex-1 items-center justify-center px-2 pb-4" @click.self="emit('tutup')">
-      <!-- Ukuran gambar dibiarkan mengikuti rasio aslinya, bukan dipaksa memenuhi -->
-           kotak lalu disisipi object-contain. Dengan object-contain, kotak elemennya
-           tetap selebar wadah sementara gambarnya menyusut di tengah, dan tanda yang
-           ditempel di sudut kotak melayang di bidang hitam di samping fotonya. -->
+      <!-- Ukuran gambar mengikuti rasio aslinya. Dengan object-contain, kotak elemennya
+           tetap selebar wadah sementara gambarnya menyusut di tengah, dan tanda di sudut
+           kotak akan melayang di bidang hitam di samping fotonya. -->
       <div v-if="sekarang" :key="sekarang.id" class="relative">
         <img
           :src="sekarang.photo_url"

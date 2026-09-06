@@ -2,8 +2,16 @@
 // Sekaligus mengambil tangkapan layar keadaan sudah masuk untuk laporan.
 
 import { chromium } from 'playwright'
+import { existsSync, readFileSync } from 'node:fs'
 import { mkdir, writeFile } from 'node:fs/promises'
-import { join } from 'node:path'
+import { join, resolve } from 'node:path'
+
+const BERKAS_ENV = ['.env', '../.env'].map(x => resolve(x)).find(existsSync)
+const env = BERKAS_ENV
+  ? Object.fromEntries(readFileSync(BERKAS_ENV, 'utf8')
+      .split(String.fromCharCode(10)).map(x => x.trim()).filter(x => x.includes('='))
+      .map((x) => { const i = x.indexOf('='); return [x.slice(0, i).trim(), x.slice(i + 1).trim()] }))
+  : {}
 
 const BASIS = 'http://localhost:3000'
 const KELUARAN = join(process.cwd(), 'gambar')
@@ -12,8 +20,8 @@ const KELUARAN = join(process.cwd(), 'gambar')
 // masuk sebagai kontributor. Isi lewat .env atau di depan perintahnya:
 //   AKUN_UJI_EMAIL=... AKUN_UJI_SANDI=... node docs/uji-menyeluruh.mjs
 const AKUN = {
-  email: process.env.AKUN_UJI_EMAIL,
-  sandi: process.env.AKUN_UJI_SANDI,
+  email: process.env.AKUN_UJI_EMAIL || env.AKUN_UJI_EMAIL,
+  sandi: process.env.AKUN_UJI_SANDI || env.AKUN_UJI_SANDI,
 }
 
 if (!AKUN.email || !AKUN.sandi) {
@@ -233,6 +241,30 @@ const adaMasuk = await page.evaluate(() =>
 catat('Keluar mengembalikan ke mode lihat', adaMasuk)
 
 await browser.close()
+
+// Lokasi yang dibuat pengujian ini dihapus lagi. Tanpa ini, tiap kali dijalankan ia
+// meninggalkan satu lokasi uji di peta yang dilihat orang.
+if (idBaru && env.SUPABASE_URL) {
+  const sesi = await (await fetch(`${env.SUPABASE_URL}/auth/v1/token?grant_type=password`, {
+    method: 'POST',
+    headers: { apikey: env.SUPABASE_KEY, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: AKUN.email, password: AKUN.sandi }),
+  })).json()
+
+  const auth = { apikey: env.SUPABASE_KEY, Authorization: `Bearer ${sesi.access_token}` }
+  const foto = await (await fetch(
+    `${env.SUPABASE_URL}/rest/v1/location_photos?select=photo_url&location_id=eq.${idBaru}`,
+    { headers: auth })).json()
+
+  for (const f of foto) {
+    const jalur = f.photo_url.split('/location-photos/')[1]
+    await fetch(`${env.SUPABASE_URL}/storage/v1/object/location-photos/${jalur}`,
+      { method: 'DELETE', headers: auth })
+  }
+  const r = await fetch(`${env.SUPABASE_URL}/rest/v1/locations?id=eq.${idBaru}`,
+    { method: 'DELETE', headers: auth })
+  catat('Lokasi uji dihapus kembali dari basis data', r.ok, `HTTP ${r.status}`)
+}
 
 console.log('')
 const gagal = langkah.filter(l => !l.lolos)

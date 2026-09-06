@@ -51,7 +51,7 @@ Berdasarkan data Badan Pusat Statistik tahun 2024, lebih dari 17,8 juta jiwa pen
 
 ### Solusi yang Ditawarkan
 
-landai adalah peta interaktif berbasis kontribusi warga. Siapa saja bisa menandai sebuah lokasi, mengisi daftar periksa delapan fasilitas aksesibilitas, dan mengunggah foto langsung dari kamera. Sistem menghitung skor aksesibilitas secara otomatis dari data yang diisi, menampilkannya sebagai penanda berwarna di peta, dan menjaga kepercayaan data lewat konfirmasi berulang dari warga lain, bukan lewat tim verifikasi tertutup.
+landai adalah peta interaktif berbasis kontribusi warga. Siapa saja bisa menandai sebuah lokasi, mengisi daftar periksa delapan fasilitas aksesibilitas, dan mengunggah foto kondisinya. Sistem menghitung skor aksesibilitas secara otomatis dari data yang diisi, menampilkannya sebagai penanda berwarna di peta, dan menjaga kepercayaan data lewat konfirmasi berulang dari warga lain, bukan lewat tim verifikasi tertutup.
 
 ### Tujuan Proyek
 
@@ -68,20 +68,20 @@ landai adalah peta interaktif berbasis kontribusi warga. Siapa saja bisa menanda
 | Fitur | Deskripsi | Keunggulan |
 |----------|--------------|---------------|
 | **Peta interaktif dengan skor aksesibilitas** | Setiap lokasi ditandai warna hijau, amber, atau merah sesuai skor, dan bentuk terisi atau berongga sesuai status verifikasi | Warna dan bentuk dipakai bersamaan, sehingga tetap terbaca oleh mata yang tidak membedakan warna |
-| **Formulir kontribusi empat langkah** | Menandai titik lewat GPS perangkat atau geser manual, mengisi identitas tempat dari sembilan jenis umum, delapan daftar periksa fasilitas, dan foto wajib dari kamera langsung | Foto tidak bisa diambil dari galeri, mencegah data yang tidak diverifikasi di lapangan |
+| **Formulir kontribusi empat langkah** | Menandai titik lewat GPS perangkat atau geser manual, mengisi identitas tempat dari sembilan jenis umum, delapan daftar periksa fasilitas, dan foto wajib | Di ponsel, tombol foto membuka kamera belakang langsung, sehingga kondisi tempat terekam saat kontributor berada di lokasi |
 | **Verifikasi komunitas otomatis** | Status lokasi naik menjadi terverifikasi setelah tiga warga berbeda mengonfirmasi, dan turun kembali kalau ada laporan sudah berubah | Kepercayaan data ditentukan komunitas, bukan satu admin, dan tetap bisa diperbarui seiring waktu |
 | **Penyaringan berdasarkan kebutuhan** | Filter terpisah untuk kebutuhan kursi roda, tunanetra, dan lansia atau stroller, bisa digabung sekaligus | Setiap filter dihitung dari kombinasi fasilitas yang relevan, bukan sekadar kategori umum |
 
 ### Fitur Tambahan
 
-- **Papan kontributor** - Menampilkan warga paling aktif menambahkan lokasi, sebagai bentuk pengakuan komunitas.
-- **Pembaruan terbuka** - Siapa pun yang masuk bisa membantu memperbarui daftar periksa dan foto sebuah lokasi, tercatat siapa pengubahnya, sementara nama, kategori, dan koordinat tetap hanya bisa diubah pemilik asli.
-- **Deteksi kemungkinan duplikat** - Memperingatkan kontributor kalau lokasi serupa sudah ada di dekatnya sebelum menyimpan data baru.
-- **Buka rute ke Google Maps** - Menyerahkan navigasi ke Google Maps lewat satu tautan, karena landai fokus pada data aksesibilitas, bukan membangun ulang sistem navigasi.
-- **Tambah foto langsung dari halaman lokasi** - Foto paling sering ditambahkan belakangan oleh orang yang kebetulan lewat, jadi tidak perlu membuka formulir empat langkah hanya untuk menambah satu foto.
-- **Pratinjau foto ukuran penuh** - Foto di kisi dipangkas jadi kotak, padahal yang terpangkas sering justru ujung ramp atau tepi trotoar. Ketuk untuk membukanya utuh, lengkap dengan perpindahan antar foto dan geser jari.
-- **Tanda landai menempel pada foto** - Ditanam ke berkasnya saat diunggah, bukan ditumpuk lewat CSS, sehingga asal fotonya tetap terbaca kalau beredar lepas dari peta.
-- **Peringatan isi kasar** - Nama tempat dan catatan lapangan diperiksa terhadap daftar kata lokal di peramban, tanpa API luar. Menegur sekali lalu mempersilakan, karena penyaring kata mana pun bisa salah menuduh nama tempat yang sah.
+- **Papan kontributor** - Menampilkan warga yang paling banyak menambahkan lokasi, sebagai bentuk pengakuan atas kontribusi mereka.
+- **Pembaruan terbuka** - Siapa pun yang masuk bisa memperbarui daftar periksa dan foto sebuah lokasi kalau kondisinya berubah, dan nama pengubahnya tercatat. Nama, kategori, dan koordinat tetap hanya bisa diubah pemilik asli.
+- **Deteksi kemungkinan duplikat** - Memberi tahu kontributor kalau ada lokasi serupa di dekat titik yang sedang diisi, sebelum data baru tersimpan.
+- **Tambah foto langsung dari halaman lokasi** - Menambah foto ke lokasi yang sudah ada cukup satu ketukan dari halaman lokasi, tanpa mengisi ulang formulir empat langkah.
+- **Pratinjau foto ukuran penuh** - Ketuk foto untuk membukanya utuh tanpa terpangkas, lalu berpindah antar foto dengan geser jari, tombol panah, atau tombol panah papan ketik.
+- **Tanda landai pada setiap foto** - Tanda ditanam ke berkas gambarnya saat diunggah, jadi asal foto tetap terbaca ketika fotonya dibagikan ulang di luar peta.
+- **Peringatan isi kasar** - Nama tempat dan catatan lapangan diperiksa di peramban terhadap daftar kata kasar berbahasa Indonesia. Peringatan muncul sekali, dan kontributor tetap bisa melanjutkan kalau kata itu memang bagian dari nama tempat yang sah.
+- **Buka rute ke Google Maps** - Satu tautan dari halaman lokasi membuka rute ke tempat tersebut di Google Maps.
 - **Masuk dengan Google** - Alternatif pendaftaran cepat selain email dan kata sandi.
 
 ---
@@ -266,7 +266,7 @@ npm run preview   # menjalankan hasil build secara lokal
 
 1. Daftar atau masuk, bisa lewat email atau akun Google.
 2. Tekan tombol tambah lokasi, tentukan titik lewat GPS atau geser manual di peta.
-3. Isi nama, jenis tempat, delapan daftar periksa fasilitas, dan ambil foto langsung dari kamera.
+3. Isi nama, jenis tempat, delapan daftar periksa fasilitas, dan unggah foto kondisi tempatnya.
 4. Simpan, lokasi langsung tampil di peta dengan status belum terverifikasi sampai dikonfirmasi warga lain.
 5. Kontributor lain yang pernah ke lokasi yang sama bisa membantu memperbarui daftar periksa atau menambahkan foto, dan menekan tombol konfirmasi akurasi.
 
